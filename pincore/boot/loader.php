@@ -12,6 +12,7 @@
 
 namespace pinoox\boot;
 
+
 define('PINOOX_CORE_PATH', PINOOX_PATH . 'pincore' . DIRECTORY_SEPARATOR);
 define('PINOOX_BOOT_PATH', PINOOX_CORE_PATH . 'boot' . DIRECTORY_SEPARATOR);
 define('PINOOX_MODEL_PATH', PINOOX_CORE_PATH . 'model' . DIRECTORY_SEPARATOR);

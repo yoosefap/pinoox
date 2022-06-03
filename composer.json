@@ -7,10 +7,6 @@
         {
             "name": "Pinoox",
             "email": "info@pinoox.com"
-        }, 
-        {
-            "name": "Erfan Ebrahimi",
-            "email": "me@erfanebrahimi.com"
         }
     ],
     "minimum-stability": "dev",
@@ -19,9 +15,6 @@
         "vladimmi/construct-static": "dev-master@dev"
 	},
     "autoload": {
-        "files" : [
-            "pincore/boot/functions.php"
-        ],
         "psr-4": {
             "pinoox\\": "pincore/",
             "pinoox\\app\\": "apps/"
