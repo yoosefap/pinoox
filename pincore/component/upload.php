@@ -989,7 +989,7 @@ class Upload
 
     // get file name if convert active
 
-    protected function isImg($type, $img_types = ["png", "jpg", "jpeg", "gif"])
+    protected function isImg($type, $img_types = ["webp","png", "jpg", "jpeg", "gif"])
     {
         if (in_array($type, $img_types)) return true;
         return false;

@@ -273,6 +273,8 @@ class ImageProcess
             $src_img = @imagecreatefromjpeg($img);
         } elseif (strpos($ext, 'png') !== false) {
             $src_img = @imagecreatefrompng($img);
+        }elseif (strpos($ext, 'webp') !== false) {
+            $src_img = @imagecreatefromwebp($img);
         } elseif (strpos($ext, 'gif') !== false) {
             return;
             $src_img = @imagecreatefromgif($img);
@@ -302,6 +304,8 @@ class ImageProcess
                 @imagejpeg($src_img, $img);
             } elseif (strpos($ext, 'png') !== false) {
                 @imagepng($src_img, $img);
+            }elseif (strpos($ext, 'webp') !== false) {
+                @imagewebp($src_img, $img);
             } elseif (strpos($ext, 'gif') !== false) {
                 @imagegif($src_img, $img);
             } elseif (strpos($ext, 'bmp') !== false) {
@@ -402,6 +406,9 @@ class ImageProcess
         switch ($convert_type) {
             case 'png':
                 $return = @imagepng($getImage, $img_save);
+                break;
+            case 'webp':
+                $return = @imagewebp($getImage, $img_save);
                 break;
             case 'jpg':
                 $return = @imagejpeg($getImage, $img_save);

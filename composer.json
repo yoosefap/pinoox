@@ -12,7 +12,9 @@
     "minimum-stability": "dev",
     "require": {
 		"php": "^7.3|^8.0",
-        "vladimmi/construct-static": "dev-master@dev"
+        "vladimmi/construct-static": "dev-master@dev",
+        "symfony/var-dumper": "5.4.x-dev",
+        "symfony/error-handler": "5.4.x-dev"
 	},
     "autoload": {
         "psr-4": {

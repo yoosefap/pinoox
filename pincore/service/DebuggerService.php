@@ -11,25 +11,20 @@
  */
 namespace pinoox\service;
 
-use pinoox\component\app\AppFinder;
 use pinoox\component\interfaces\ServiceInterface;
-use pinoox\component\Router;
-use pinoox\component\Url;
+use Symfony\Component\ErrorHandler\Debug;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-class RouterService implements ServiceInterface
+class DebuggerService implements ServiceInterface
 {
 
     public function _run()
     {
-        if ( ! is_null(Url::request())){
-            AppFinder::current();
-          //  Router::start();
-          //  Router::call();
-        }
+        Debug::enable();
+        DebugClassLoader::enable();
     }
 
     public function _stop()
     {
     }
 }
-

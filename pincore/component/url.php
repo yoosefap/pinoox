@@ -27,9 +27,10 @@ class Url
         return $q;
     }
 
-    public static function parts($index = null)
+    public static function parts($index = null,$isActiveApp = true)
     {
-        $parts = substr(self::current(), strripos(self::app() . '/', '/'));
+        $parts = substr(self::current(), strripos(self::app($isActiveApp) . '/', '/'));
+
         if (!is_null($index)) {
 
             $partsArr = explode('/', $parts);
@@ -53,23 +54,24 @@ class Url
 
     public static function protocol()
     {
-        return self::isHttps()? 'https' : 'http';
+        return self::isHttps() ? 'https' : 'http';
     }
 
     public static function domain()
     {
-        return isset($_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : null;
+        return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
     }
 
     public static function request()
     {
-        return isset($_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : null;
+        return isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : null;
     }
 
-    public static function app()
+    public static function app($isActiveApp = true)
     {
         $appUrl = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
-        if (!Router::isAppDefault()) $appUrl .= self::appKey() . '/';
+
+        if ($isActiveApp && !Router::isAppDefault() && !empty(self::appKey())) $appUrl .= self::appKey() . '/';
 
         return self::fullDomain() . $appUrl;
     }
@@ -178,6 +180,16 @@ class Url
             $img = HelperString::firstDelete($img, self::link('~'));
         $path = Dir::thumb($img, $thumbSize, null, $path, $isCreateThumb, $isCheck);
         return (!empty($path)) ? self::link('~' . $path) : $defaultImage;
+    }
+
+    public static function urlParams()
+    {
+        $url = Url::site();
+        $url = substr(Url::current(), strlen($url));
+
+        if (strstr($url, '?')) $url = substr($url, 0, strpos($url, '?'));
+        $url = trim($url, '/');
+        return $url;
     }
 
 }
