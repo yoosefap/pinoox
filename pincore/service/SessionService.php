@@ -15,7 +15,7 @@ namespace pinoox\service;
 use pinoox\component\Config;
 use pinoox\component\interfaces\ServiceInterface;
 use pinoox\component\Session;
-use pinoox\model\PinooxDatabase;
+use pinoox\model\PincoreModel;
 
 class SessionService implements ServiceInterface
 {
@@ -23,7 +23,7 @@ class SessionService implements ServiceInterface
     public function _run()
     {
         $dbConfig = Config::get('~database');
-        if (empty($dbConfig) || isset($dbConfig['isLock']) || !PinooxDatabase::$db->tableExists('session'))
+        if (empty($dbConfig) || isset($dbConfig['isLock']) || !PincoreModel::$db->tableExists('session'))
             $store_in_file = true;
         else
             $store_in_file = false;

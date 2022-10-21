@@ -12,12 +12,13 @@
 
 namespace pinoox\model;
 
+use Illuminate\Database\Eloquent\Model;
 use pinoox\component\Date;
 use pinoox\component\HelperHeader;
 use pinoox\component\HelperString;
 use pinoox\component\Token;
 
-class TokenModel extends PinooxDatabase
+class TokenModel extends Model
 {
 
     public static function fetch_by_key($token_key)

@@ -20,7 +20,7 @@ use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\interfaces\ServiceInterface;
 use pinoox\component\User;
-use pinoox\model\PinooxDatabase;
+use pinoox\model\PincoreModel;
 use pinoox\model\UserModel;
 
 class UpdateService implements ServiceInterface
@@ -58,13 +58,13 @@ class UpdateService implements ServiceInterface
             $query = str_replace('{dbprefix}', $prefix . $package_name . '_', $query);
             $queryArr = explode(';', $query);
 
-            PinooxDatabase::$db->startTransaction();
+            PincoreModel::$db->startTransaction();
             foreach ($queryArr as $q) {
                 if (empty($q)) continue;
-                PinooxDatabase::$db->mysqli()->query($q);
+                PincoreModel::$db->mysqli()->query($q);
             }
 
-            PinooxDatabase::$db->commit();
+            PincoreModel::$db->commit();
 
             File::remove_file($appDB);
 

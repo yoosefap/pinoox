@@ -12,9 +12,9 @@
 
 namespace pinoox\app\com_pinoox_manager\model;
 
-use pinoox\model\PinooxDatabase;
+use pinoox\model\PincoreModel;
 
-class LangModel extends PinooxDatabase
+class LangModel extends PincoreModel
 {
 
     public static function fetch_all()

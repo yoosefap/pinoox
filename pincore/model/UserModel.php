@@ -12,11 +12,12 @@
 
 namespace pinoox\model;
 
+use Illuminate\Database\Eloquent\Model;
 use pinoox\component\User;
 use pinoox\component\Date;
 use pinoox\component\Security;
 
-class UserModel extends PinooxDatabase
+class UserModel extends Model
 {
 
     const active = "active";

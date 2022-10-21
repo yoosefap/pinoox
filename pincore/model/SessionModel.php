@@ -11,11 +11,12 @@
  */
 namespace pinoox\model;
 
+use Illuminate\Database\Eloquent\Model;
 use pinoox\component\Date;
 use pinoox\component\HelperHeader;
 use pinoox\component\Session;
 
-class SessionModel extends PinooxDatabase
+class SessionModel extends Model
 {
     public static function fetch_by_id($session_id, $lifetime = 0, $security_token = null)
     {

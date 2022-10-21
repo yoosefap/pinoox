@@ -25,7 +25,7 @@ use pinoox\component\Response;
 use pinoox\component\Service;
 use pinoox\component\System;
 use pinoox\component\Validation;
-use pinoox\model\PinooxDatabase;
+use pinoox\model\PincoreModel;
 use pinoox\model\UserModel;
 
 class MainController extends MasterConfiguration
@@ -153,15 +153,15 @@ class MainController extends MasterConfiguration
         $query = str_replace('{dbprefix}', $c['prefix'], $query);
         $queryArr = explode(';', $query);
 
-        PinooxDatabase::__constructStatic();
-        PinooxDatabase::startTransaction();
+        PincoreModel::__constructStatic();
+        PincoreModel::startTransaction();
         foreach ($queryArr as $q) {
             if (empty($q)) continue;
-            PinooxDatabase::$db->mysqli()->query($q);
+            PincoreModel::$db->mysqli()->query($q);
         }
         $user['app'] = 'com_pinoox_manager';
         UserModel::insert($user);
-        PinooxDatabase::commit();
+        PincoreModel::commit();
         Config::save('~database');
         return true;
     }

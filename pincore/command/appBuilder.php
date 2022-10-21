@@ -355,7 +355,6 @@ class appBuilder extends console implements CommandInterface
         return (bool)preg_match('#^' . $pattern . '\z#i', $currentPath);
     }
 
-
     private function Zip($source, $destination)
     {
         $zip = new \ZipArchive();

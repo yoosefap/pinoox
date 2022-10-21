@@ -28,9 +28,6 @@ use pinoox\component\Service;
 
 class Loader
 {
-    private static $className;
-    private static $fullClassName;
-    private static $arrayCurrentClass = array();
     private static $listAllClass = array();
 
     public static function boot()

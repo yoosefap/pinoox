@@ -9,16 +9,23 @@
  * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
-namespace pinoox\component\source;
 
-use pinoox\component\DB;
+namespace pinoox\component\migration;
 
-abstract class Database
+use Illuminate\Database\Migrations\Migration;
+use pinoox\storage\Database;
+
+class MigrationBase extends Migration
 {
-    /**
-     * Store an object of DB component
-     *
-     * @var DB;
-     */
-    public static $db;
+
+    protected $db = null;
+    protected $schema = null;
+
+    public function __construct()
+    {
+        $this->db = new Database();
+        $this->schema = $this->db->getSchema();
+    }
+
+
 }

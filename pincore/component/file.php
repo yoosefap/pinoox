@@ -672,7 +672,7 @@ class File
         $get_files = scandir($directory);
         $get_files = array_filter($get_files);
         $get_files = array_diff($get_files, array(".", ".."));
-
+ 
         foreach ($get_files as $get_file) {
             $file = $directory . $get_file;
             $ext = self::extension($file);
@@ -684,7 +684,6 @@ class File
                     if (!self::in_extension($file, $exts)) $check_ext = false;
                 }
             }
-
             if (empty($no_file) || !in_array($file, $no_file)) {
                 if ($check_ext) {
                     if (is_file($file)) {

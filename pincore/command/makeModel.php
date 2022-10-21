@@ -86,7 +86,7 @@ class makeModel extends console implements CommandInterface
             $this->extend = end($extend);
             $this->use = implode('\\' , $extend);
         } elseif ( $extend == 'PinooxDatabase' ){
-            $this->use = 'pinoox\model\PinooxDatabase';
+            $this->use = 'pinoox\model\PincoreModel';
             $this->extend = 'PinooxDatabase';
         } elseif ( $this->option('extends') == null ){
             $this->use = null;

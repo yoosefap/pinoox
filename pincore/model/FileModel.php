@@ -11,11 +11,12 @@
  */
 namespace pinoox\model;
 
+use Illuminate\Database\Eloquent\Model;
 use pinoox\component\Date;
 use pinoox\component\HelperString;
 use pinoox\component\Router;
 
-class FileModel extends PinooxDatabase
+class FileModel extends Model
 {
     public static function fetch_by_id($file_id)
     {
