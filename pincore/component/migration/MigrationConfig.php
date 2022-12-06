@@ -1,7 +1,5 @@
 <?php
 
-use pinoox\component\Config;
-
 /**
  *      ****  *  *     *  ****  ****  *    *
  *      *  *  *  * *   *  *  *  *  *   *  *
@@ -15,11 +13,13 @@ use pinoox\component\Config;
 
 namespace pinoox\component\migration;
 
+use pinoox\component\Config;
+
 class MigrationConfig
 {
     private $errors = null;
     public $app_path = null;
-    public $sub_path = null;
+    public $folders = null;
     public $migration_path = null;
     public $namespace = null;
     public $package = null;
@@ -51,15 +51,17 @@ class MigrationConfig
         $this->errors[] = $err;
     }
 
-
     public function load()
     {
-        $this->sub_path = self::DS . 'database' . self::DS . 'migrations' . self::DS;
-        $this->migration_path = $this->app_path . $this->sub_path;
+        $this->folders = self::DS . 'database' . self::DS . 'migrations' . self::DS;
+        $this->migration_path = $this->app_path . $this->folders;
 
-        // set namespace
-        $this->namespace = 'pinoox' . self::DS . 'app' . self::DS . $this->package . $this->sub_path;
-
+        //namespace
+        if ($this->package=='pincore'){
+            $this->namespace = 'pinoox'. $this->folders;
+        }else{
+            $this->namespace = 'pinoox' . self::DS . 'app' . self::DS . $this->package . $this->folders;
+        }
         $this->config = $this->getConfig();
     }
 
