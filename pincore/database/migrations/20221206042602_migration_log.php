@@ -13,7 +13,7 @@
 namespace pinoox\database\migrations;
 
 use Illuminate\Database\Schema\Blueprint;
-use pinoox\component\MigrationBase;
+use pinoox\component\migration\MigrationBase;
 
 class MigrationLog extends MigrationBase
 {
@@ -23,7 +23,8 @@ class MigrationLog extends MigrationBase
             // Auto-increment id
             $table->increments('log_id');
             $table->dateTime('version');
-            $table->string('name');
+            $table->string('app');
+            $table->string('migration_name');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             // Required for Eloquent's created_at and updated_at columns
@@ -34,6 +35,8 @@ class MigrationLog extends MigrationBase
 
     public function down()
     {
-        $this->schema->drop('migration_log');
+        if ($this->schema->hasTable('migration_log')){
+            $this->schema->drop('migration_log');
+        }
     }
 }
