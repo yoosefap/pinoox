@@ -4,7 +4,6 @@ namespace pinoox\storage;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Events\Dispatcher;
 use pinoox\component\Config;
 
@@ -25,8 +24,10 @@ class Database
 
     public function __construct()
     {
-        $this->capsule = new Capsule;
         $config = Config::get('~database.development');
+
+        $this->capsule = new Capsule;
+
         $this->capsule->addConnection($config);
         
         // Set the event dispatcher used by Eloquent models... (optional)
