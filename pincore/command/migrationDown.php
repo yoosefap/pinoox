@@ -9,7 +9,7 @@ use pinoox\component\migration\MigrationConfig;
 use pinoox\component\migration\MigrationToolkit;
 
 
-class migrationUp extends console implements CommandInterface
+class migrationDown extends console implements CommandInterface
 {
 
     /**
@@ -17,14 +17,14 @@ class migrationUp extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "db:migrate";
+    protected $signature = "db:rollback";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Migrate the database migrations";
+    protected $description = "Rollback the database migrations";
 
     /**
      * The console command Arguments.
@@ -65,7 +65,7 @@ class migrationUp extends console implements CommandInterface
     public function handle()
     {
         $this->init();
-        $this->run_up();
+        $this->reverse_down();
     }
 
     private function init()
@@ -88,37 +88,23 @@ class migrationUp extends console implements CommandInterface
         $this->schema = $this->toolkit->getSchema();
     }
 
-    private function run_up()
+    private function reverse_down()
     {
-        $migrations = $this->toolkit->getMigrations();
-
-        if (empty($migrations)) {
-            $this->error('There are no migrations!');
-            $this->newLine();
-        }
-        $this->success('start migrating...');
+        $this->success('start rolling back...');
         $this->newLine();
+        $migrations = $this->toolkit->getMigrations();
         foreach ($migrations as $m) {
-            //check if already exists
-            if ($this->schema->hasTable($m['tableName'])) {
-                $this->warning('Table: "' . $m['tableName'] . '" already exists');
-                $this->gray('  File: "' . $m['fileName'] . '.php"');
-                $this->newLine();
-                continue;
-            }
 
-            $this->success('Table: "' . $m['tableName'] . '" migrated');
-            $this->gray('  File: "' . $m['fileName'] . '.php"');
+            $this->success('Table: "' . $m['tableName'] . '" rollback');
+            $this->gray('  File: "' . $m['fileName'] . '"');
             $this->newLine();
             $obj = new $m['classObject']();
-            $obj->up();
-
-
+            $obj->down();
         }
 
         if ($this->toolkit->isSuccess()) {
             $this->newLine();
-            $this->success('migration done!');
+            $this->success('rollback done!');
         }
     }
 

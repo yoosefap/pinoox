@@ -3,7 +3,6 @@
 namespace pinoox\command;
 
 
-use pinoox\component\Config;
 use pinoox\component\console;
 use pinoox\component\File;
 use pinoox\component\HelperString;
@@ -12,7 +11,7 @@ use pinoox\component\migration\MigrationConfig;
 use pinoox\component\migration\MigrationToolkit;
 
 
-class createMigration extends console implements CommandInterface
+class migrationCreate extends console implements CommandInterface
 {
 
     /**
