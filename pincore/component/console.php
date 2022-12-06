@@ -46,6 +46,7 @@ class console
         'blue' => '44', 'magenta' => '45',
         'cyan' => '46', 'light_gray' => '47',
     );
+    protected $cli;
 
 
     /**
@@ -530,7 +531,6 @@ class console
         echo self::$isHtml ? "" : ("\x1b[2J");
     }
 
-
     protected static function getColumnWidth($commands)
     {
         $widths = [];
@@ -600,7 +600,6 @@ class console
                 self::findCommand();
         }
     }
-
 
     protected static function getListCommand($needCommand = null, &$commandSignatures = null)
     {
@@ -738,7 +737,6 @@ class console
         return $result;
     }
 
-
     // Returns colored string
     protected static function getColoredString($string, $foreground_color = null, $background_color = null)
     {
@@ -769,15 +767,30 @@ class console
         return $colored_string;
     }
 
-    protected function chooseApp()
+    protected function chooseApp($packageOpt = null)
+    {
+        $this->cli = config('~cli');
+        if (empty($packageOpt) && isset($this->cli['package'])) {
+            $this->success('Using cli config ');
+            $this->gray('`' . $this->cli['package'] . '`');
+            $this->newLine();
+        } else if (empty($packageOpt) || $packageOpt != 'pincore') {
+            $this->cli = $this->chooseFromApps($packageOpt);
+        } else {
+            $this->cli['path'] = Dir::path('~pincore');
+            $this->cli['package'] = 'pincore';
+        }
+    }
+
+    protected function chooseFromApps($packageOpt = null)
     {
         try {
-            $package = $this->argument('package');
+            $package = !empty($packageOpt) ? $packageOpt : $this->argument('package');
             if ($package == null) {
                 $apps = AppModel::fetch_all(null, true);
                 $apps = array_keys($apps);
                 $appId = $this->choice('Please select package you want...', $apps);
-                $package = isset($apps[$appId]) ? $apps[$appId] : null;
+                $package = $apps[$appId] ?? null;
                 if ($package == null) {
                     $this->error('Can not find selected package!');
                 }
@@ -786,7 +799,7 @@ class console
             if (is_null($app)) $this->error(sprintf('Can not find app with name `%s`!', $package));
 
             $app_path = Dir::path('~apps/' . $package);
-            return [$app_path, $package];
+            return ['path' => $app_path, 'package' => $package];
         } catch (\Exception $exception) {
             $this->danger('Something went wrong!');
             $this->newLine();
@@ -797,4 +810,5 @@ class console
             $this->error('Some error happened!');
         }
     }
+
 }
