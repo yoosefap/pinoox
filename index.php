@@ -16,8 +16,6 @@
 |
 */
 
-$composer = require __DIR__.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+$composer = require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 $loader = new ConstructStatic\Loader($composer);
-
-#boot pinoox
-include_once  dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pincore' . DIRECTORY_SEPARATOR . "boot" . DIRECTORY_SEPARATOR . 'boot.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pincore' . DIRECTORY_SEPARATOR . "boot" . DIRECTORY_SEPARATOR . 'boot.php';

@@ -1,7 +1,12 @@
 {
     "name": "pinoox/pinoox",
     "description": "pinoox is a simple environment for web management and development. You can do whatever you want on the web and add your desire features to your website in a simple way",
+    "keywords": [
+        "PHP",
+        "PHP Framework"
+    ],
     "type": "project",
+    "homepage": "http://www.pinoox.com/",
     "license": "MIT",
     "authors": [
         {
