@@ -99,21 +99,22 @@ class migrationUp extends console implements CommandInterface
         $this->success('start migrating...');
         $this->newLine();
         foreach ($migrations as $m) {
+            $tableName = $m['packageName'] . '_' . $m['tableName'];
+
             //check if already exists
-            if ($this->schema->hasTable($m['tableName'])) {
-                $this->warning('Table: "' . $m['tableName'] . '" already exists');
+            if ($this->schema->hasTable($tableName)) {
+                $this->warning('Table: "' . $tableName . '" already exists');
                 $this->gray('  File: "' . $m['fileName'] . '.php"');
                 $this->newLine();
                 continue;
             }
 
-            $this->success('Table: "' . $m['tableName'] . '" migrated');
+            $this->success('Table: "' . $tableName . '" migrated');
             $this->gray('  File: "' . $m['fileName'] . '.php"');
             $this->newLine();
             $obj = new $m['classObject']();
+            $obj->prefix = $m['packageName'] . '_';
             $obj->up();
-
-
         }
 
         if ($this->toolkit->isSuccess()) {

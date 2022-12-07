@@ -20,10 +20,10 @@ use ReflectionClass;
 
 class console
 {
+    private static $CommandOptions = [];
     private static $argument = [];
     private static $CommandSignature = null;
     private static $isHtml = false;
-    private static $CommandOptions = [];
     private static $CommandArguments = [];
     private static $CommandEnter = null;
     private static $CommandClass = null;
@@ -104,7 +104,7 @@ class console
     {
         if (is_null($key))
             return self::$CommandOptions;
-
+        
         if (isset(self::$CommandOptions[$key]))
             return self::$CommandOptions[$key];
 
@@ -127,12 +127,13 @@ class console
         return self::$CommandEnter;
     }
 
-    protected static function hasOption($optionNeed, $Options)
+    protected static function hasOption($optionNeed, $Options): bool
     {
         $OptionName = false;
         $OptionNameMin = false;
         foreach ($Options as $option) {
             if ((isset($option[0]) and $option[0] == $optionNeed) or (isset($option[1]) and $option[1] == $optionNeed)) {
+
                 $OptionName = isset($option[0]) ? '--' . $option[0] : false;
                 $OptionNameMin = isset($option[1]) ? '--' . $option[1] : false;
             }
@@ -673,9 +674,7 @@ class console
             if (isset($argument[1]) and $argument[1] and !isset($TempCommandArguments[$index]))
                 $errors[] = sprintf('"%s"', $argument[0]);
             else
-                $CommandArguments[$argument[0]] = isset($TempCommandArguments[$index]) ?
-                    $TempCommandArguments[$index] :
-                    (isset($argument[3]) ? $argument[3] : null);
+                $CommandArguments[$argument[0]] = $TempCommandArguments[$index] ?? ($argument[3] ?? null);
         }
         if (count($errors) > 0) {
             self::error(sprintf("Not enough arguments (missing: %s).", implode(", ", $errors)));
@@ -683,10 +682,12 @@ class console
         foreach ($command['Options'] as $index => $Option) {
             if (!is_array($Option))
                 $Option[0] = $Option;
-            $CommandOptions[$Option[0]] = isset($TempCommandOptions[$Option[0]]) ? $TempCommandOptions[$Option[0]] : (isset($Option[3]) ? $Option[3] : null);
+
+            if (isset($Option[3]) && $Option[3]===true)
+            $CommandOptions[$Option[0]] = $TempCommandOptions[$Option[0]] ?? ($Option[3] ?? null);
             if (isset($Option[1])) {
-                $CommandOptions[$Option[0]] = isset($TempCommandOptions[$Option[1]]) ? $TempCommandOptions[$Option[1]] : (isset($Option[3]) ? $Option[3] : null);
-                $CommandOptions[$Option[1]] = isset($TempCommandOptions[$Option[1]]) ? $TempCommandOptions[$Option[1]] : (isset($Option[3]) ? $Option[3] : null);
+                $CommandOptions[$Option[0]] = $TempCommandOptions[$Option[1]] ?? ($Option[3] ?? null);
+                $CommandOptions[$Option[1]] = $TempCommandOptions[$Option[1]] ?? ($Option[3] ?? null);
             }
         }
         call_user_func_array([$command['class'], "setCommandData"], [$CommandArguments, $CommandOptions, implode(' ', self::$argument)]);
@@ -767,25 +768,25 @@ class console
         return $colored_string;
     }
 
-    protected function chooseApp($packageOpt = null)
+    protected function chooseApp($packageName = null)
     {
         $this->cli = config('~cli');
-        if (empty($packageOpt) && isset($this->cli['package'])) {
+        if (empty($packageName) && isset($this->cli['package'])) {
             $this->success('Using cli config ');
-            $this->gray('`' . $this->cli['package'] . '`');
+            $this->info('`' . $this->cli['package'] . '`');
             $this->newLine();
-        } else if (empty($packageOpt) || $packageOpt != 'pincore') {
-            $this->cli = $this->chooseFromApps($packageOpt);
+        } else if (empty($packageName) || $packageName != 'pincore') {
+            $this->cli = $this->chooseFromApps($packageName);
         } else {
             $this->cli['path'] = Dir::path('~pincore');
             $this->cli['package'] = 'pincore';
         }
     }
 
-    protected function chooseFromApps($packageOpt = null)
+    protected function chooseFromApps($packageName = null)
     {
         try {
-            $package = !empty($packageOpt) ? $packageOpt : $this->argument('package');
+            $package = !empty($packageName) ? $packageName : $this->argument('package');
             if ($package == null) {
                 $apps = AppModel::fetch_all(null, true);
                 $apps = array_keys($apps);

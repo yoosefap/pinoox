@@ -14,12 +14,14 @@ namespace pinoox\component\migration;
 
 use Illuminate\Database\Migrations\Migration;
 use pinoox\storage\Database;
+use \Illuminate\Database\Schema\Builder;
 
 class MigrationBase extends Migration
 {
 
-    protected $db = null;
-    protected $schema = null;
+    protected Database $db;
+    protected Builder $schema;
+    public string $prefix;
 
     public function __construct()
     {

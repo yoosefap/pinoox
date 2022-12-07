@@ -19,7 +19,8 @@
 		"php": "^7.4|^8.0",
         "vladimmi/construct-static": "dev-master@dev",
         "illuminate/database": "8.x-dev",
-        "illuminate/events": "8.x-dev"
+        "illuminate/events": "8.x-dev",
+        "doctrine/dbal": "3.5.x-dev"
     },
     "autoload": {
         "files" : [

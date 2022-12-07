@@ -12,15 +12,10 @@
 
 namespace pinoox\component\migration;
 
-use Composer\Autoload\AutoloadGenerator;
-use Composer\Autoload\ClassLoader;
 use Illuminate\Database\Capsule\Manager;
-use Illuminate\Support\Facades\Schema;
-use pinoox\boot\Loader;
 use pinoox\component\File;
 use pinoox\component\HelperString;
 use pinoox\storage\Database;
-use function Composer\Autoload\includeFile;
 
 class MigrationToolkit
 {
@@ -85,6 +80,7 @@ class MigrationToolkit
 
             $classObject = $this->namespace . $className;
             $this->migrations[] = [
+                'packageName' => $this->package,
                 'className' => $className,
                 'fileName' => $fileName,
                 'tableName' => HelperString::toUnderScore($className),
