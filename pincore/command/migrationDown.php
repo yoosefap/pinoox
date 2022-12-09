@@ -65,7 +65,7 @@ class migrationDown extends console implements CommandInterface
     public function handle()
     {
         $this->init();
-        $this->reverse_down();
+        $this->reverseDown();
     }
 
     private function init()
@@ -88,7 +88,7 @@ class migrationDown extends console implements CommandInterface
         $this->schema = $this->toolkit->getSchema();
     }
 
-    private function reverse_down()
+    private function reverseDown()
     {
         $this->success('start rolling back...');
         $this->newLine();

@@ -35,7 +35,7 @@ class modelCreate extends console implements CommandInterface
      */
     protected $arguments = [
         ['model', true, 'Model Name'],
-        ['package_name', false, 'package name of app.'],
+        ['package', false, 'package name of app'],
     ];
 
     /**
@@ -53,13 +53,10 @@ class modelCreate extends console implements CommandInterface
         ["migration", 'm', "Create a database migration", true],
     ];
 
-    protected $nameSpaceOfModelFolder = null;
-    protected $nameSpaceOfModel = null;
-    protected $conteroller = null;
-    protected $conterollerPath = null;
     protected $extend = null;
     protected $use = null;
-    protected $package = null;
+    protected $model = null;
+    protected $modelPath = null;
 
     /**
      * Execute the console command.
@@ -67,52 +64,42 @@ class modelCreate extends console implements CommandInterface
      */
     public function handle()
     {
-        $this->chooseApp($this->argument('package_name'));
-        $package = $this->cli['package'];
-        $this->conterollerPath = Dir::path('~apps/' . $package . '/model');
+        $this->model = $this->argument('model');
+        $package = $this->argument('package');
 
-        $this->nameSpaceOfModelFolder = 'pinoox\app\\' . $package . '\\model';
+        $this->chooseApp($package);
 
-        $Model = explode('\\', str_replace('/', '\\', $this->argument('model')));
+        $this->setPath();
 
-        $this->conteroller = array_pop($Model);
-        $ModelScope = implode('\\', $Model);
+        $this->setExtend();
 
-        $this->nameSpaceOfModel = $this->nameSpaceOfModelFolder . ((count($Model) > 0) ? '\\' . $ModelScope : "");
+        $isCreated = $this->createModel();
 
-        $this->conterollerPath = $this->conterollerPath . ((count($Model) > 0) ? '/' . implode('/', $Model) : "") . '/' . ucfirst(strtolower($this->conteroller)) . '.php';
-
-        $extend = str_replace('/', '\\', $this->option('extends'));
-
-        if (HelperString::firstHas(strtolower($extend), 'pinoox\\')) {
-            $extend = explode('\\', $extend);
-            $this->extend = end($extend);
-            $this->use = implode('\\', $extend);
-        } elseif ($extend == 'Model') {
-            $this->use = 'pinoox\storage\Model';
-            $this->extend = 'Model';
-        } elseif ($this->option('extends') == null) {
-            $this->use = null;
-            $this->extend = null;
-        } else {
-            $extend = explode('\\', $extend);
-            $this->extend = end($extend);
-            $ModelScope = implode('\\', $Model);
-            if ($this->nameSpaceOfModelFolder . ((count($extend) > 1) ? '\\' . $ModelScope : "") != $this->nameSpaceOfModel)
-                $this->use = $this->nameSpaceOfModelFolder . ((count($extend) > 1) ? '\\' . $ModelScope : '\\' . $this->extend);
-        }
-
-        $isCreated =$this->createModel();
-        if (!$isCreated){
+        if (!$isCreated) {
             $this->error(sprintf('Can not Create model in "%s"!', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->conterollerPath)));
             $this->newLine();
             exit;
         }
 
         if (self::hasOption('migration', $this->options)) {
-            $this->execute('db:create ' . $this->conteroller);
+            $this->execute('db:create ' . $this->model);
         }
     }
+
+    private function setPath()
+    {
+        $this->modelPath = $this->cli['path'] .'\\model\\'.ucfirst($this->model).'.php';
+    }
+
+    private function setExtend()
+    {
+        $extend = $this->option('extends');
+        if (strtolower($extend) == 'model') {
+            $this->use = 'pinoox\storage\Model';
+            $this->extend = 'Model';
+        }
+    }
+
 
     private function createModel(): bool
     {
@@ -121,14 +108,13 @@ class modelCreate extends console implements CommandInterface
         $code .= $this->createNameSpace();
         if ($this->use != null)
             $code .= sprintf("use %s;\n\n", $this->use);
-        $code .= sprintf("class %s ", ucfirst(strtolower($this->conteroller)));
+        $code .= sprintf("class %s ", ucfirst(strtolower($this->model)));
         if ($this->extend != null)
             $code .= sprintf("extends %s\n", $this->extend);
         else
             $code .= "\n";
         $code .= "{\n\n";
         $code .= "}\n";
-
         return $this->createFile($code);
     }
 
@@ -156,16 +142,16 @@ class modelCreate extends console implements CommandInterface
 
     private function createNameSpace(): string
     {
-        return sprintf("namespace %s;\n\n", $this->nameSpaceOfModel);
+        return sprintf("namespace %s;\n\n", $this->cli['namespace'] . '\model');
     }
 
     private function createFile($content): bool
     {
-        if (file_exists($this->conterollerPath)) {
-            $this->error(sprintf('Same file exist in "%s"!', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->conterollerPath)));
+        if (file_exists($this->modelPath)) {
+            $this->error(sprintf('Same file exist in "%s"!', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->modelPath)));
         }
-        if (File::generate($this->conterollerPath, $content)) {
-            $this->success(sprintf('Model created in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->conterollerPath)));
+        if (File::generate($this->modelPath, $content)) {
+            $this->success(sprintf('Model created in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->modelPath)));
             $this->newLine();
             return true;
         }

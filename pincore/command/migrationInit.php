@@ -48,7 +48,7 @@ class migrationInit extends console implements CommandInterface
      */
     public function handle()
     {
-        $this->success('Initialized migration_log table');
+        $this->success('Initialized migration table');
         $this->newLine();
         $this->execute('db:migrate', ['pincore']);
     }

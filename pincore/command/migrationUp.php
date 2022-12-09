@@ -65,7 +65,7 @@ class migrationUp extends console implements CommandInterface
     public function handle()
     {
         $this->init();
-        $this->run_up();
+        $this->runUp();
     }
 
     private function init()
@@ -84,11 +84,11 @@ class migrationUp extends console implements CommandInterface
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
             ->ready();
-
+        
         $this->schema = $this->toolkit->getSchema();
     }
 
-    private function run_up()
+    private function runUp()
     {
         $migrations = $this->toolkit->getMigrations();
 

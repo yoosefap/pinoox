@@ -104,7 +104,7 @@ class console
     {
         if (is_null($key))
             return self::$CommandOptions;
-        
+
         if (isset(self::$CommandOptions[$key]))
             return self::$CommandOptions[$key];
 
@@ -683,8 +683,8 @@ class console
             if (!is_array($Option))
                 $Option[0] = $Option;
 
-            if (isset($Option[3]) && $Option[3]===true)
-            $CommandOptions[$Option[0]] = $TempCommandOptions[$Option[0]] ?? ($Option[3] ?? null);
+            if (isset($Option[3]) && $Option[3] === true)
+                $CommandOptions[$Option[0]] = $TempCommandOptions[$Option[0]] ?? ($Option[3] ?? null);
             if (isset($Option[1])) {
                 $CommandOptions[$Option[0]] = $TempCommandOptions[$Option[1]] ?? ($Option[3] ?? null);
                 $CommandOptions[$Option[1]] = $TempCommandOptions[$Option[1]] ?? ($Option[3] ?? null);
@@ -772,6 +772,8 @@ class console
     {
         $this->cli = config('~cli');
         if (empty($packageName) && isset($this->cli['package'])) {
+            $this->cli['namespace'] = 'pinoox\\app\\' . $this->cli['package'] ;
+
             $this->success('Using cli config ');
             $this->info('`' . $this->cli['package'] . '`');
             $this->newLine();
@@ -780,6 +782,7 @@ class console
         } else {
             $this->cli['path'] = Dir::path('~pincore');
             $this->cli['package'] = 'pincore';
+            $this->cli['namespace'] = 'pinoox';
         }
     }
 
@@ -799,8 +802,11 @@ class console
             $app = AppModel::fetch_by_package_name($package);
             if (is_null($app)) $this->error(sprintf('Can not find app with name `%s`!', $package));
 
+            $namespace = "pinoox\\app\\" . $package . "\\";
             $app_path = Dir::path('~apps/' . $package);
-            return ['path' => $app_path, 'package' => $package];
+
+            return ['path' => $app_path, 'package' => $package, 'namespace' => $namespace];
+
         } catch (\Exception $exception) {
             $this->danger('Something went wrong!');
             $this->newLine();

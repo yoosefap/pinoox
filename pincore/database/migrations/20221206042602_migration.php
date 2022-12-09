@@ -15,11 +15,11 @@ namespace pinoox\database\migrations;
 use Illuminate\Database\Schema\Blueprint;
 use pinoox\component\migration\MigrationBase;
 
-class MigrationLog extends MigrationBase
+class Migration extends MigrationBase
 {
     public function up()
     {
-        $this->schema->create('migration_log', function (Blueprint $table) {
+        $this->schema->create('migration', function (Blueprint $table) {
             // Auto-increment id
             $table->increments('log_id');
             $table->dateTime('version');
@@ -35,8 +35,8 @@ class MigrationLog extends MigrationBase
 
     public function down()
     {
-        if ($this->schema->hasTable('migration_log')){
-            $this->schema->drop('migration_log');
+        if ($this->schema->hasTable('migration')){
+            $this->schema->drop('migration');
         }
     }
 }
