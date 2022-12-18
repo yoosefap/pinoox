@@ -99,25 +99,29 @@ class createMigration extends console implements CommandInterface
 
         $exportPath = $this->mc->migration_path . $exportFile;
 
-        $builder = ClassBuilder::init($className)
-            ->namespace("pinoox\\app\\" . $this->mc->package . "\\database\\migrations")
-            ->use('Illuminate\\Database\\Schema\\Blueprint')
-            ->use('pinoox\component\migration\MigrationBase')
-            ->extends('MigrationBase')
-            ->method('public function up', 'Run the migrations.')
-            ->method('public function down', 'Reverse the migrations.')
-            ->build()
-            ->export($exportPath);
-
-        if ($builder->isSuccess()) {
-            //print success messages
-            $this->success('✓ Created Class ' . $className);
-            $this->gray(' in path: ' . $this->mc->folders);
-            $this->warning($exportFile);
-            $this->newLine();
-        } else {
-            $this->error('Can\'t generate a new migration class!');
+        try {
+            $builder = ClassBuilder::init($className)
+                ->namespace("pinoox\\app\\" . $this->mc->package . "\\database\\migrations")
+                ->use('Illuminate\\Database\\Schema\\Blueprint')
+                ->use('pinoox\component\migration\MigrationBase')
+                ->extends('MigrationBase')
+                ->method('public function up', 'Run the migrations.')
+                ->method('public function down', 'Reverse the migrations.')
+                ->build()
+                ->export($exportPath);
+            if ($builder->isSuccess()) {
+                //print success messages
+                $this->success('✓ Created Class ' . $className);
+                $this->gray(' in path: ' . $this->mc->folders);
+                $this->warning($exportFile);
+                $this->newLine();
+            } else {
+                $this->error('Can\'t generate a new migration class!');
+            }
+        } catch (\Exception $e) {
+            $this->error($e);
         }
+
     }
 
 
