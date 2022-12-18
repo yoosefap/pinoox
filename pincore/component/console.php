@@ -17,6 +17,7 @@ namespace pinoox\component;
 use pinoox\app\com_pinoox_manager\model\AppModel;
 use pinoox\component\app\AppProvider;
 use ReflectionClass;
+use Symfony\Component\Finder\Finder;
 
 class console
 {
@@ -726,12 +727,18 @@ class console
             }
         }
         $commandPath = Dir::path('~pincore/command/');
-        $files = File::get_files_by_pattern($commandPath, '*.php');
-        foreach ($files as $file) {
+        $finder = new Finder();
+        $finder->files()->in($commandPath);
+
+        foreach ($finder as $file) {
+            $path = $file->getPath();
+            $folders = str_replace($commandPath, '', $file->getPathInfo() . self::DS);
+            $baseName = $file->getFilenameWithoutExtension();
+            $fileName = $file->getFilename();
             $result[] = [
                 'package_name' => '~',
-                'class' => 'pinoox\command\\' . file::name($file),
-                'file' => $file
+                'class' => 'pinoox\command\\' . $folders . $baseName,
+                'file' => $path . self::DS . $fileName
             ];
         }
         AppProvider::app('~');
@@ -772,7 +779,7 @@ class console
     {
         $this->cli = config('~cli');
         if (empty($packageName) && isset($this->cli['package'])) {
-            $this->cli['namespace'] = 'pinoox\\app\\' . $this->cli['package'] ;
+            $this->cli['namespace'] = 'pinoox\\app\\' . $this->cli['package'];
 
             $this->success('Using cli config ');
             $this->info('`' . $this->cli['package'] . '`');

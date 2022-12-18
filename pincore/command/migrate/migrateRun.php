@@ -1,6 +1,6 @@
 <?php
 
-namespace pinoox\command;
+namespace pinoox\command\migrate;
 
 
 use pinoox\component\console;
@@ -9,7 +9,7 @@ use pinoox\component\migration\MigrationConfig;
 use pinoox\component\migration\MigrationToolkit;
 
 
-class migrationDown extends console implements CommandInterface
+class migrateRun extends console implements CommandInterface
 {
 
     /**
@@ -17,14 +17,14 @@ class migrationDown extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "db:rollback";
+    protected $signature = "migrate:run";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Rollback the database migrations";
+    protected $description = "Migrate schemas";
 
     /**
      * The console command Arguments.
@@ -65,7 +65,7 @@ class migrationDown extends console implements CommandInterface
     public function handle()
     {
         $this->init();
-        $this->reverseDown();
+        $this->runUp();
     }
 
     private function init()
@@ -84,27 +84,42 @@ class migrationDown extends console implements CommandInterface
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
             ->ready();
-
+        
         $this->schema = $this->toolkit->getSchema();
     }
 
-    private function reverseDown()
+    private function runUp()
     {
-        $this->success('start rolling back...');
-        $this->newLine();
         $migrations = $this->toolkit->getMigrations();
-        foreach ($migrations as $m) {
 
-            $this->success('Table: "' . $m['tableName'] . '" rollback');
-            $this->gray('  File: "' . $m['fileName'] . '"');
+        if (empty($migrations)) {
+            $this->error('There are no migrations!');
+            $this->newLine();
+        }
+        $this->success('start migrating...');
+        $this->newLine();
+        foreach ($migrations as $m) {
+            $tableName = $m['packageName'] . '_' . $m['tableName'];
+
+            //check if already exists
+            if ($this->schema->hasTable($tableName)) {
+                $this->warning('Table: "' . $tableName . '" already exists');
+                $this->gray('  File: "' . $m['fileName'] . '.php"');
+                $this->newLine();
+                continue;
+            }
+
+            $this->success('Table: "' . $tableName . '" migrated');
+            $this->gray('  File: "' . $m['fileName'] . '.php"');
             $this->newLine();
             $obj = new $m['classObject']();
-            $obj->down();
+            $obj->prefix = $m['packageName'] . '_';
+            $obj->up();
         }
 
         if ($this->toolkit->isSuccess()) {
             $this->newLine();
-            $this->success('rollback done!');
+            $this->success('migration done!');
         }
     }
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace pinoox\command;
+namespace pinoox\command\create;
 
-
+use pinoox\component\ClassBuilder;
 use pinoox\component\console;
 use pinoox\component\File;
 use pinoox\component\HelperString;
@@ -11,7 +11,7 @@ use pinoox\component\migration\MigrationConfig;
 use pinoox\component\migration\MigrationToolkit;
 
 
-class migrationCreate extends console implements CommandInterface
+class createMigration extends console implements CommandInterface
 {
 
     /**
@@ -19,7 +19,7 @@ class migrationCreate extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "db:create";
+    protected $signature = "create:migration";
 
     /**
      * The console command description.
@@ -46,6 +46,7 @@ class migrationCreate extends console implements CommandInterface
      * @var MigrationToolkit
      */
     private $toolkit = null;
+
     /**
      * Execute the console command.
      *
@@ -93,16 +94,22 @@ class migrationCreate extends console implements CommandInterface
             }
         }
 
-        //create timestamp
-        $timestamp = date('Ymdhis');
-        $exportFile = $timestamp . '_' . $fileName . '.php';
+        //create timestamp filename
+        $exportFile = date('Ymdhis') .  $fileName . '.php';
 
-        //get class default pattern
-        $pattern_class = $this->get_default_pattern_class($className);
+        $exportPath = $this->mc->migration_path . $exportFile;
 
-        //generate class
-        $isSuccess = File::generate($this->mc->migration_path . $exportFile, $pattern_class);
-        if ($isSuccess) {
+        $builder = ClassBuilder::init($className)
+            ->namespace("pinoox\\app\\" . $this->mc->package . "\\database\\migrations")
+            ->use('Illuminate\\Database\\Schema\\Blueprint')
+            ->use('pinoox\component\migration\MigrationBase')
+            ->extends('MigrationBase')
+            ->method('public function up', 'Run the migrations.')
+            ->method('public function down', 'Reverse the migrations.')
+            ->build()
+            ->export($exportPath);
+
+        if ($builder->isSuccess()) {
             //print success messages
             $this->success('✓ Created Class ' . $className);
             $this->gray(' in path: ' . $this->mc->folders);
@@ -111,37 +118,6 @@ class migrationCreate extends console implements CommandInterface
         } else {
             $this->error('Can\'t generate a new migration class!');
         }
-    }
-
-    private function get_default_pattern_class($className)
-    {
-        return "<?php
-
-namespace pinoox\\app\\" . $this->mc->package . "\\database\\migrations;
-
-use Illuminate\Database\Schema\Blueprint;
-use pinoox\component\migration\MigrationBase;
-
-class " . $className . " extends MigrationBase
-{
-    /**
-    * Run the migrations
-    *
-    * @return void
-    */
-    public function up()
-    {
-    }
-
-    /**
-    * Reverse the migrations
-    *
-    * @return void
-    */
-    public function down()
-    {
-    }
-}";
     }
 
 

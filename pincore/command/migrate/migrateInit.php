@@ -1,15 +1,13 @@
 <?php
 
-namespace pinoox\command;
+namespace pinoox\command\migrate;
 
 
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
-use pinoox\component\migration\MigrationConfig;
-use pinoox\component\migration\MigrationToolkit;
 
 
-class migrationInit extends console implements CommandInterface
+class migrateInit extends console implements CommandInterface
 {
 
     /**
@@ -17,14 +15,14 @@ class migrationInit extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "db:init";
+    protected $signature = "migrate:init";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Initialize migration tables and configs";
+    protected $description = "Initialize migration repository and create tables";
 
     /**
      * The console command Arguments.

@@ -1,6 +1,6 @@
 <?php
 
-namespace pinoox\command;
+namespace pinoox\command\cli;
 
 
 use pinoox\component\Config;
@@ -8,7 +8,7 @@ use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
 
 
-class cliSet extends console implements CommandInterface
+class cliClear extends console implements CommandInterface
 {
 
     /**
@@ -16,14 +16,14 @@ class cliSet extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "cli:set";
+    protected $signature = "cli:clear";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Set a default app to use in cli";
+    protected $description = "Clear default app in config";
 
     /**
      * The console command Arguments.
@@ -31,7 +31,6 @@ class cliSet extends console implements CommandInterface
      * @var array
      */
     protected $arguments = [
-        ['package', false, 'Name of package that you want to work with that', null],
     ];
 
     /**
@@ -49,13 +48,11 @@ class cliSet extends console implements CommandInterface
      */
     public function handle()
     {
-        $app  = $this->chooseFromApps();
-
-        Config::set('~cli.path', $app['path']);
-        Config::set('~cli.package', $app['package']);
+        Config::set('~cli.path', null);
+        Config::set('~cli.package', null);
         Config::save('~cli');
 
-        $this->success('Saved in CLI config');
+        $this->success('Cleared CLI config');
     }
 
 }
