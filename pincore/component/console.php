@@ -82,7 +82,9 @@ class console
                     $argv[] = '--' . $value;
                 else
                     $argv[] = '--' . $key . '=' . $value;
-        self::run($argv, true);
+
+        self::run($argv, $html);
+
         $output = ob_get_contents();
         ob_end_clean();
         if ($html) {
@@ -183,7 +185,6 @@ class console
 
     protected static function error($text, $exit = true)
     {
-
         if (self::$isHtml)
             echo '<div class="console"><pre>';
         $text = "     " . $text . "     ";
@@ -542,7 +543,7 @@ class console
         return $widths ? max($widths) + 2 : 0;
     }
 
-    private static function findCommand()
+    private static function findCommand(): void
     {
         $arguments = self::$argument;
         if (isset($arguments[1]) and HelperString::has($arguments[1], '--')) {
@@ -552,10 +553,10 @@ class console
             self::$argument[] = '--c=' . $arguments[1];
             array_splice($arguments, 1, 1, ['help']);
         }
-        self::$CommandSignature = isset($arguments[1]) ? $arguments[1] : "help";
+        self::$CommandSignature = $arguments[1] ?? "help";
         $commandSignatures = [];
         $command = self::getListCommand(self::$CommandSignature, $commandSignatures);
-        if ($command == false) {
+        if (!$command) {
             self::error(sprintf('Command "%s" is not defined.', self::$CommandSignature), false);
             self::findSimilarCommand(self::$CommandSignature, $commandSignatures);
         } else {
@@ -564,7 +565,7 @@ class console
         }
     }
 
-    protected static function findSimilarCommand($CommandSignature, $commandSignatures, $percentSimilarity = 40)
+    protected static function findSimilarCommand($CommandSignature, $commandSignatures, $percentSimilarity = 40): void
     {
         $closetCommand = [];
         $i = 0;
