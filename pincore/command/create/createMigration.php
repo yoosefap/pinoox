@@ -95,7 +95,7 @@ class createMigration extends console implements CommandInterface
         }
 
         //create timestamp filename
-        $exportFile = date('Ymdhis') .  $fileName . '.php';
+        $exportFile = date('Ymdhis') . '_' . $fileName . '.php';
 
         $exportPath = $this->mc->migration_path . $exportFile;
 

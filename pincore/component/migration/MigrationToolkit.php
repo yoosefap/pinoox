@@ -13,9 +13,11 @@
 namespace pinoox\component\migration;
 
 use Illuminate\Database\Capsule\Manager;
+use phpDocumentor\Reflection\Types\Array_;
 use pinoox\component\File;
 use pinoox\component\HelperString;
 use pinoox\storage\Database;
+use function foo\func;
 
 class MigrationToolkit
 {
@@ -28,6 +30,8 @@ class MigrationToolkit
     private $app_path = null;
     private $migration_path = null;
     private $package = null;
+    private $check = true;
+    private $rollback = false;
     private $namespace = null;
     private $errors = null;
     private $migrations = [];
@@ -62,32 +66,87 @@ class MigrationToolkit
         return $this;
     }
 
+    /**
+     * Check existence in migration table of database
+     * @param $val
+     * @return $this
+     */
+    public function check($val)
+    {
+        $this->check = $val;
+        return $this;
+    }
+
+    /**
+     * if true fetch rolling backs migration files from database instead load from path
+     * @return $this
+     */
+    public function rollback()
+    {
+        $this->rollback = true;
+        return $this;
+    }
+
     public function migration_path($val)
     {
         $this->migration_path = $val;
         return $this;
     }
 
+    private function getFromDB(): array
+    {
+        $batch = MigrationQuery::fetchLatestBatch($this->package);
+        $migrations = MigrationQuery::fetchAllByBatch($batch, $this->package);
+        return array_map(function ($m) {
+            return $m['migration'];
+        }, $migrations);
+    }
+
     public function ready()
     {
         if (!$this->checkPaths()) return $this;
-        $migrations = File::get_files($this->migration_path);
 
-        foreach ($migrations as $f) {
-            $fileName = $this->getFileName($f);
-            $className = $this->getClassName($fileName);
-            $this->loadMigrationClass($this->migration_path . $fileName . '.php');
+        if ($this->rollback) {
+            $migrations = $this->getFromDB();
+        } else {
+            $migrations = $this->readyFromPath();
+        }
+ 
+        foreach ($migrations as $m) {
+            list($fileName, $className, $classObject) = $this->extract($m);
 
-            $classObject = $this->namespace . $className;
-            $this->migrations[] = [
-                'packageName' => $this->package,
-                'className' => $className,
-                'fileName' => $fileName,
-                'tableName' => HelperString::toUnderScore($className),
-                'classObject' => $classObject,
-            ];
+            //check
+            if (!$this->rollback && $this->check && MigrationQuery::is_exists($fileName, $this->package))
+                continue;
+
+            $this->migrations[] = $this->build($className, $fileName, $classObject);
         }
         return $this;
+    }
+
+    private function readyFromPath()
+    {
+        return File::get_files($this->migration_path);
+    }
+
+    private function extract($item)
+    { 
+        $fileName = $this->getFileName($item);
+        $className = $this->getClassName($fileName);
+        $this->loadMigrationClass($this->migration_path . $fileName . '.php');
+        $classObject = $this->namespace . $className;
+        return [$fileName, $className, $classObject];
+    }
+
+
+    private function build($className, $fileName, $classObject)
+    {
+        return [
+            'packageName' => $this->package,
+            'className' => $className,
+            'fileName' => $fileName,
+            'classObject' => $classObject,
+        ];
     }
 
     public function getMigrations()
@@ -159,7 +218,8 @@ class MigrationToolkit
         });
     }
 
-    public function saveLog($migrations){
+    public function saveLog($migrations)
+    {
 
     }
 }

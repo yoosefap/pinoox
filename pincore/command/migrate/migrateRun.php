@@ -6,6 +6,7 @@ namespace pinoox\command\migrate;
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\migration\MigrationConfig;
+use pinoox\component\migration\MigrationQuery;
 use pinoox\component\migration\MigrationToolkit;
 
 
@@ -17,7 +18,7 @@ class migrateRun extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "migrate:run";
+    protected $signature = "migrate";
 
     /**
      * The console command description.
@@ -84,7 +85,7 @@ class migrateRun extends console implements CommandInterface
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
             ->ready();
-        
+
         $this->schema = $this->toolkit->getSchema();
     }
 
@@ -93,33 +94,31 @@ class migrateRun extends console implements CommandInterface
         $migrations = $this->toolkit->getMigrations();
 
         if (empty($migrations)) {
-            $this->error('There are no migrations!');
+            $this->success('Nothing to migrate.');
             $this->newLine();
         }
-        $this->success('start migrating...');
-        $this->newLine();
+
+        $batch = MigrationQuery::fetchLatestBatch($this->mc->package);
+
         foreach ($migrations as $m) {
-            $tableName = $m['packageName'] . '_' . $m['tableName'];
 
-            //check if already exists
-            if ($this->schema->hasTable($tableName)) {
-                $this->warning('Table: "' . $tableName . '" already exists');
-                $this->gray('  File: "' . $m['fileName'] . '.php"');
-                $this->newLine();
-                continue;
-            }
-
-            $this->success('Table: "' . $tableName . '" migrated');
-            $this->gray('  File: "' . $m['fileName'] . '.php"');
+            $start_time = microtime(true);
+            $this->warning('Migrating: ');
+            $this->info( $m['fileName'] );
             $this->newLine();
             $obj = new $m['classObject']();
-            $obj->prefix = $m['packageName'] . '_';
             $obj->up();
-        }
 
-        if ($this->toolkit->isSuccess()) {
+            MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
+
+            $end_time = microtime(true);
+            $exec_time = $end_time - $start_time;
+
+            //end migrating
+            $this->success('Migrated: ');
+            $this->info($m['fileName']);
+            $this->gray(' ('.substr($exec_time, 0,5).'ms)');
             $this->newLine();
-            $this->success('migration done!');
         }
     }
 

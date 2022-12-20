@@ -21,13 +21,11 @@ class MigrationBase extends Migration
 
     protected Database $db;
     protected Builder $schema;
-    public string $prefix;
 
     public function __construct()
     {
         $this->db = new Database();
         $this->schema = $this->db->getSchema();
     }
-
 
 }

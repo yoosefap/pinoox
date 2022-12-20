@@ -73,7 +73,7 @@ class createModel extends console implements CommandInterface
         $this->createModel();
 
         if (self::hasOption('migration', $this->options)) {
-            $this->execute('db:create ' . $this->model);
+            $this->execute('create:migration ' . $this->model);
         }
     }
 

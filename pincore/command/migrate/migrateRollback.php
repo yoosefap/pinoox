@@ -6,6 +6,7 @@ namespace pinoox\command\migrate;
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\migration\MigrationConfig;
+use pinoox\component\migration\MigrationQuery;
 use pinoox\component\migration\MigrationToolkit;
 
 
@@ -83,6 +84,7 @@ class migrateRollback extends console implements CommandInterface
             ->migration_path($this->mc->migration_path)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
+            ->rollback()
             ->ready();
 
         $this->schema = $this->toolkit->getSchema();
@@ -90,22 +92,34 @@ class migrateRollback extends console implements CommandInterface
 
     private function reverseDown()
     {
-        $this->success('start rolling back...');
-        $this->newLine();
         $migrations = $this->toolkit->getMigrations();
-        foreach ($migrations as $m) {
 
-            $this->success('Table: "' . $m['tableName'] . '" rollback');
-            $this->gray('  File: "' . $m['fileName'] . '"');
+        if (empty($migrations)) {
+            $this->success('Nothing to rollback.');
+            $this->newLine();
+        }
+
+        $batch = MigrationQuery::fetchLatestBatch($this->mc->package);
+        foreach ($migrations as $m) {
+            $start_time = microtime(true);
+            $this->warning('Rolling back: ');
+            $this->info($m['fileName']);
             $this->newLine();
             $obj = new $m['classObject']();
             $obj->down();
+
+            MigrationQuery::delete($batch, $m['packageName']);
+
+            $end_time = microtime(true);
+            $exec_time = $end_time - $start_time;
+
+            //end migrating
+            $this->success('Rolled back: ');
+            $this->info($m['fileName']);
+            $this->gray(' (' . substr($exec_time, 0, 5) . 'ms)');
+            $this->newLine();
         }
 
-        if ($this->toolkit->isSuccess()) {
-            $this->newLine();
-            $this->success('rollback done!');
-        }
     }
 
 }
