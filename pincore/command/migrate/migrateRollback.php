@@ -84,7 +84,8 @@ class migrateRollback extends console implements CommandInterface
             ->migration_path($this->mc->migration_path)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
-            ->rollback()
+            ->fromDB(false)
+            ->checkDB(false)
             ->ready();
 
         $this->schema = $this->toolkit->getSchema();
@@ -100,7 +101,16 @@ class migrateRollback extends console implements CommandInterface
         }
 
         $batch = MigrationQuery::fetchLatestBatch($this->mc->package);
+
         foreach ($migrations as $m) {
+
+            if (!$m['isLoad']) {
+                $this->danger('Migration not found: ');
+                $this->info($m['fileName']);
+                $this->newLine();
+                continue;
+            }
+
             $start_time = microtime(true);
             $this->warning('Rolling back: ');
             $this->info($m['fileName']);

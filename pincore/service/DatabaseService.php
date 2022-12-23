@@ -12,18 +12,15 @@
 
 namespace pinoox\service;
 
-use pinoox\component\console;
+use pinoox\component\database\Database;
 use pinoox\component\interfaces\ServiceInterface;
-use pinoox\component\Router;
-use pinoox\component\Url;
-use pinoox\storage\Database;
 
 class DatabaseService implements ServiceInterface
 {
 
     public function _run()
     {
-        new Database();
+        Database::establish();
     }
 
     public function _stop()

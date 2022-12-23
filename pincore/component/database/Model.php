@@ -1,6 +1,6 @@
 <?php
 
-namespace pinoox\storage;
+namespace pinoox\component\database;
 
 use \Illuminate\Database\Eloquent\Model as EloquentModel;
 
@@ -10,10 +10,11 @@ use \Illuminate\Database\Eloquent\Model as EloquentModel;
  *      ****  *  *  *  *  *  *  *  *    *
  *      *     *  *   * *  *  *  *  *   *  *
  *      *     *  *    **  ****  ****  *    *
- * @license    https://opensource.org/licenses/MIT MIT License
- * @link       pinoox.com
- * @copyright  pinoox
+ * @author   Pinoox
+ * @link https://www.pinoox.com/
+ * @license  https://opensource.org/licenses/MIT MIT License
  */
+
 abstract class Model extends EloquentModel
 {
     use Table;

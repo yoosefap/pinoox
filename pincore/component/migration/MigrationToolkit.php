@@ -13,11 +13,9 @@
 namespace pinoox\component\migration;
 
 use Illuminate\Database\Capsule\Manager;
-use phpDocumentor\Reflection\Types\Array_;
 use pinoox\component\File;
 use pinoox\component\HelperString;
-use pinoox\storage\Database;
-use function foo\func;
+use pinoox\component\database\Database;
 
 class MigrationToolkit
 {
@@ -26,68 +24,92 @@ class MigrationToolkit
     /**
      * @var Manager;
      */
-    private $cp = null;
-    private $app_path = null;
-    private $migration_path = null;
-    private $package = null;
-    private $check = true;
-    private $rollback = false;
-    private $namespace = null;
-    private $errors = null;
-    private $migrations = [];
+    private Manager $cp;
+    /**
+     * path of app
+     * @var string
+     */
+    private string $app_path;
+
+    /**
+     * path of migration files
+     * @var string
+     */
+    private string $migration_path;
+
+    /**
+     * package name of app
+     * @var string
+     */
+    private string $package;
+
+    /**
+     * namespace
+     * @var string
+     */
+    private string $namespace;
+
+    /**
+     * use filter and exclude migrations in database, for example when run commands like: rollback OR status
+     * @var bool
+     */
+    private bool $fromDB = true;
+    private bool $checkDB = true;
+
+    /**
+     * errors
+     * @var array | string
+     */
+    private $errors = [];
+
+    /**
+     * migration files list
+     * @var array
+     */
+    private array $migrations = [];
 
     public function __construct()
     {
         $this->init();
     }
 
-    public function init()
+    public function init(): void
     {
-        $db = new Database();
+        $db = Database::establish();
         $this->schema = $db->getSchema();
         $this->cp = $db->getCapsule();
     }
 
-    public function app_path($val)
+    public function app_path($val): self
     {
         $this->app_path = $val;
         return $this;
     }
 
-    public function namespace($val)
+    public function namespace($val): self
     {
         $this->namespace = $val;
         return $this;
     }
 
-    public function package($val)
+    public function package($val): self
     {
         $this->package = $val;
         return $this;
     }
 
+
     /**
-     * Check existence in migration table of database
-     * @param $val
      * @return $this
      */
-    public function check($val)
+    public function fromDB($fromDB = true, $checkDB = false): self
     {
-        $this->check = $val;
+        $this->fromDB = $fromDB;
+        $this->checkDB = $checkDB;
         return $this;
     }
 
-    /**
-     * if true fetch rolling backs migration files from database instead load from path
-     * @return $this
-     */
-    public function rollback()
-    {
-        $this->rollback = true;
-        return $this;
-    }
-
-    public function migration_path($val)
+    public function migration_path($val): self
     {
         $this->migration_path = $val;
         return $this;
@@ -102,46 +124,46 @@ class MigrationToolkit
         }, $migrations);
     }
 
-    public function ready()
+    public function ready(): self
     {
         if (!$this->checkPaths()) return $this;
 
-        if ($this->rollback) {
+        if ($this->fromDB) {
             $migrations = $this->getFromDB();
         } else {
             $migrations = $this->readyFromPath();
         }
- 
+
         foreach ($migrations as $m) {
-            list($fileName, $className, $classObject) = $this->extract($m);
+            list($fileName, $className, $classObject, $isLoad) = $this->extract($m);
+            if ($this->checkDB && MigrationQuery::is_exists($fileName, $this->package)) continue;
 
-            //check
-            if (!$this->rollback && $this->check && MigrationQuery::is_exists($fileName, $this->package))
-                continue;
-
-            $this->migrations[] = $this->build($className, $fileName, $classObject);
+            $this->migrations[] = $this->build($className, $fileName, $classObject, $isLoad);
         }
+
         return $this;
     }
 
-    private function readyFromPath()
+    private function readyFromPath(): array
     {
         return File::get_files($this->migration_path);
     }
 
-    private function extract($item)
-    { 
+    private function extract($item): array
+    {
         $fileName = $this->getFileName($item);
         $className = $this->getClassName($fileName);
-        $this->loadMigrationClass($this->migration_path . $fileName . '.php');
+        $isLoad = $this->loadMigrationClass($this->migration_path . $fileName . '.php');
         $classObject = $this->namespace . $className;
-        return [$fileName, $className, $classObject];
+
+        return [$fileName, $className, $classObject, $isLoad];
     }
 
 
-    private function build($className, $fileName, $classObject)
+    private function build($className, $fileName, $classObject, $isLoad): array
     {
         return [
+            'isLoad' => $isLoad,
             'packageName' => $this->package,
             'className' => $className,
             'fileName' => $fileName,
@@ -149,7 +171,7 @@ class MigrationToolkit
         ];
     }
 
-    public function getMigrations()
+    public function getMigrations(): array
     {
         return $this->migrations;
     }
@@ -167,7 +189,7 @@ class MigrationToolkit
         return $fileName;
     }
 
-    private function getClassName($fileName)
+    private function getClassName($fileName): string
     {
         $justFilename = substr($fileName, 15);
         if (!$justFilename) {
@@ -176,12 +198,12 @@ class MigrationToolkit
         return HelperString::toCamelCase($justFilename);
     }
 
-    private function getFileName($file)
+    private function getFileName($file): string
     {
         return basename($file, '.php');
     }
 
-    private function checkPaths()
+    private function checkPaths(): bool
     {
         if (empty($this->migration_path)) {
             $this->setError('migration path not defined');
@@ -193,33 +215,35 @@ class MigrationToolkit
         }
 
         return true;
-
     }
 
-    public function getErrors()
+    public function getErrors($end = true)
     {
+        if ($end) return end($this->errors);
         return $this->errors;
     }
 
-    public function isSuccess()
+    public function isSuccess(): bool
     {
-        if (empty($this->getErrors())) return true;
+        if (empty($this->getErrors()))
+            return true;
+        return false;
     }
 
-    private function setError($err)
+    private function setError($err): void
     {
         $this->errors[] = $err;
     }
 
-    private function loadMigrationClass($classFile)
+
+    private function loadMigrationClass($classFile): bool
     {
+        if (!file_exists($classFile))
+            return false;
         spl_autoload_register(function ($className) use ($classFile) {
             include_once $classFile;
         });
+        return true;
     }
 
-    public function saveLog($migrations)
-    {
-
-    }
 }

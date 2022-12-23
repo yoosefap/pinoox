@@ -73,6 +73,7 @@ class createMigration extends console implements CommandInterface
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
             ->ready();
+
     }
 
     private function create()

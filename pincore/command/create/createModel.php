@@ -86,7 +86,7 @@ class createModel extends console implements CommandInterface
     {
         $extend = $this->option('extends');
         if (strtolower($extend) == 'model') {
-            $this->use = 'pinoox\storage\Model';
+            $this->use = 'pinoox\component\database\Model';
             $this->extend = 'Model';
         }
     }

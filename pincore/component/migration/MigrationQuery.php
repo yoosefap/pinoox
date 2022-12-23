@@ -17,9 +17,9 @@ use pinoox\model\MigrationModel;
 class MigrationQuery
 {
 
-    public static function fetchLatestBatch($app)
+    public static function fetchLatestBatch($app): int
     {
-        return MigrationModel::where('app', $app)->first()->batch ?? 0;
+        return MigrationModel::where('app', $app)->orderBy('batch','DESC')->first()->batch ?? 0;
     }
 
     public static function fetchAllByBatch($batch, $app)

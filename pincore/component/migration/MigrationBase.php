@@ -13,19 +13,20 @@
 namespace pinoox\component\migration;
 
 use Illuminate\Database\Migrations\Migration;
-use pinoox\storage\Database;
+use pinoox\component\database\Database;
 use \Illuminate\Database\Schema\Builder;
 
 class MigrationBase extends Migration
 {
 
-    protected Database $db;
-    protected Builder $schema;
+    public Database $db;
+    public Builder $schema;
 
     public function __construct()
     {
-        $this->db = new Database();
-        $this->schema = $this->db->getSchema();
+        $db = Database::establish();
+        $this->db = $db;
+        $this->schema = $db->getSchema();
     }
 
 }

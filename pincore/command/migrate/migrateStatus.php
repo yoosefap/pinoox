@@ -10,7 +10,7 @@ use pinoox\component\migration\MigrationQuery;
 use pinoox\component\migration\MigrationToolkit;
 
 
-class migrateRun extends console implements CommandInterface
+class migrateStatus extends console implements CommandInterface
 {
 
     /**
@@ -18,14 +18,14 @@ class migrateRun extends console implements CommandInterface
      *
      * @var string
      */
-    protected $signature = "migrate";
+    protected $signature = "migrate:status";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Migrate schemas";
+    protected $description = "Show the status of each migration";
 
     /**
      * The console command Arguments.
@@ -68,7 +68,7 @@ class migrateRun extends console implements CommandInterface
     public function handle()
     {
         $this->init();
-        $this->runUp();
+        $this->status();
     }
 
     private function init()
@@ -87,43 +87,25 @@ class migrateRun extends console implements CommandInterface
             ->migration_path($this->mc->migration_path)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
+            ->fr
+        omDB(false)
             ->ready();
 
         $this->schema = $this->toolkit->getSchema();
     }
 
-    private function runUp()
+    private function status()
     {
         $migrations = $this->toolkit->getMigrations();
 
         if (empty($migrations)) {
-            $this->success('Nothing to migrate.');
+            $this->success('There are no migrations!');
             $this->newLine();
         }
 
-        $batch = MigrationQuery::fetchLatestBatch($this->mc->package) ?? 0;
-
         foreach ($migrations as $m) {
 
-            $start_time = microtime(true);
-            $this->warning('Migrating: ');
-            $this->info($m['fileName']);
-            $this->newLine();
-            $obj = new $m['classObject']();
-            $obj->up();
 
-            if ($this->package != 'pincore') {
-                MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
-            }
-
-            $end_time = microtime(true);
-            $exec_time = $end_time - $start_time;
-
-            //end migrating
-            $this->success('Migrated: ');
-            $this->info($m['fileName']);
-            $this->gray(' (' . substr($exec_time, 0, 5) . 'ms)');
-            $this->newLine();
         }
     }
 

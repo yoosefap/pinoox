@@ -6,7 +6,7 @@
 
 namespace pinoox\model;
 
-use pinoox\storage\Model;
+use pinoox\component\database\Model;
 
 
 class MigrationModel extends Model

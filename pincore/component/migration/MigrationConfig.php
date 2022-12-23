@@ -14,6 +14,7 @@
 namespace pinoox\component\migration;
 
 use pinoox\component\Config;
+use pinoox\component\database\Database;
 
 class MigrationConfig
 {
@@ -36,6 +37,7 @@ class MigrationConfig
     {
         return $this->errors;
     }
+
     public function getLastError()
     {
         return end($this->errors);
@@ -57,11 +59,15 @@ class MigrationConfig
         $this->migration_path = $this->app_path . $this->folders;
 
         //namespace
-        if ($this->package=='pincore'){
-            $this->namespace = 'pinoox'. $this->folders;
-        }else{
+        if ($this->package == 'pincore') {
+            $this->namespace = 'pinoox' . $this->folders;
+        } else {
             $this->namespace = 'pinoox' . self::DS . 'app' . self::DS . $this->package . $this->folders;
         }
+
+        //check database
+        $this->isPrepareDB();
+
         $this->config = $this->getConfig();
     }
 
@@ -78,5 +84,15 @@ class MigrationConfig
         }
 
         return $database;
+    }
+
+    public function isPrepareDB(): bool
+    {
+        $db = Database::establish();
+        if (empty($db->getCapsule()->getConnection())) {
+            $this->setError('Database not connected');
+            return false;
+        }
+        return true;
     }
 }
