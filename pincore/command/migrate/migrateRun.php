@@ -42,6 +42,7 @@ class migrateRun extends console implements CommandInterface
      * @var array
      */
     protected $options = [
+        ['init', 'i', 'to run init', false],
     ];
 
     private $package;
@@ -50,6 +51,12 @@ class migrateRun extends console implements CommandInterface
      * @var MigrationConfig
      */
     private $mc = null;
+
+
+    /**
+     * @var boolean
+     */
+    private $isInit = true;
 
     /**
      * @var MigrationToolkit
@@ -82,13 +89,19 @@ class migrateRun extends console implements CommandInterface
         if ($this->mc->getErrors())
             $this->error($this->mc->getLastError());
 
+        $this->isInit = $this->hasOption($this->options, 'i');
+
         $this->toolkit = (new MigrationToolkit())
             ->app_path($this->mc->app_path)
             ->migration_path($this->mc->migration_path)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
+            ->action($this->isInit ? 'init' : 'run')
             ->ready();
-
+        
+        if (!$this->toolkit->isSuccess()) {
+            $this->error($this->toolkit->getErrors());
+        }
         $this->schema = $this->toolkit->getSchema();
     }
 
@@ -101,7 +114,7 @@ class migrateRun extends console implements CommandInterface
             $this->newLine();
         }
 
-        $batch = MigrationQuery::fetchLatestBatch($this->mc->package) ?? 0;
+        $batch = !$this->isInit && MigrationQuery::fetchLatestBatch($this->mc->package) ?? 0;
 
         foreach ($migrations as $m) {
 
@@ -112,7 +125,7 @@ class migrateRun extends console implements CommandInterface
             $obj = new $m['classObject']();
             $obj->up();
 
-            if ($this->package != 'pincore') {
+            if (!$this->isInit) {
                 MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
             }
 

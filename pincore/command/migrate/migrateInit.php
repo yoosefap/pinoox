@@ -48,7 +48,7 @@ class migrateInit extends console implements CommandInterface
     {
         $this->success('Initialized migration table');
         $this->newLine();
-        echo $this->execute('migrate', ['pincore'], [], false);
+        echo $this->execute('migrate', ['pincore'], ['i' => true], false);
     }
 
 }

@@ -4,7 +4,7 @@ return [
     'development' => [
         'driver' => 'mysql',
         'host' => 'localhost',
-        'database' => 'pinoox2',
+        'database' => 'pinoox',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',

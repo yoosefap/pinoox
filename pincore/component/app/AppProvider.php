@@ -82,7 +82,7 @@ class AppProvider extends AppSource
      */
     private function build($app = null, $packageName = null)
     {
-        if (!is_file($packageName)) {
+        if (!empty($packageName) && !is_file($packageName)) {
             $app = ($app === '~') ? null : $app;
             $this->path = (empty($packageName)) ? Dir::path('pinker/app.php', $app) : Dir::path('pinker/app.php', $packageName);
             if (!is_file($this->path)) {
@@ -106,7 +106,7 @@ class AppProvider extends AppSource
      */
     private function getOptionsApp()
     {
-        if (is_file($this->path))
+        if (!empty($this->path) && is_file($this->path))
             return (array)(include $this->path);
         else
             return [];

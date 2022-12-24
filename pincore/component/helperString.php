@@ -138,7 +138,7 @@ class HelperString
             }
 
         } else {
-            if (substr($string, 0, strlen($search)) == $search) {
+            if (!empty($string) && str_starts_with($string, $search)) {
                 return true;
             }
         }
@@ -360,11 +360,8 @@ class HelperString
 
     public static function width($string = '')
     {
-        if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return \strlen($string);
-        }
-
-        return mb_strwidth($string, $encoding);
+        if (empty($string)) return null;
+        return mb_strwidth($string);
     }
 
 

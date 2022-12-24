@@ -87,8 +87,7 @@ class migrateStatus extends console implements CommandInterface
             ->migration_path($this->mc->migration_path)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
-            ->fr
-        omDB(false)
+            ->action('status')
             ->ready();
 
         $this->schema = $this->toolkit->getSchema();
@@ -101,12 +100,27 @@ class migrateStatus extends console implements CommandInterface
         if (empty($migrations)) {
             $this->success('There are no migrations!');
             $this->newLine();
+            exit;
         }
 
+        $this->info('Migration status:');
+        $this->newLine();
+        $this->table(['Migration', 'Batch', 'Status'], $this->getRows($migrations));
+    }
+
+    private function getRows($migrations)
+    {
+        $rows = [];
         foreach ($migrations as $m) {
-
-
+            $status = !empty($m['sync']) ? 'Done' : 'Pending';
+            $batch = $m['sync']['batch'] ?? null;
+            $rows[] = [
+                $m['fileName'],
+                $batch,
+                $status
+            ];
         }
+        return $rows;
     }
 
 }

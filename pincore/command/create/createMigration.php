@@ -103,7 +103,7 @@ class createMigration extends console implements CommandInterface
         try {
             $builder = ClassBuilder::init($className)
                 ->namespace("pinoox\\app\\" . $this->mc->package . "\\database\\migrations")
-                ->use('Illuminate\\Database\\Schema\\Blueprint')
+                ->use('Illuminate\Database\Schema\Blueprint')
                 ->use('pinoox\component\migration\MigrationBase')
                 ->extends('MigrationBase')
                 ->method('public function up', 'Run the migrations.')

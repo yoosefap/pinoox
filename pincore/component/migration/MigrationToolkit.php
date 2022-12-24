@@ -12,10 +12,12 @@
 
 namespace pinoox\component\migration;
 
+use Doctrine\DBAL\Schema\Schema;
 use Illuminate\Database\Capsule\Manager;
 use pinoox\component\File;
 use pinoox\component\HelperString;
 use pinoox\component\database\Database;
+use pinoox\model\MigrationModel;
 
 class MigrationToolkit
 {
@@ -50,11 +52,10 @@ class MigrationToolkit
     private string $namespace;
 
     /**
-     * use filter and exclude migrations in database, for example when run commands like: rollback OR status
-     * @var bool
+     * actions: rollback,run,init,status
+     * @var string
      */
-    private bool $fromDB = true;
-    private bool $checkDB = true;
+    private string $action = 'run';
 
     /**
      * errors
@@ -98,14 +99,12 @@ class MigrationToolkit
         return $this;
     }
 
-
     /**
      * @return $this
      */
-    public function fromDB($fromDB = true, $checkDB = false): self
+    public function action($action): self
     {
-        $this->fromDB = $fromDB;
-        $this->checkDB = $checkDB;
+        $this->action = $action;
         return $this;
     }
 
@@ -115,30 +114,35 @@ class MigrationToolkit
         return $this;
     }
 
-    private function getFromDB(): array
+    private function getFromDB(): mixed
     {
-        $batch = MigrationQuery::fetchLatestBatch($this->package);
-        $migrations = MigrationQuery::fetchAllByBatch($batch, $this->package);
-        return array_map(function ($m) {
-            return $m['migration'];
-        }, $migrations);
+        $isExists = Database::establish()->getSchema()->hasTable('migration');
+        if (!$isExists) {
+            $this->setError('Migration table not exists.');
+            return false;
+        }
+        $batch = $this->action == 'rollback' ?
+            MigrationQuery::fetchLatestBatch($this->package) : null;
+
+        return MigrationQuery::fetchAllByBatch($batch, $this->package);
     }
 
     public function ready(): self
     {
         if (!$this->checkPaths()) return $this;
 
-        if ($this->fromDB) {
-            $migrations = $this->getFromDB();
-        } else {
-            $migrations = $this->readyFromPath();
-        }
+        $migrations = $this->readyFromPath();
+        $migrations = $this->syncWithDB($migrations);
 
-        foreach ($migrations as $m) {
-            list($fileName, $className, $classObject, $isLoad) = $this->extract($m);
-            if ($this->checkDB && MigrationQuery::is_exists($fileName, $this->package)) continue;
+        if (!empty($migrations)) {
+            foreach ($migrations as $m) {
+                list($fileName, $className, $classObject, $isLoad) = $this->extract($m);
 
-            $this->migrations[] = $this->build($className, $fileName, $classObject, $isLoad);
+                if ($this->action === 'rollback' && empty($m['sync'])) continue;
+                if ($this->action === 'run' && !empty($m['sync'])) continue;
+
+                $this->migrations[] = $this->build($m['sync'], $className, $fileName, $classObject, $isLoad);
+            }
         }
 
         return $this;
@@ -146,7 +150,14 @@ class MigrationToolkit
 
     private function readyFromPath(): array
     {
-        return File::get_files($this->migration_path);
+        $files = File::get_files($this->migration_path);
+        return array_map(function ($f) {
+            return [
+                'sync' => false,
+                'path' => $f,
+                'migration' => basename($f, '.php'),
+            ];
+        }, $files);
     }
 
     private function extract($item): array
@@ -160,9 +171,10 @@ class MigrationToolkit
     }
 
 
-    private function build($className, $fileName, $classObject, $isLoad): array
+    private function build($sync, $className, $fileName, $classObject, $isLoad): array
     {
         return [
+            'sync' => $sync,
             'isLoad' => $isLoad,
             'packageName' => $this->package,
             'className' => $className,
@@ -200,6 +212,9 @@ class MigrationToolkit
 
     private function getFileName($file): string
     {
+        if (is_array($file)) {
+            return $file['migration'];
+        }
         return basename($file, '.php');
     }
 
@@ -238,12 +253,28 @@ class MigrationToolkit
 
     private function loadMigrationClass($classFile): bool
     {
-        if (!file_exists($classFile))
-            return false;
+        if (!file_exists($classFile)) return false;
+
         spl_autoload_register(function ($className) use ($classFile) {
             include_once $classFile;
         });
         return true;
     }
 
+    private function syncWithDB($migrations): array
+    {
+        if (empty($migrations)) return [];
+
+        $records = $this->getFromDB();
+
+        //find migrations in database
+        return array_map(function ($m) use ($records) {
+            $index = array_search($m['migration'], array_column($records, 'migration'));
+ 
+            if ($index !== false) {
+                $m['sync'] = $records[$index] ?? null;
+            }
+            return $m;
+        }, $migrations);
+    }
 }

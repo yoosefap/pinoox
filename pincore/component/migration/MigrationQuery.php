@@ -19,15 +19,17 @@ class MigrationQuery
 
     public static function fetchLatestBatch($app): int
     {
-        return MigrationModel::where('app', $app)->orderBy('batch','DESC')->first()->batch ?? 0;
+        return MigrationModel::where('app', $app)->orderBy('batch', 'DESC')->first()->batch ?? 0;
     }
 
     public static function fetchAllByBatch($batch, $app)
     {
-        return MigrationModel::where([
-            ['batch', $batch],
-            ['app', $app],
-        ])->get()->toArray() ?? null;
+
+        if (!empty($batch)) {
+            return MigrationModel::query()->where('batch', $batch)->where('app', $app)->get()->toArray() ?? null;
+        } else {
+            return MigrationModel::query()->where('app', $app)->get()->toArray() ?? null;
+        }
     }
 
     public static function insert($fileName, $app, $batch)

@@ -39,7 +39,7 @@ class console
         'red' => '0;31', 'light_red' => '1;31',
         'purple' => '0;35', 'light_purple' => '1;35',
         'brown' => '0;33', 'yellow' => '1;33',
-        'light_gray' => '0;37', 'white' => '1;37',
+        'light_gray' => '0;37', 'white' => '1;1',
     );
     private static $background_colors = array(
         'black' => '40', 'red' => '41',
@@ -156,6 +156,11 @@ class console
     protected static function success($text)
     {
         echo self::getColoredString($text, 'green');
+    }
+
+    protected static function white($text)
+    {
+        echo self::getColoredString($text, 'white');
     }
 
     protected static function danger($text)
@@ -366,13 +371,13 @@ class console
                     }
                 }
                 $border .= '┐';
-                self::gray($border);
+                self::white($border);
                 self::newLine();
-                self::gray('│');
+                self::white('│');
                 $border = '├';
                 foreach ($headers as $index => $header) {
-                    self::success(' ' . $header . str_repeat(' ', $widths[$index] - HelperString::width($header) - 1));
-                    self::gray('│');
+                    self::white(' ' . $header . str_repeat(' ', $widths[$index] - HelperString::width($header) - 1));
+                    self::white('│');
                     $border .= str_repeat('─', $widths[$index]);
                     if (next($headers) == true) {
                         $border .= '┼';
@@ -380,16 +385,16 @@ class console
                 }
                 $border .= '┤';
                 self::newLine();
-                self::gray($border);
+                self::white($border);
 
                 foreach ($rows as $row) {
                     $hasNextRow = next($rows) == true;
                     self::newLine();
-                    self::gray('│');
+                    self::white('│');
                     $border = $hasNextRow ? '├' : '└';
                     foreach ($row as $index => $column) {
                         self::info(' ' . $column . str_repeat(' ', (isset($widths[$index]) ? $widths[$index] : HelperString::width($column) + 1) - HelperString::width($column) - 1));
-                        self::gray('│');
+                        self::white('│');
                         $border .= str_repeat('─', isset($widths[$index]) ? $widths[$index] : HelperString::width($column) + 1);
                         if (next($row) == true) {
                             $border .= $hasNextRow ? '┼' : '┴';
@@ -397,7 +402,7 @@ class console
                     }
                     $border .= $hasNextRow ? '┤' : '┘';
                     self::newLine();
-                    self::gray($border);
+                    self::white($border);
                 }
 
                 if (count($rows) == 0) {
@@ -410,7 +415,7 @@ class console
                     }
                     $border .= '┘';
                     self::newLine();
-                    self::gray($border);
+                    self::success($border);
                 }
                 self::newLine();
 

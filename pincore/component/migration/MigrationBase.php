@@ -18,7 +18,6 @@ use \Illuminate\Database\Schema\Builder;
 
 class MigrationBase extends Migration
 {
-
     public Database $db;
     public Builder $schema;
 

@@ -84,10 +84,9 @@ class migrateRollback extends console implements CommandInterface
             ->migration_path($this->mc->migration_path)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
-            ->fromDB(false)
-            ->checkDB(false)
+            ->action('rollback')
             ->ready();
-
+        
         $this->schema = $this->toolkit->getSchema();
     }
 
