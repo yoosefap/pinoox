@@ -89,7 +89,7 @@ class migrateRun extends console implements CommandInterface
         if ($this->mc->getErrors())
             $this->error($this->mc->getLastError());
 
-        $this->isInit = $this->hasOption($this->options, 'i');
+        $this->isInit = $this->option('i');
 
         $this->toolkit = (new MigrationToolkit())
             ->app_path($this->mc->app_path)

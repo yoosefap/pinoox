@@ -116,15 +116,20 @@ class MigrationToolkit
 
     private function getFromDB(): mixed
     {
+        $batch = $this->action == 'rollback' ?
+            MigrationQuery::fetchLatestBatch($this->package) : null;
+
+        return MigrationQuery::fetchAllByBatch($batch, $this->package);
+    }
+
+    private function isExistsMigrationTable()
+    {
         $isExists = Database::establish()->getSchema()->hasTable('migration');
         if (!$isExists) {
             $this->setError('Migration table not exists.');
             return false;
         }
-        $batch = $this->action == 'rollback' ?
-            MigrationQuery::fetchLatestBatch($this->package) : null;
-
-        return MigrationQuery::fetchAllByBatch($batch, $this->package);
+        return true;
     }
 
     public function ready(): self
@@ -132,7 +137,10 @@ class MigrationToolkit
         if (!$this->checkPaths()) return $this;
 
         $migrations = $this->readyFromPath();
-        $migrations = $this->syncWithDB($migrations);
+
+        if ($this->action !='init' && $this->isExistsMigrationTable()) {
+            $migrations = $this->syncWithDB($migrations);
+        }
 
         if (!empty($migrations)) {
             foreach ($migrations as $m) {
@@ -270,7 +278,7 @@ class MigrationToolkit
         //find migrations in database
         return array_map(function ($m) use ($records) {
             $index = array_search($m['migration'], array_column($records, 'migration'));
- 
+
             if ($index !== false) {
                 $m['sync'] = $records[$index] ?? null;
             }
