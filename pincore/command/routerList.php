@@ -4,12 +4,12 @@ namespace pinoox\command;
 
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\Config;
-use pinoox\component\console;
+use pinoox\component\worker\Config;
+use pinoox\component\Console;
 use pinoox\component\interfaces\CommandInterface;
 
 
-class routerList extends console implements CommandInterface
+class routerList extends Console implements CommandInterface
 {
 
 	/**
@@ -55,7 +55,7 @@ class routerList extends console implements CommandInterface
 	}
 
 	private function listRoute(){
-        $routes = Config::get('~app');
+        $routes = Config::init('~app')->get();
         $result = [];
         if (!empty($routes)) {
             foreach ($routes as $alias => $packageName) {

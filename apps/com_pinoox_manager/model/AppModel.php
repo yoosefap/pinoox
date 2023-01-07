@@ -14,9 +14,10 @@ namespace pinoox\app\com_pinoox_manager\model;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\app\AppProvider;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
+use pinoox\component\package\App;
 use pinoox\component\Router;
 use pinoox\component\Url;
 use pinoox\model\PinooxDatabase;
@@ -34,7 +35,7 @@ class AppModel extends PinooxDatabase
         $path = Dir::path('~apps/');
         $folders = File::get_dir_folders($path);
         $icon_default = Url::file('resources/default.png');
-        $app = Router::getApp();
+        $app = App::package();
 
         $result = [];
         foreach ($folders as $folder) {
@@ -43,22 +44,22 @@ class AppModel extends PinooxDatabase
             if (!Router::existApp($package_key))
                 continue;
             Router::setApp($package_key);
-            AppProvider::app($package_key);
+            App::app($package_key);
 
-            $isEnable = AppProvider::get('enable');
+            $isEnable = App::get('enable');
             if (!$isEnable)
                 continue;
 
-            $isHidden = AppProvider::get('hidden');
+            $isHidden = App::get('hidden');
             if ($isHidden)
                 continue;
 
-            $isRouter = AppProvider::get('router');
+            $isRouter = App::get('router');
             if ($isCheckRouter && !$isRouter)
                 continue;
 
             if (!is_null($sysApp)) {
-                $sysAppState = AppProvider::get('sys-app');
+                $sysAppState = App::get('sys-app');
                 if ($sysApp && !$sysAppState) {
                     continue;
                 } else if (!$sysApp && $sysAppState) {
@@ -69,28 +70,28 @@ class AppModel extends PinooxDatabase
             $result[$package_key] = [
                 'package_name' => $package_key,
                 'hidden' => $isHidden,
-                'dock' => AppProvider::get('dock'),
+                'dock' => App::get('dock'),
                 'router' => $isRouter,
-                'name' => AppProvider::get('name'),
-                'description' => AppProvider::get('description'),
-                'version' => AppProvider::get('version-name'),
-                'version_code' => AppProvider::get('version-code'),
-                'developer' => AppProvider::get('developer'),
-                'open' => AppProvider::get('open'),
-                'sys_app' => AppProvider::get('sys-app'),
-                'icon' => Url::check(Url::file(AppProvider::get('icon'), $package_key), $icon_default),
+                'name' => App::get('name'),
+                'description' => App::get('description'),
+                'version' => App::get('version-name'),
+                'version_code' => App::get('version-code'),
+                'developer' => App::get('developer'),
+                'open' => App::get('open'),
+                'sys_app' => App::get('sys-app'),
+                'icon' => Url::check(Url::file(App::get('icon'), $package_key), $icon_default),
                 'routes' => self::fetch_all_aliases_by_package_name($package_key)
             ];
         }
 
-        AppProvider::app('~');
+        App::app('~');
         Router::setApp($app);
         return $result;
     }
 
     public static function fetch_all_aliases_by_package_name($packageName)
     {
-        $routes = Config::get('~app');
+        $routes = Config::init('~app')->get();
         $aliases = [];
         foreach ($routes as $alias => $package) {
             if ($package == $packageName) {
@@ -103,28 +104,28 @@ class AppModel extends PinooxDatabase
     public static function fetch_by_package_name($packageName)
     {
         $icon_default = Url::file('resources/default.png');
-        $app = Router::getApp();
+        $app = App::package();
 
         Router::setApp($packageName);
-        AppProvider::app($packageName);
+        App::app($packageName);
         $result = null;
         if (Router::existApp($packageName)) {
             $result = [
-                'name' => AppProvider::get('name'),
-                'hidden' => AppProvider::get('hidden'),
-                'dock' => AppProvider::get('dock'),
-                'router' => AppProvider::get('router'),
-                'enable' => AppProvider::get('enable'),
-                'open' => AppProvider::get('open'),
-                'sys-app' => AppProvider::get('sys-app'),
-                'description' => AppProvider::get('description'),
-                'version' => AppProvider::get('version-name'),
-                'version_code' => AppProvider::get('version-code'),
-                'developer' => AppProvider::get('developer'),
-                'icon' => Url::check(Url::file(AppProvider::get('icon'), $packageName), $icon_default),
+                'name' => App::get('name'),
+                'hidden' => App::get('hidden'),
+                'dock' => App::get('dock'),
+                'router' => App::get('router'),
+                'enable' => App::get('enable'),
+                'open' => App::get('open'),
+                'sys-app' => App::get('sys-app'),
+                'description' => App::get('description'),
+                'version' => App::get('version-name'),
+                'version_code' => App::get('version-code'),
+                'developer' => App::get('developer'),
+                'icon' => Url::check(Url::file(App::get('icon'), $packageName), $icon_default),
             ];
         }
-        AppProvider::app('~');
+        App::app('~');
         Router::setApp($app);
 
         return $result;
@@ -141,14 +142,16 @@ class AppModel extends PinooxDatabase
             foreach ($files as $file)
             {
                 $data = Wizard::pullDataPackage($file);
-                if (!Wizard::isValidNamePackage($data['package_name']) || !Config::getLinear('market',$data['package_name']))
+                $package_name = Config::init('market')->get($data['package_name']);
+                if (!Wizard::isValidNamePackage($data['package_name']) || !$package_name)
                 {
                     Wizard::deletePackageFile($file);
-                    Config::remove('market.' . $data['package_name']);
-                    Config::save('market');
+                    Config::init('market')
+                        ->delete($data['package_name'])
+                        ->save();
                     continue;
                 }
-                $data['market'] = Config::get('market.' . $data['package_name']);
+                $data['market'] = Config::init('market')->get($data['package_name']);
                 $result[] = $data;
             }
 

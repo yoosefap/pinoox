@@ -15,7 +15,7 @@
 namespace pinoox\app\com_pinoox_manager\service\app;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\interfaces\ServiceInterface;
@@ -28,14 +28,15 @@ class UpdateService implements ServiceInterface
 
     public function _run()
     {
-        Config::remove('options.pinoox_auth');
-        Config::save('options');
+        Config::init('options')
+            ->delete('pinoox_auth')
+            ->save();
 
-        $dir = Dir::path('pinupdate/','com_pinoox_manager');
-        if(!is_dir($dir))
+        $dir = Dir::path('pinupdate/', 'com_pinoox_manager');
+        if (!is_dir($dir))
             return;
 
-        $pinoox_version_code = config('~pinoox.version_code');
+        $pinoox_version_code = Config::init('~pinoox')->get('version_code');
         $files = File::get_files_by_pattern($dir, '*.db');
 
         foreach ($files as $file) {
@@ -51,11 +52,11 @@ class UpdateService implements ServiceInterface
     private static function runQuery($appDB)
     {
         if (is_file($appDB)) {
-            $package_name = 'com_pinoox_manager';
+            $packageName = 'com_pinoox_manager';
 
-            $prefix = Config::get('~database.prefix');
+            $prefix = Config::init('~database')->get('prefix');
             $query = file_get_contents($appDB);
-            $query = str_replace('{dbprefix}', $prefix . $package_name . '_', $query);
+            $query = str_replace('{dbprefix}', $prefix . $packageName . '_', $query);
             $queryArr = explode(';', $query);
 
             PinooxDatabase::$db->startTransaction();

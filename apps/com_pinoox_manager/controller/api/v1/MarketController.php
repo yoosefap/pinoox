@@ -14,7 +14,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\Download;
 use pinoox\component\HelperHeader;
@@ -33,25 +33,26 @@ class MarketController extends LoginConfiguration
 
     public function deleteDownload()
     {
-        $package_name = Request::inputOne('package_name', null, '!empty');
+        $packageName = Request::inputOne('package_name', null, '!empty');
 
-        if (empty($package_name))
+        if (empty($packageName))
             Response::json(Lang::get('manager.error_happened'), false);
 
-        $pinFile = Wizard::get_downloaded($package_name);
+        $pinFile = Wizard::get_downloaded($packageName);
         if (!is_file($pinFile))
             Response::json(Lang::get('manager.error_happened'), false);
 
         Wizard::deletePackageFile($pinFile);
-        Config::remove('market.' . $package_name);
-        Config::save('market');
+        Config::init('market')
+            ->delete($packageName)
+            ->save();
         Response::json(Lang::get('manager.delete_successfully'), true);
     }
 
 
     private function getAuthParams($auth)
     {
-        $pinVer = Config::get('~pinoox');
+        $pinVer = Config::init('~pinoox')->get();
         return [
             'token' => $auth['token'],
             'remote_url' => Url::site(),
@@ -66,34 +67,35 @@ class MarketController extends LoginConfiguration
         echo $data;
     }
 
-    public function getOneApp($package_name)
+    public function getOneApp($packageName)
     {
-        $data = Request::sendGet("https://www.pinoox.com/api/manager/v1/market/getApp/" . $package_name);
+        $data = Request::sendGet("https://www.pinoox.com/api/manager/v1/market/getApp/" . $packageName);
         HelperHeader::contentType('application/json', 'UTF-8');
         $arr = json_decode($data, true);
-        $arr['state'] = Wizard::app_state($package_name);
+        $arr['state'] = Wizard::app_state($packageName);
         Response::json($arr);
     }
 
-    public function downloadRequest($package_name)
+    public function downloadRequest($packageName)
     {
-        $app = AppModel::fetch_by_package_name($package_name);
+        $app = AppModel::fetch_by_package_name($packageName);
         if (!empty($app))
             Response::json(rlang('manager.currently_installed'), false);
 
         $auth = Request::inputOne('auth');
         $params = $this->getAuthParams($auth);
 
-        $res = Request::sendPost('https://www.pinoox.com/api/manager/v1/market/downloadRequest/' . $package_name, $params);
+        $res = Request::sendPost('https://www.pinoox.com/api/manager/v1/market/downloadRequest/' . $packageName, $params);
         if (!empty($res)) {
             $response = json_decode($res, true);
             if (!$response['status']) {
                 exit($res);
             } else {
-                $path = path("downloads>apps>" . $package_name . ".pin");
+                $path = path("downloads>apps>" . $packageName . ".pin");
                 Download::fetch('https://www.pinoox.com/api/manager/v1/market/download/' . $response['result']['hash'], $path)->process();
-                Config::set('market.' . $package_name, $response['result']);
-                Config::save('market');
+                Config::init('market')
+                    ->set($packageName, $response['result'])
+                    ->save();
                 Response::json(rlang('manager.download_completed'), true);
             }
         }
@@ -103,16 +105,16 @@ class MarketController extends LoginConfiguration
     * Templates
     */
 
-    public function getTemplates($package_name)
+    public function getTemplates($packageName)
     {
-        $data = Request::sendGet('https://www.pinoox.com/api/manager/v1/market/getAppTemplates/' . $package_name);
+        $data = Request::sendGet('https://www.pinoox.com/api/manager/v1/market/getAppTemplates/' . $packageName);
         HelperHeader::contentType('application/json', 'UTF-8');
         $result = json_decode($data, true);
         $templates = [];
         if (!empty($result)) {
             foreach ($result as $t) {
                 //check template state
-                $t['state'] = Wizard::template_state($package_name, $t['uid']);
+                $t['state'] = Wizard::template_state($packageName, $t['uid']);
                 $t['type'] = 'theme';
                 $templates[] = $t;
             }

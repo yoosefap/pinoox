@@ -1,6 +1,6 @@
 <?php
 
-return [
-  '*' => 'com_pinoox_welcome',
-  'manager' => 'com_pinoox_manager',
-];
+return pinker(function (){
+    return ['test'];
+    //return \pinoox\model\UserModel::fetch_all();
+});

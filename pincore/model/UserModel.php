@@ -219,9 +219,9 @@ class UserModel extends PinooxDatabase
         self::$db->where('status', $status);
     }
 
-    public static function where_app($package_name)
+    public static function where_app($packageName)
     {
-        self::$db->where('app', $package_name);
+        self::$db->where('app', $packageName);
     }
 
     public static function where_search($keyword)

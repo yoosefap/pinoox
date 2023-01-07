@@ -15,10 +15,10 @@ namespace pinoox\app\com_pinoox_installer\controller\api\v1;
 
 use pinoox\component\app\AppProvider;
 use pinoox\component\Cache;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\DB;
 use pinoox\component\Dir;
-use pinoox\component\HelperArray;
+use pinoox\component\helpers\HelperArray;
 use pinoox\component\Lang;
 use pinoox\component\Request;
 use pinoox\component\Response;
@@ -33,8 +33,8 @@ class MainController extends MasterConfiguration
     public function changeLang($lang)
     {
         $lang = strtolower($lang);
-        AppProvider::set('lang', $lang);
-        AppProvider::save();
+        App::set('lang', $lang);
+        App::save();
         Lang::change($lang);
         Response::json($this->getLang());
     }
@@ -110,23 +110,24 @@ class MainController extends MasterConfiguration
             Response::json(rlang('install.err_insert_tables'), false);
         }
 
-        $app = Config::get('app');
-        Config::set('~app', $app);
-        Config::save('~app');
+        $app = Config::init('app')->get();
+        Config::init('~app')
+            ->data($app)
+            ->save();
 
-        $lang = AppProvider::get('lang');
-        AppProvider::set('enable', false);
-        AppProvider::save();
+        $lang = App::get('lang');
+        App::set('enable', false);
+        App::save();
 
         // change lang app welcome
-        AppProvider::app('com_pinoox_welcome');
-        AppProvider::set('lang', $lang);
-        AppProvider::save();
+        App::app('com_pinoox_welcome');
+        App::set('lang', $lang);
+        App::save();
 
         // change lang app manager
-        AppProvider::app('com_pinoox_manager');
-        AppProvider::set('lang', $lang);
-        AppProvider::save();
+        App::app('com_pinoox_manager');
+        App::set('lang', $lang);
+        App::save();
 
         // run service update & caching last version
         Cache::app('com_pinoox_manager');
@@ -144,7 +145,7 @@ class MainController extends MasterConfiguration
         $isConnected = DB::checkConnect($c['host'], $c['username'], $c['password'], $c['database']);
         if (!$isConnected) return false;
 
-        Config::set('~database', $c);
+        Config::init('~database')->data($c);
         $file = Dir::path("pinoox.db");
         if (!is_file($file))
             return false;
@@ -153,7 +154,6 @@ class MainController extends MasterConfiguration
         $query = str_replace('{dbprefix}', $c['prefix'], $query);
         $queryArr = explode(';', $query);
 
-        PinooxDatabase::__constructStatic();
         PinooxDatabase::startTransaction();
         foreach ($queryArr as $q) {
             if (empty($q)) continue;
@@ -162,7 +162,7 @@ class MainController extends MasterConfiguration
         $user['app'] = 'com_pinoox_manager';
         UserModel::insert($user);
         PinooxDatabase::commit();
-        Config::save('~database');
+        Config::init('~database')->save();
         return true;
     }
 

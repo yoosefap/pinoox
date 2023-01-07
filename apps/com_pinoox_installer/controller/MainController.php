@@ -12,15 +12,33 @@
  */
 namespace pinoox\app\com_pinoox_installer\controller;
 
-use pinoox\component\HelperHeader;
+use pinoox\component\http\Request;
+use pinoox\component\kernel\Boot;
+use pinoox\component\kernel\controller\Controller;
+use pinoox\component\package\App;
 use pinoox\component\Response;
-use pinoox\component\Router;
+use pinoox\component\router\Router;
+use pinoox\component\router\Route;
 
-class MainController extends MasterConfiguration
+class MainController extends Controller
 {
-    public function _main()
+    public function test(Route $route,Request $request)
     {
-        self::$template->view('index');
+        return 'okay test!';
+       // dd('MainController:test');
+       // return 'test';
+       // return self::$template->render('test.twig',['test' => 'lang2']);
+    }
+
+    public function _main(Request $request)
+    {
+        return $this->forward('test');
+
+        // dd($request);
+      //  dd('main_installer');
+       // self::$template->view('index');
+
+       // return self::$template->render('test.twig',['test' => 'lang2']);
     }
 
     public function _exception()

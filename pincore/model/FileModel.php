@@ -12,7 +12,8 @@
 namespace pinoox\model;
 
 use pinoox\component\Date;
-use pinoox\component\HelperString;
+use pinoox\component\helpers\HelperString;
+use pinoox\component\package\App;
 use pinoox\component\Router;
 
 class FileModel extends PinooxDatabase
@@ -36,7 +37,7 @@ class FileModel extends PinooxDatabase
     {
         return self::$db->insert(self::file, array(
             "user_id" => $option['user_id'],
-            "app" => Router::getApp(),
+            "app" => App::package(),
             "file_group" => $option['group'],
             "file_realname" => HelperString::replaceSpace($option['realname'], '_'),
             "file_name" => $option['uploadname'],

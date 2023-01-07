@@ -61,16 +61,16 @@ class AppController extends LoginConfiguration
         if ($key == 'router')
             $config = $config === 'multiple' ? 'single' : 'multiple';
 
-        $currentApp = AppProvider::app();
+        $currentApp = App::app();
         if (!is_null($config)) {
-            AppProvider::app($packageName);
-            AppProvider::set($key, $config);
-            AppProvider::save();
+            App::app($packageName);
+            App::set($key, $config);
+            App::save();
             Response::json($config, true);
         } else {
             Response::json(null, false);
         }
-        AppProvider::app($currentApp);
+        App::app($currentApp);
 
 
     }

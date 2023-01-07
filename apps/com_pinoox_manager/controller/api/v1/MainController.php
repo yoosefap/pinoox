@@ -14,7 +14,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\app\com_pinoox_manager\model\LangModel;
 use pinoox\component\app\AppProvider;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Lang;
 use pinoox\component\Response;
 
@@ -23,8 +23,8 @@ class MainController extends LoginConfiguration
     public function changeLang($lang)
     {
         $lang = strtolower($lang);
-        AppProvider::set('lang', $lang);
-        AppProvider::save();
+        App::set('lang', $lang);
+        App::save();
         Lang::change($lang);
         $total_lang = LangModel::fetch_all();
         $direction = $total_lang['manager']['direction'];

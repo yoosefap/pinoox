@@ -11,7 +11,7 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
     
-use pinoox\component\HelperArray;
+use pinoox\component\helpers\HelperArray;
 
 function convertToJavascript($array)
 {

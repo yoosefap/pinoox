@@ -44,8 +44,8 @@ class TemplateController extends LoginConfiguration
             }
             $meta['folder'] = File::name($folder);
 
-            AppProvider::app($packageName);
-            $current = AppProvider::get('theme');
+            App::app($packageName);
+            $current = App::get('theme');
 
             $meta['activate'] = $current === $meta['folder'];
             $templates[] = $meta;
@@ -96,9 +96,9 @@ class TemplateController extends LoginConfiguration
 
     public function set($packageName, $folderName)
     {
-        AppProvider::app($packageName);
-        AppProvider::set('theme', $folderName);
-        AppProvider::save();
+        App::app($packageName);
+        App::set('theme', $folderName);
+        App::save();
     }
 
     public function remove($packageName, $folderName)

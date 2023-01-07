@@ -13,7 +13,7 @@
 
 namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\HelperString;
 use pinoox\component\HttpRequest;
 use pinoox\component\Request;
@@ -48,15 +48,16 @@ class AccountController extends LoginConfiguration
         );
         $array = json_decode($data, true);
         if ($array['status']) {
-            Config::set('connect.token_key', $array['result']['token']);
-            Config::save('connect');
+            Config::init('connect')
+                ->set('token_key', $array['result']['token'])
+                ->save();
         }
         exit($data);
     }
 
     public function getPinooxAuth()
     {
-        $token_key = Config::get('connect.token_key');
+        $token_key = Config::init('connect')->get('token_key');
         $data = Request::sendPost(
             'https://www.pinoox.com/api/manager/v1/account/getData',
             [
@@ -70,8 +71,7 @@ class AccountController extends LoginConfiguration
         );
 
         $data = HelperString::decodeJson($data);
-        if($data['status'])
-        {
+        if ($data['status']) {
             Response::json($data['result']);
         }
 
@@ -93,8 +93,9 @@ class AccountController extends LoginConfiguration
 
         $array = json_decode($data, true);
         if (!empty($array['token_key'])) {
-            Config::set('connect.token_key', $array['token_key']);
-            Config::save('connect');
+            Config::init('connect')
+                ->set('token_key', $array['token_key'])
+                ->save();
 
             Response::json($array['token_key'], true);
         }
@@ -104,13 +105,14 @@ class AccountController extends LoginConfiguration
 
     public function getConnectData()
     {
-        $data = Config::get('connect');
+        $data = Config::init('connect')->get();
         Response::json($data);
     }
 
     public function logout()
     {
-        Config::set('connect.token_key',null);
-        Config::save('connect');
+        Config::init('connect')
+            ->set('token_key', null)
+            ->save();
     }
 }

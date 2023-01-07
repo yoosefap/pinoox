@@ -21,7 +21,7 @@ class WidgetController extends LoginConfiguration
 {
     public function clock()
     {
-        $isJalali = (AppProvider::get('lang') === 'fa');
+        $isJalali = (App::get('lang') === 'fa');
         $date = $isJalali? Date::j('d F Y') : Date::g('d F Y');
 
         Response::json([

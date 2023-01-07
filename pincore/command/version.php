@@ -3,9 +3,9 @@ namespace pinoox\command;
 
 
 use pinoox\app\com_pinoox_manager\component\Notification;
-use pinoox\component\Config;
-use pinoox\component\console;
-use pinoox\component\HelperString;
+use pinoox\component\worker\Config;
+use pinoox\component\Console;
+use pinoox\component\helpers\HelperString;
 use pinoox\component\HttpRequest;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\Lang;
@@ -13,7 +13,7 @@ use pinoox\component\Request;
 use pinoox\component\Url;
 
 
-class version extends console implements CommandInterface
+class version extends Console implements CommandInterface
 {
 
 	/**
@@ -74,7 +74,7 @@ class version extends console implements CommandInterface
     private static function getVersions()
     {
         $server_version = self::getServerVersion();
-        $client_version = Config::get('~pinoox');
+        $client_version = Config::init('~pinoox')->get();
         $client_version = [
             'version_code' => $client_version['version_code'],
             'version_name' => $client_version['version_name'],
@@ -98,7 +98,7 @@ class version extends console implements CommandInterface
         Notification::push($title, $message, 0, true);
     }
     private static function getServerVersion(){
-        $pinoox = Config::get('~pinoox');
+        $pinoox = Config::init('~pinoox')->get();
         $data = Request::sendPost(
             'https://www.pinoox.com/api/v1/update/checkVersion/',
             [

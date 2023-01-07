@@ -13,7 +13,7 @@
 namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\component\app\AppProvider;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\Response;
 
@@ -23,15 +23,16 @@ class OptionsController extends LoginConfiguration
     {
         $path = Dir::theme('dist/images/backgrounds/' . $name . '.jpg');
         if (is_file($path)) {
-            Config::set('options.background', $name);
-            Config::save('options');
+            Config::init('options')
+                ->set('background', $name)
+                ->save();
             Response::json($name, true);
         }
 
         Response::json($name, false);
     }
 
-    public function changeLockTime($minutes=0)
+    public function changeLockTime($minutes = 0)
     {
         switch ($minutes) {
             case 10:
@@ -47,10 +48,11 @@ class OptionsController extends LoginConfiguration
                 break;
         }
 
-        $lock_time = Config::get('options.lock_time');
+        $lock_time = Config::init('options')->get('lock_time');
         if ($lock_time != $minutes) {
-            Config::set('options.lock_time', $minutes);
-            Config::save('options');
+            Config::init('options')
+                ->set('lock_time', $minutes)
+                ->save();
             Response::json($minutes, true);
         }
 

@@ -17,10 +17,11 @@ namespace pinoox\app\com_pinoox_manager\component;
 
 use pinoox\component\app\AppProvider;
 use pinoox\component\Cache;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\Lang;
+use pinoox\component\package\App;
 use pinoox\component\Router;
 use pinoox\component\Service;
 use pinoox\component\Url;
@@ -136,12 +137,12 @@ class Wizard
         return true;
     }
 
-    public static function runQuery($appDB, $package_name, $isRemoveFile = true, $isCopyUser = true)
+    public static function runQuery($appDB, $packageName, $isRemoveFile = true, $isCopyUser = true)
     {
         if (is_file($appDB)) {
-            $prefix = Config::get('~database.prefix');
+            $prefix = Config::init('~database')->get('prefix');
             $query = file_get_contents($appDB);
-            $query = str_replace('{dbprefix}', $prefix . $package_name . '_', $query);
+            $query = str_replace('{dbprefix}', $prefix . $packageName . '_', $query);
             $queryArr = explode(';', $query);
 
             PinooxDatabase::$db->startTransaction();
@@ -152,7 +153,7 @@ class Wizard
 
             //copy new user
             if ($isCopyUser)
-                UserModel::copy(User::get('user_id'), $package_name);
+                UserModel::copy(User::get('user_id'), $packageName);
 
             PinooxDatabase::$db->commit();
 
@@ -164,14 +165,14 @@ class Wizard
         return false;
     }
 
-    public static function changeLang($package_name)
+    public static function changeLang($packageName)
     {
         $lang = Lang::current();
-        if (!Lang::exists($lang, $package_name))
+        if (!Lang::exists($lang, $packageName))
             return false;
-        self::setApp($package_name);
-        AppProvider::set('lang', $lang);
-        AppProvider::save();
+        self::setApp($packageName);
+        App::set('lang', $lang);
+        App::save();
         return true;
     }
 
@@ -180,12 +181,12 @@ class Wizard
         if (self::$isApp && !$isAgain) return;
         self::$isApp = true;
         Router::setApp($packageName);
-        AppProvider::app($packageName);
+        App::app($packageName);
     }
 
     private static function runService($packageName, $state = 'install')
     {
-        $current = Router::getApp();
+        $current = App::package();
         self::setApp($packageName);
         Cache::app($packageName);
         Service::app($packageName);
@@ -224,13 +225,13 @@ class Wizard
 
 
         self::setApp($data['package_name']);
-        AppProvider::set('version-code', $data['version_code']);
-        AppProvider::set('version-name', $data['version']);
-        AppProvider::set('name', $data['name']);
-        AppProvider::set('developer', $data['developer']);
-        AppProvider::set('description', $data['description']);
-        AppProvider::set('icon', $data['path_icon']);
-        AppProvider::save();
+        App::set('version-code', $data['version_code']);
+        App::set('version-name', $data['version']);
+        App::set('name', $data['name']);
+        App::set('developer', $data['developer']);
+        App::set('description', $data['description']);
+        App::set('icon', $data['path_icon']);
+        App::save();
         self::runService($data['package_name'], 'update');
 
         self::setApp('com_pinoox_manager', true);
@@ -263,14 +264,15 @@ class Wizard
 
     private static function removeRoutes($packageName)
     {
-        $routes = Config::get('~app');
+        $routes = Config::init('~app')->get();
         foreach ($routes as $alias => $package) {
             if ($package == $packageName && $alias != '*') {
                 unset($routes[$alias]);
             }
         }
-        Config::set('~app', $routes);
-        Config::save('~app');
+        Config::init('~app')
+            ->data($routes)
+            ->save();
     }
 
     private static function removeDatabase($packageName)
@@ -308,11 +310,11 @@ class Wizard
         Service::run('app>update');
     }
 
-    public static function app_state($package_name)
+    public static function app_state($packageName)
     {
-        if (self::is_installed($package_name))
+        if (self::is_installed($packageName))
             $state = 'installed';
-        else if (self::is_downloaded($package_name))
+        else if (self::is_downloaded($packageName))
             $state = 'install';
         else
             $state = 'download';
@@ -320,25 +322,25 @@ class Wizard
         return $state;
     }
 
-    public static function is_installed($package_name)
+    public static function is_installed($packageName)
     {
-        return Router::existApp($package_name);
+        return Router::existApp($packageName);
     }
 
-    public static function is_downloaded($package_name)
+    public static function is_downloaded($packageName)
     {
-        $file = Dir::path('downloads>apps>' . $package_name . '.pin');
+        $file = Dir::path('downloads>apps>' . $packageName . '.pin');
         return (!empty($file) && file_exists($file));
     }
 
-    public static function get_downloaded($package_name)
+    public static function get_downloaded($packageName)
     {
-        return Dir::path('downloads>apps>' . $package_name . '.pin');
+        return Dir::path('downloads>apps>' . $packageName . '.pin');
     }
 
-    public static function template_state($package_name, $uid)
+    public static function template_state($packageName, $uid)
     {
-        if (self::is_installed_template($package_name, $uid))
+        if (self::is_installed_template($packageName, $uid))
             $state = 'installed';
         else if (self::is_downloaded_template($uid))
             $state = 'install';
@@ -348,9 +350,9 @@ class Wizard
         return $state;
     }
 
-    public static function is_installed_template($package_name, $uid)
+    public static function is_installed_template($packageName, $uid)
     {
-        $file = Dir::path("~apps>$package_name>theme>$uid");
+        $file = Dir::path("~apps>$packageName>theme>$uid");
         return (!empty($file) && file_exists($file));
     }
 

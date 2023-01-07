@@ -13,9 +13,9 @@
 namespace pinoox\app\com_pinoox_manager\controller;
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\Config;
-use pinoox\component\HelperHeader;
-use pinoox\component\HelperString;
+use pinoox\component\worker\Config;
+use pinoox\component\helpers\HelperHeader;
+use pinoox\component\helpers\HelperString;
 use pinoox\component\Request;
 use pinoox\component\Response;
 use pinoox\component\Router;
@@ -28,14 +28,14 @@ class MainController extends MasterConfiguration
         $this->_main();
     }
 
-    public function app($package_name)
+    public function app($packageName)
     {
-        if (User::isLoggedIn() && Router::existApp($package_name)) {
-            $app = AppModel::fetch_by_package_name($package_name);
+        if (User::isLoggedIn() && Router::existApp($packageName)) {
+            $app = AppModel::fetch_by_package_name($packageName);
             if ($app['enable'] && !$app['sys-app']) {
                 self::$template = null;
                 User::reset();
-                Router::build('manager/app/' . $package_name, $package_name);
+                Router::build('manager/app/' . $packageName, $packageName);
                 exit;
             }
         }

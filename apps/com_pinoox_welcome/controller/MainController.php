@@ -11,10 +11,15 @@
  */
 namespace pinoox\app\com_pinoox_welcome\controller;
 
-use pinoox\component\Download;
 
-class MainController extends MasterConfiguration
+use Symfony\Component\HttpFoundation\Response;
+
+class MainController
 {
+
+    public function test()
+    {
+    }
 
     public function _main()
     {

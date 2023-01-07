@@ -13,9 +13,9 @@
 namespace pinoox\app\com_pinoox_manager\controller;
 
 use pinoox\app\com_pinoox_manager\model\LangModel;
-use pinoox\component\Config;
+use pinoox\component\worker\Config;
 use pinoox\component\Dir;
-use pinoox\component\HelperString;
+use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\ControllerInterface;
 use pinoox\component\Request;
 use pinoox\component\Response;

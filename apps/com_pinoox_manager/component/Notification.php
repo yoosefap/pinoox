@@ -14,7 +14,8 @@
 namespace pinoox\app\com_pinoox_manager\component;
 
 use pinoox\app\com_pinoox_manager\model\NotificationModel;
-use pinoox\component\HelperString;
+use pinoox\component\helpers\HelperString;
+use pinoox\component\package\App;
 use pinoox\component\Router;
 
 class Notification
@@ -68,7 +69,7 @@ class Notification
 
     private static function getApp()
     {
-        return (empty(self::$app)) ? Router::getApp() : self::$app;
+        return (empty(self::$app)) ? App::package() : self::$app;
     }
 
     public static function send($ntf_id)

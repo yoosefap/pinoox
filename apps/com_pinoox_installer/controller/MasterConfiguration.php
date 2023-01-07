@@ -12,27 +12,33 @@
  */
 namespace pinoox\app\com_pinoox_installer\controller;
 
-use pinoox\component\app\AppProvider;
+use pinoox\component\package\App;
+use pinoox\component\package\AppRouter;
+use pinoox\component\package\AppSource;
 use pinoox\component\Dir;
-use pinoox\component\HelperString;
+use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\ControllerInterface;
 use pinoox\component\Response;
 use pinoox\component\Template;
 
-class MasterConfiguration implements ControllerInterface
+class MasterConfiguration
 {
     protected static $template;
 
     public function __construct()
     {
-        self::$template = new Template();
-        $this->getAssets();
-        $this->setLang();
+//        $folder = App::get('theme');
+//        $pathTheme = Dir::path(App::get('path-theme'));
+//        $loader = new \Twig\Loader\FilesystemLoader($folder,$pathTheme);
+//        $loader->addPath('test');
+//        self::$template = new \Twig\Environment($loader);
+       // $this->getAssets();
+        //$this->setLang();
     }
 
     private function setLang()
     {
-        $lang = AppProvider::get('lang');
+        $lang = App::get('lang');
         $direction = in_array($lang, ['fa', 'ar']) ? 'rtl' : 'ltr';
         $data = HelperString::encodeJson([
             'install' => rlang('install'),
@@ -42,7 +48,6 @@ class MasterConfiguration implements ControllerInterface
         self::$template->set('_lang', $data);
         self::$template->set('_direction', $direction);
         self::$template->set('currentLang', $lang);
-
     }
 
     private function getAssets()
@@ -64,10 +69,6 @@ class MasterConfiguration implements ControllerInterface
         self::$template->assets = ['js' => $js, 'css' => $css];
     }
 
-    public function _main()
-    {
-        Response::redirect(url());
-    }
 
     public function _exception()
     {

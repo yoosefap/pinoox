@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="<?php echo $_url; ?>dist/<?php echo @$assets['css']; ?>">
     <link rel="icon" href="<?php echo $_url; ?>dist/images/logo-64.png">
 
-    <title><?php lang('install.title_page'); ?></title>
+    <title>{{ lang('install.title_page') }}</title>
 </head>
 <body class="<?php echo @$_direction; ?>">
-<h1></h1>
+<h1>{{}}</h1>
 
 <div id="app"></div>
 

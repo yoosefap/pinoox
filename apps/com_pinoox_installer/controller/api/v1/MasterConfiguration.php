@@ -24,7 +24,7 @@ class MasterConfiguration extends ApiConfiguration
 
     protected function getLang($lang = null)
     {
-        $lang = empty($lang) ? AppProvider::get('lang') : $lang;
+        $lang = empty($lang) ? App::get('lang') : $lang;
         return [
             'direction' => in_array($lang, ['fa', 'ar']) ? 'rtl' : 'ltr',
             'lang' => [

@@ -23,8 +23,8 @@ class RouterService implements ServiceInterface
     {
         if ( ! is_null(Url::request())){
             AppFinder::current();
-          //  Router::start();
-          //  Router::call();
+            Router::start();
+            Router::call();
         }
     }
 

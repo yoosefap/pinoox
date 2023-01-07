@@ -13,8 +13,8 @@
 namespace pinoox\model;
 
 use pinoox\component\Date;
-use pinoox\component\HelperHeader;
-use pinoox\component\HelperString;
+use pinoox\component\helpers\HelperHeader;
+use pinoox\component\helpers\HelperString;
 use pinoox\component\Token;
 
 class TokenModel extends PinooxDatabase

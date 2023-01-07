@@ -3,15 +3,15 @@ namespace pinoox\command;
 
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\console;
+use pinoox\component\Console;
 use pinoox\component\Dir;
 use pinoox\component\File;
-use pinoox\component\HelperString;
+use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\Zip;
 
 
-class appBuilder extends console implements CommandInterface
+class appBuilder extends Console implements CommandInterface
 {
 
     /**
