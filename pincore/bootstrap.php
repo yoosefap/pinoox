@@ -13,7 +13,7 @@
 use pinoox\component\kernel\Loader;
 
 define('PINOOX_DEFAULT_LANG', 'en');
-define('PINOOX_PATH', realpath(__DIR__ .DIRECTORY_SEPARATOR. '..') . DIRECTORY_SEPARATOR);
+define('PINOOX_PATH', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
 define('PINOOX_CORE_PATH', PINOOX_PATH . 'pincore' . DIRECTORY_SEPARATOR);
 define('PINOOX_BOOT_PATH', PINOOX_CORE_PATH . 'boot' . DIRECTORY_SEPARATOR);
 define('PINOOX_MODEL_PATH', PINOOX_CORE_PATH . 'model' . DIRECTORY_SEPARATOR);
@@ -32,7 +32,7 @@ define('PINOOX_PATH_THUMB', 'thumbs/{name}_{size}.{ext}');
 | into the script here so we don't need to manually load our classes.
 |
 */
-$composer = require PINOOX_PATH.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+$composer = require PINOOX_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 $loader = new ConstructStatic\Loader($composer);
 
 /*

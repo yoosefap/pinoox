@@ -27,7 +27,7 @@ use pinoox\component\Service;
 use pinoox\component\Url;
 use pinoox\component\User;
 use pinoox\component\Zip;
-use pinoox\model\PinooxDatabase;
+use pinoox\model\PincoreModel;
 use pinoox\model\SessionModel;
 use pinoox\model\TokenModel;
 use pinoox\model\UserModel;
@@ -145,17 +145,17 @@ class Wizard
             $query = str_replace('{dbprefix}', $prefix . $packageName . '_', $query);
             $queryArr = explode(';', $query);
 
-            PinooxDatabase::$db->startTransaction();
+            PincoreModel::$db->startTransaction();
             foreach ($queryArr as $q) {
                 if (empty($q)) continue;
-                PinooxDatabase::$db->mysqli()->query($q);
+                PincoreModel::$db->mysqli()->query($q);
             }
 
             //copy new user
             if ($isCopyUser)
                 UserModel::copy(User::get('user_id'), $packageName);
 
-            PinooxDatabase::$db->commit();
+            PincoreModel::$db->commit();
 
             if ($isRemoveFile)
                 File::remove_file($appDB);
@@ -277,23 +277,23 @@ class Wizard
 
     private static function removeDatabase($packageName)
     {
-        PinooxDatabase::startTransaction();
+        PincoreModel::startTransaction();
 
-        $tables = PinooxDatabase::getTables($packageName);
+        $tables = PincoreModel::getTables($packageName);
         $tables = implode(',', $tables);
-        PinooxDatabase::$db->rawQuery("SET FOREIGN_KEY_CHECKS = 0");
+        PincoreModel::$db->rawQuery("SET FOREIGN_KEY_CHECKS = 0");
 
         //delete all tables
         if (!empty($tables))
-            PinooxDatabase::$db->rawQuery("DROP TABLE IF EXISTS " . $tables);
+            PincoreModel::$db->rawQuery("DROP TABLE IF EXISTS " . $tables);
 
         //delete all rows
         UserModel::delete_by_app($packageName);
         TokenModel::delete_by_app($packageName);
         SessionModel::delete_by_app($packageName);
 
-        PinooxDatabase::$db->rawQuery("SET FOREIGN_KEY_CHECKS = 1");
-        PinooxDatabase::commit();
+        PincoreModel::$db->rawQuery("SET FOREIGN_KEY_CHECKS = 1");
+        PincoreModel::commit();
     }
 
     public static function updateCore($file)

@@ -22,7 +22,6 @@ use pinoox\component\Uploader;
 use pinoox\component\Url;
 use pinoox\component\User;
 use pinoox\component\Validation;
-use pinoox\model\PinooxDatabase;
 use pinoox\model\UserModel;
 
 class UserController extends MasterConfiguration
@@ -133,7 +132,7 @@ class UserController extends MasterConfiguration
 
         if (Request::isFile('avatar')) {
 
-            PinooxDatabase::startTransaction();
+            PincoreModel::startTransaction();
 
             $old_avatar_id = User::get('avatar_id');
             $up = Uploader::init('avatar', path('uploads/avatar/'))
@@ -145,7 +144,7 @@ class UserController extends MasterConfiguration
 
             $avatar_id = $up->getInsertId();
             if ($up->isCommit() && UserModel::update_avatar(User::get('user_id'), $avatar_id)) {
-                PinooxDatabase::commit();
+                PincoreModel::commit();
                 $up->commit();
                 Uploader::init()->thumb('128f', PINOOX_PATH_THUMB)->actRemoveRow($old_avatar_id);
             }

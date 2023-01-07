@@ -15,7 +15,7 @@ namespace pinoox\component\helpers;
 class HelperString
 {
     // get unique form one string by time,md5,exists,uniqid,...
-    public static function get_unique_string($string, $decoding_type = "", $prefix = "", $postfix = "", $i_loop = "", $dir = null,$ext = null)
+    public static function get_unique_string($string, $decoding_type = "", $prefix = "", $postfix = "", $i_loop = "", $dir = null, $ext = null)
     {
         #change it, time..
         if ($decoding_type == "time") {
@@ -36,16 +36,15 @@ class HelperString
             $return = $prefix . uniqid($string) . $i_loop . $postfix;
         } #nothing
         else {
-            $return = self::changeSignsToOneSing($string).$i_loop . $postfix;
+            $return = self::changeSignsToOneSing($string) . $i_loop . $postfix;
             $return = preg_replace('/-+/', '-', $return);
             $return = $prefix . $return;
         }
 
-        if(!empty($dir) && !empty($ext) && is_file($dir.$return.'.'.$ext))
-        {
-            $i_loop = !empty($i_loop)? $i_loop : 0;
+        if (!empty($dir) && !empty($ext) && is_file($dir . $return . '.' . $ext)) {
+            $i_loop = !empty($i_loop) ? $i_loop : 0;
             $i_loop++;
-            $return = self::get_unique_string($string, $decoding_type, $prefix, $postfix, $i_loop, $dir,$ext);
+            $return = self::get_unique_string($string, $decoding_type, $prefix, $postfix, $i_loop, $dir, $ext);
         }
         return $return;
     }
@@ -139,7 +138,7 @@ class HelperString
             }
 
         } else {
-            if (substr($string, 0, strlen($search)) == $search) {
+            if (!empty($string) && str_starts_with($string, $search)) {
                 return true;
             }
         }
@@ -205,6 +204,21 @@ class HelperString
             $result .= ($index != 0) ? ucfirst($item) : $item;
         }
         return $result;
+    }
+
+    public static function toCamelCase($str, array $noStrip = [])
+    {
+        // non-alpha and non-numeric characters become spaces
+        $str = preg_replace('/[^a-z0-9' . implode("", $noStrip) . ']+/i', ' ', $str);
+        $str = trim($str);
+        // uppercase the first character of each word
+        $str = ucwords($str);
+        return str_replace(" ", "", $str);
+    }
+
+    public static function toUnderScore($str)
+    {
+        return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $str)), '_');
     }
 
     public static function multiExplode(array $delimiters,string $string): array|bool
@@ -343,13 +357,10 @@ class HelperString
         return (preg_match('/\\.[^.\\s]{' . $start . ',' . $end . '}$/', $string));
     }
 
-    public static function width($string= '')
+    public static function width($string = '')
     {
-        if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return \strlen($string);
-        }
-
-        return mb_strwidth($string, $encoding);
+        if (empty($string)) return null;
+        return mb_strwidth($string);
     }
 
 
@@ -361,29 +372,31 @@ class HelperString
      * @param false $showPercent
      * @return array|false|mixed
      */
-    public static function closest_word($input, $words , $showPercent = false) {
+    public static function closest_word($input, $words, $showPercent = false)
+    {
         $morePercent = -1;
         $closest = false;
         foreach ($words as $word) {
             $lev = levenshtein($input, $word);
             similar_text($input, $word, $percent1);
             similar_text($word, $input, $percent2);
-            $percent0 = ( 1 - $lev / max(strlen($input), strlen($closest)) ) * 100;
-            $avg = ($percent1  + $percent2  + $percent0 ) / 3 ;
-            if ($lev == 0 or $percent1 >= 95 or $percent2 >= 95 ) {
+            $percent0 = (1 - $lev / max(strlen($input), strlen($closest))) * 100;
+            $avg = ($percent1 + $percent2 + $percent0) / 3;
+            if ($lev == 0 or $percent1 >= 95 or $percent2 >= 95) {
                 $closest = $word;
                 $morePercent = $avg;
                 break;
             }
-            if ($avg > $morePercent)  {
-                $closest  = $word;
+            if ($avg > $morePercent) {
+                $closest = $word;
                 $morePercent = $avg;
             }
         }
-        if ( $showPercent ) {
-            $percent = round($morePercent , 2);
-            return [$closest,$percent];
+        if ($showPercent) {
+            $percent = round($morePercent, 2);
+            return [$closest, $percent];
         }
         return $closest;
     }
+
 }

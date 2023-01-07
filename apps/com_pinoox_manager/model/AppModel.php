@@ -12,6 +12,7 @@
 
 namespace pinoox\app\com_pinoox_manager\model;
 
+use Illuminate\Database\Eloquent\Model;
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\app\AppProvider;
 use pinoox\component\worker\Config;
@@ -20,9 +21,8 @@ use pinoox\component\File;
 use pinoox\component\package\App;
 use pinoox\component\Router;
 use pinoox\component\Url;
-use pinoox\model\PinooxDatabase;
 
-class AppModel extends PinooxDatabase
+class AppModel extends Model
 {
     /**
      * @param null|boolean $sysApp null: return all installed and system apps | true: return all system apps | false: return all installed app
@@ -105,7 +105,6 @@ class AppModel extends PinooxDatabase
     {
         $icon_default = Url::file('resources/default.png');
         $app = App::package();
-
         Router::setApp($packageName);
         App::app($packageName);
         $result = null;

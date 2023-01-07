@@ -15,14 +15,18 @@ namespace pinoox\service;
 use pinoox\component\worker\Config;
 use pinoox\component\interfaces\ServiceInterface;
 use pinoox\component\Session;
-use pinoox\model\PinooxDatabase;
+use pinoox\model\PincoreModel;
 
 class SessionService implements ServiceInterface
 {
 
     public function after()
     {
-    }
+        $dbConfig = Config::get('~database');
+        if (empty($dbConfig) || isset($dbConfig['isLock']) || !PincoreModel::$db->tableExists('session'))
+            $store_in_file = true;
+        else
+            $store_in_file = false;
 
     public function before()
     {

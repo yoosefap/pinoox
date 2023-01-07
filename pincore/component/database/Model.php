@@ -1,4 +1,9 @@
 <?php
+
+namespace pinoox\component\database;
+
+use \Illuminate\Database\Eloquent\Model as EloquentModel;
+
 /**
  *      ****  *  *     *  ****  ****  *    *
  *      *  *  *  * *   *  *  *  *  *   *  *
@@ -9,14 +14,8 @@
  * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
- 
-namespace pinoox\app\com_pinoox_manager\model;
 
-use Illuminate\Database\Eloquent\Model;
-
-class ManagerDatabase extends Model
+abstract class Model extends EloquentModel
 {
-    const notification = 'com_pinoox_manager_notification';
-
+    use Table;
 }
-    

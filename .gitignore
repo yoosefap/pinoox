@@ -26,3 +26,5 @@ package-lock.json
 
 # PHPUnit
 .phpunit.result.cache
+
+# Migrations
