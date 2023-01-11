@@ -14,7 +14,11 @@ namespace pinoox\component;
 
 use pinoox\component\helpers\HelperArray;
 use pinoox\component\helpers\HelperString;
+use pinoox\component\http\Http;
 use ReflectionException;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class Request
 {
@@ -278,11 +282,12 @@ class Request
      * @param $url string
      * @param $params array
      * @param $options array
-     * @return array|string|bool|mixed
+     * @return ResponseInterface|null
      */
-    public static function sendPost($url, $params, $options = [])
+    public static function sendPost(string $url, array $params = [], array $options = []): ?ResponseInterface
     {
-        return HttpRequest::init($url, HttpRequest::POST)->params($params)->options($options)->send();
+        $options['body'] = $params;
+        return Http::post( $url, $options);
     }
 
     /**

@@ -5,20 +5,16 @@
  *      ****  *  *  *  *  *  *  *  *    *
  *      *     *  *   * *  *  *  *  *   *  *
  *      *     *  *    **  ****  ****  *    *
- * @author   Erfan Ebrahimi
- * @link http://www.erfanebrahimi.ir/
+ * @author   Pinoox
+ * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\component\interfaces;
 
-interface CommandInterface
+namespace pinoox\component\template;
+
+
+class View
 {
-    /**
-     * Main method
-     *
-     * this method call when command run
-     */
-    public function handle();
 
 }

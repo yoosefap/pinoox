@@ -16,7 +16,8 @@ use pinoox\app\com_pinoox_installer\controller\MainController;
 action('main', [MainController::class, '_main']);
 action('test', [MainController::class, 'test']);
 
-route('/test','@main','test');
+route('/','@main');
+route('/test','@test');
 
 collection(
     path: '/A',

@@ -49,7 +49,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class Boot
 {
-    public static Request $request;
+    public static ?Request $request = null;
     public static Closure $next;
 
     public function build()

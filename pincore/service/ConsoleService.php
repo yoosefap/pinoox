@@ -24,6 +24,7 @@ class ConsoleService implements ServiceInterface
         if ( is_null(Url::request())){
             Global $argv ;
             Console::run($argv);
+            exit;
         }
     }
 

@@ -11,12 +11,12 @@ use pinoox\component\router\Router;
  *
  * @param array|string $path
  * @param array|string|Closure $action
- * @param string|null $name
+ * @param string $name
  * @param string|array $methods
  * @param array $defaults
  * @param array $filters
  */
-function route(array|string $path, array|string|Closure $action = '', string $name = null, string|array $methods = [], array $defaults = [], array $filters = []): void
+function route(array|string $path, array|string|Closure $action = '', string $name = '', string|array $methods = [], array $defaults = [], array $filters = []): void
 {
     Router::add($path, $action, $name, $methods, $defaults, $filters);
 }
@@ -56,11 +56,11 @@ function action(string $name, array|string|Closure $action): void
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function get(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function get(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::get($path, $action, $name, $defaults, $filters);
 }
@@ -71,11 +71,11 @@ function get(array|string $path, array|string|Closure $action = '', string $name
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function post(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function post(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::post($path, $action, $name, $defaults, $filters);
 }
@@ -86,11 +86,11 @@ function post(array|string $path, array|string|Closure $action = '', string $nam
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function put(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function put(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::put($path, $action, $name, $defaults, $filters);
 }
@@ -101,11 +101,11 @@ function put(array|string $path, array|string|Closure $action = '', string $name
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function patch(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function patch(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::patch($path, $action, $name, $defaults, $filters);
 }
@@ -116,11 +116,11 @@ function patch(array|string $path, array|string|Closure $action = '', string $na
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function delete(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function delete(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::delete($path, $action, $name, $defaults, $filters);
 }
@@ -131,11 +131,11 @@ function delete(array|string $path, array|string|Closure $action = '', string $n
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function options(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function options(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::options($path, $action, $name, $defaults, $filters);
 }
@@ -146,11 +146,11 @@ function options(array|string $path, array|string|Closure $action = '', string $
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function head(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function head(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::head($path, $action, $name, $defaults, $filters);
 }
@@ -161,11 +161,11 @@ function head(array|string $path, array|string|Closure $action = '', string $nam
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function purge(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function purge(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::purge($path, $action, $name, $defaults, $filters);
 }
@@ -175,11 +175,11 @@ function purge(array|string $path, array|string|Closure $action = '', string $na
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function trace(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function trace(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::trace($path, $action, $name, $defaults, $filters);
 }
@@ -189,11 +189,11 @@ function trace(array|string $path, array|string|Closure $action = '', string $na
  *
  * @param array|string $path
  * @param mixed|null $action
- * @param string|null $name
+ * @param string $name
  * @param array $defaults
  * @param array $filters
  */
-function connect(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = []): void
+function connect(array|string $path, array|string|Closure $action = '', string $name = '', array $defaults = [], array $filters = []): void
 {
     Router::connect($path, $action, $name, $defaults, $filters);
 }

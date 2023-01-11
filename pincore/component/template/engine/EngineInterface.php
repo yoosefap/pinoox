@@ -5,20 +5,17 @@
  *      ****  *  *  *  *  *  *  *  *    *
  *      *     *  *   * *  *  *  *  *   *  *
  *      *     *  *    **  ****  ****  *    *
- * @author   Erfan Ebrahimi
- * @link http://www.erfanebrahimi.ir/
+ * @author   Pinoox
+ * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\component\interfaces;
 
-interface CommandInterface
+namespace pinoox\component\template\engine;
+
+use Symfony\Component\Templating\EngineInterface as EngineInterfaceSymfony;
+
+interface EngineInterface extends EngineInterfaceSymfony
 {
-    /**
-     * Main method
-     *
-     * this method call when command run
-     */
-    public function handle();
 
 }

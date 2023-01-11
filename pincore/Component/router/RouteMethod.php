@@ -27,9 +27,9 @@ final class RouteMethod
 
 
     /**
-     * @var array|string[]
+     * @var string[]
      */
-    public static array $methods = [
+    public const METHODS = [
         self::HEAD,
         self::GET,
         self::POST,
@@ -53,6 +53,6 @@ final class RouteMethod
         // $ref = new ReflectionClass(self::class);
         // $methods = $ref->getConstants();
         $method = strtoupper($method);
-        return in_array($method, self::$methods);
+        return in_array($method, self::METHODS);
     }
 }

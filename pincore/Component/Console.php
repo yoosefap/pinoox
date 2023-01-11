@@ -15,10 +15,11 @@ namespace pinoox\component;
 
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\app\AppProvider;
 use pinoox\component\helpers\HelperString;
+use pinoox\component\package\AppBuilder;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class Console
 {
@@ -711,33 +712,47 @@ class Console
     private static function getListCommandFile()
     {
         $path = Dir::path('~apps/');
-        $folders = File::get_dir_folders($path);
-        $result = [];
-        App::bake('~');
-        foreach ($folders as $folder) {
-            $package_key = basename($folder);
-            App::app($package_key);
-            $isEnable = App::get('enable');
-            if (!$isEnable)
-                continue;
+        $appFiles = Finder::create()
+            ->files()
+            ->depth(1)
+            ->name('app.php')
+            ->in($path);
 
-            $commandPath = $folder . 'command' . DIRECTORY_SEPARATOR;
-            if (!is_dir($commandPath))
-                continue;
-            $files = File::get_files_by_pattern($commandPath, '*.php');
-            foreach ($files as $file) {
-                $result[] = [
-                    'package_name' => $package_key,
-                    'class' => 'pinoox\app\\' . $package_key . '\command\\' . file::name($file),
-                    'file' => $file
-                ];
+        $result = [];
+
+        foreach ($appFiles as $appFile) {
+            if ($appFile instanceof SplFileInfo) {
+                $path = $appFile->getPathInfo()->getPathname();
+                $packageName = $appFile->getPathInfo()->getFilename();
+                $isEnable = AppBuilder::init($packageName)->get('enable');
+                if (!$isEnable)
+                    continue;
+
+                $commandPath = $path . DIRECTORY_SEPARATOR . 'command' . DIRECTORY_SEPARATOR;
+                if (!is_dir($commandPath))
+                    continue;
+
+                $commandFiles = Finder::create()
+                    ->files()
+                    ->name('*.php')
+                    ->in($commandPath);
+
+                foreach ($commandFiles as $commandFile) {
+                    if ($commandFile instanceof SplFileInfo) {
+                        $className = $commandFile->getRelativePathname();
+                        $className = HelperString::lastDelete($className, '.php');
+                        $result[] = [
+                            'package_name' => $packageName,
+                            'class' => 'pinoox\app\\' . $packageName . '\command\\' . $className,
+                            'file' => $commandFile->getRealPath()
+                        ];
+                    }
+                }
             }
         }
         $commandPath = Dir::path('~pincore/command/');
-        $finder = new Finder();
-        $finder->files()->in($commandPath);
-
-        foreach ($finder as $file) {
+        $files = Finder::create()->files()->in($commandPath);
+        foreach ($files as $file) {
             $path = $file->getPath();
             $folders = str_replace($commandPath, '', $file->getPathInfo() . self::DS);
             $baseName = $file->getFilenameWithoutExtension();
@@ -748,7 +763,6 @@ class Console
                 'file' => $path . self::DS . $fileName
             ];
         }
-        App::app('~');
         return $result;
     }
 

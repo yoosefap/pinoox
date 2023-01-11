@@ -556,8 +556,8 @@ class Template
 
     public function __destruct()
     {
-        $this->renderJs();
-        $this->render();
+       // $this->renderJs();
+       // $this->render();
     }
 
     private function renderJs()

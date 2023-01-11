@@ -27,6 +27,7 @@ class SessionService implements ServiceInterface
             $store_in_file = true;
         else
             $store_in_file = false;
+    }
 
     public function before()
     {
@@ -35,5 +36,15 @@ class SessionService implements ServiceInterface
     public function handle()
     {
 
+    }
+
+    public function _run()
+    {
+        // TODO: Implement _run() method.
+    }
+
+    public function _stop()
+    {
+        // TODO: Implement _stop() method.
     }
 }

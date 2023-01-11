@@ -16,10 +16,7 @@ use Closure;
 use Exception;
 use pinoox\component\Dir;
 use pinoox\component\kernel\Boot;
-use pinoox\component\kernel\Container;
-use pinoox\component\Request;
 use pinoox\component\router\Router;
-use pinoox\component\Url;
 
 class App
 {
@@ -42,7 +39,7 @@ class App
             throw new Exception('package `' . $packageName . '` not found!');
 
         $app = self::$app;
-        $path = Boot::$request->getRequestUri();
+        $path = Boot::$request?->getRequestUri() ?? '';
         self::$app = new AppLayer($path, $packageName);
         if (!is_callable($closure))
             throw new Exception('the value must be of function type');
@@ -177,7 +174,6 @@ class App
      * @param string $key
      * @param mixed $value
      * @return AppBuilder|null
-     * @throws Exception
      */
     public static function set(string $key, mixed $value): ?AppBuilder
     {
@@ -190,7 +186,6 @@ class App
      * @param string $key
      * @param mixed $value
      * @return AppBuilder|null
-     * @throws Exception
      */
     public static function add(string $key, mixed $value): ?AppBuilder
     {
@@ -201,7 +196,6 @@ class App
      * Set data in config current app
      *
      * @return AppBuilder|null
-     * @throws Exception
      */
     public static function save(): ?AppBuilder
     {

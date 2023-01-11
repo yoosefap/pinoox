@@ -30,7 +30,9 @@
         "symfony/dependency-injection": "6.0.x-dev",
         "twig/twig": "3.x-dev",
         "symfony/serializer": "6.0.x-dev",
-        "symfony/property-access": "6.0.x-dev"
+        "symfony/property-access": "6.0.x-dev",
+        "symfony/http-client": "6.0.x-dev",
+        "symfony/templating": "6.0.x-dev"
 	},
     "autoload": {
         "psr-4": {
