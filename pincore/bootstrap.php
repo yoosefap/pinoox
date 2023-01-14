@@ -40,7 +40,7 @@ $loader = new ConstructStatic\Loader($composer);
 | Register Pinoox Loader
 |--------------------------------------------------------------------------
 */
-include __DIR__ . DIRECTORY_SEPARATOR . 'boot' . DIRECTORY_SEPARATOR . 'functions.php';
-include __DIR__ . DIRECTORY_SEPARATOR . 'boot' . DIRECTORY_SEPARATOR . 'routes.php';
+include __DIR__ . DIRECTORY_SEPARATOR .'functions'. DIRECTORY_SEPARATOR . 'base.php';
+include __DIR__ . DIRECTORY_SEPARATOR  .'functions'. DIRECTORY_SEPARATOR . 'router' . DIRECTORY_SEPARATOR . 'routes.php';
 
 Loader::boot();

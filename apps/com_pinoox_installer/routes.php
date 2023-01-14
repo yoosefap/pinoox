@@ -10,14 +10,15 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-use function pinoox\router\{route, action, collection, get};
+use function pinoox\router\{route, action, collection,get };
 use pinoox\app\com_pinoox_installer\controller\MainController;
 
 action('main', [MainController::class, '_main']);
 action('test', [MainController::class, 'test']);
 
 route('/','@main');
-route('/test','@test');
+get('/test','@test');
+
 
 collection(
     path: '/A',

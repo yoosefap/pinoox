@@ -11,23 +11,10 @@
  */
 
 
-namespace pinoox\service;
+namespace pinoox\component\template\engine;
 
+use Symfony\Component\Templating\DelegatingEngine as DelegatingEngineSymfony;
 
-use pinoox\component\interfaces\ServiceInterface;
-use pinoox\component\kernel\Boot;
-
-class BootService implements ServiceInterface
+class DelegatingEngine extends DelegatingEngineSymfony implements EngineInterface
 {
-
-    public function _run()
-    {
-        (new Boot())->build();
-    }
-
-    public function _stop()
-    {
-    }
-
-
 }

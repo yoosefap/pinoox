@@ -19,6 +19,7 @@ use pinoox\component\Config;
  */
 
 use \Illuminate\Database\Schema\Builder;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class Database
 {
@@ -36,7 +37,7 @@ class Database
     public function __construct()
     {
         $config = Config::get('~database.development');
- 
+
         $this->capsule = new Capsule;
 
         $this->capsule->addConnection($config);

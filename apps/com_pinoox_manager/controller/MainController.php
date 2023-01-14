@@ -44,7 +44,7 @@ class MainController extends MasterConfiguration
 
     public function _main()
     {
-        self::$template->view('index');
+        self::$template->view('index3');
     }
 
     public function dist()

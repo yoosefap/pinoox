@@ -19,6 +19,8 @@ use pinoox\component\Service;
 use pinoox\component\Url;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\worker\Pinker;
+use pinoox\component\kernel\Container;
+use pinoox\component\template\ViewInterface;
 
 if (!function_exists('url')) {
     function url($link = null)
@@ -94,7 +96,7 @@ if (!function_exists('service')) {
 }
 
 if (!function_exists('app')) {
-    function app($key)
+    function app($key = null)
     {
         return App::get($key);
     }
@@ -108,7 +110,7 @@ if (!function_exists('pinker')) {
      * @param array $info
      * @return array
      */
-    function pinker(mixed $data,array $info = []): array
+    function pinker(mixed $data, array $info = []): array
     {
         return Pinker::build($data, $info);
     }
@@ -126,5 +128,25 @@ if (!function_exists('cache')) {
     {
         $info = $lifetime ? ['lifetime' => $lifetime] : [];
         return Pinker::build($data, $info);
+    }
+}
+
+if (!function_exists('view')) {
+    /**
+     * render view
+     *
+     * @param string $name
+     * @param array $parameters
+     * @return ViewInterface
+     * @throws Exception
+     */
+    function view(string $name = '', array $parameters = []): ViewInterface
+    {
+        $view = Container::pincore()->get('view');
+
+        if (!($view instanceof ViewInterface))
+            throw new Exception('not found view class in the container');
+
+        return $view->ready($name, $parameters);
     }
 }

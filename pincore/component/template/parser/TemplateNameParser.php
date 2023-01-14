@@ -26,9 +26,9 @@ class TemplateNameParser implements TemplateNameParserInterface
     const TWIG_PHP = 'twig.php';
 
     const ENGINES = [
-        self::PHP,
-        self::TWIG,
         self::TWIG_PHP,
+        self::TWIG,
+        self::PHP,
     ];
 
     public function parse(TemplateReferenceInterface|string $name): TemplateReferenceInterface
@@ -37,11 +37,12 @@ class TemplateNameParser implements TemplateNameParserInterface
             return $name;
         }
 
-        $engine = null;
         if (HelperString::lastHas($name, '.' . self::TWIG_PHP)) {
             $engine = self::TWIG_PHP;
         } else if (false !== $pos = strrpos($name, '.')) {
             $engine = substr($name, $pos + 1);
+        } else {
+            $engine = 'twig';
         }
 
         return new TemplateReference($name, $engine);

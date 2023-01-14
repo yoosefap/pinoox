@@ -25,42 +25,64 @@ class PhpEngine implements EngineInterface
     private TemplateNameParserInterface $parser;
     private PhpEngineSymfony $template;
 
+    /**
+     * PhpEngine constructor.
+     *
+     * @param TemplateNameParserInterface $parser
+     * @param string|array $folder
+     * @param string|null $rootPath
+     */
     public function __construct(TemplateNameParserInterface $parser, string|array $folder, ?string $rootPath = null)
     {
-        $paths = $this->getPaths($rootPath, $folder);
+        $paths = $this->buildPaths($rootPath, $folder);
         $this->loader = new FilesystemLoader($paths);
         $this->parser = $parser;
         $this->template = new PhpEngineSymfony($this->parser, $this->loader, [new SlotsHelper()]);
     }
 
-    private function getPaths(?string $rootPath, string|array $folders): array|string
+    /**
+     * build paths template
+     *
+     * @param string|null $rootPath
+     * @param string|array $folders
+     * @return array|string
+     */
+    private function buildPaths(?string $rootPath, string|array $folders): array|string
     {
         $paths = [];
         if (is_array($folders)) {
             foreach ($folders as $folder) {
-                $paths[] = $this->getPaths($rootPath, $folder);
+                $paths[] = $this->buildPaths($rootPath, $folder);
             }
         } else {
-            $paths = $rootPath . '/' . $folders .'/'. '%name%';
+            $paths = $rootPath . '/' . $folders . '/' . '%name%';
         }
 
         return $paths;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function render(TemplateReferenceInterface|string $name, array $parameters = []): string
     {
         return $this->template->render($name, $parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function exists(TemplateReferenceInterface|string $name): bool
     {
         return $this->template->exists($name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function supports(TemplateReferenceInterface|string $name): bool
     {
         $reference = $this->parser->parse($name);
-
         return 'php' === $reference->get('engine');
     }
 }

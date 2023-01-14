@@ -16,7 +16,9 @@ use Closure;
 use Exception;
 use pinoox\component\Dir;
 use pinoox\component\kernel\Boot;
+use pinoox\component\kernel\Container;
 use pinoox\component\router\Router;
+use pinoox\component\template\View;
 
 class App
 {

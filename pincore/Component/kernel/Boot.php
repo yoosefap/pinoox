@@ -15,13 +15,13 @@ namespace pinoox\component\kernel;
 use Closure;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\resolver\RouteValueResolver;
-use pinoox\component\router\Collection;
+use pinoox\component\template\View;
 use Symfony\Component\HttpFoundation\Response;
 use pinoox\component\router\Router;
 use pinoox\component\kernel\resolver\ContainerControllerResolver;
 use pinoox\component\kernel\event\ResponseEvent;
 use pinoox\component\kernel\listener\ActionRoutesManageListener;
-use pinoox\component\kernel\listener\StringResponseListener;
+use pinoox\component\kernel\listener\ViewListener;
 use pinoox\component\package\App;
 use pinoox\component\package\AppRouter;
 use pinoox\controller\ErrorController;
@@ -43,7 +43,6 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -66,6 +65,7 @@ class Boot
     {
         $this->setParameters($container);
         $this->addEvents($container);
+        $this->registerView($container);
         $this->registerListeners($container);
         $this->registerResolvers($container);
         $this->registerDispatcher($container);
@@ -110,7 +110,7 @@ class Boot
             ->setArgument('$projectDir', null)
             ->setArgument('$debug', false);
 
-        $container->register('listener.string_response', StringResponseListener::class);
+        $container->register('listener.view', ViewListener::class);
 
         $container->register('listener.controller', ActionRoutesManageListener::class);
 
@@ -128,7 +128,7 @@ class Boot
             ->addMethodCall('addSubscriber', [Container::ref('listener.response')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.exception')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.controller')])
-            ->addMethodCall('addSubscriber', [Container::ref('listener.string_response')]);
+            ->addMethodCall('addSubscriber', [Container::ref('listener.view')]);
     }
 
     private function registerResolvers(ContainerBuilder $container): void
@@ -188,6 +188,11 @@ class Boot
                 Container::ref('request_stack'),
                 Container::ref('argument_resolver'),
             ]);
+    }
+
+    private function registerView(ContainerBuilder $container)
+    {
+        $container->register('view', View::class);
     }
 
     private function registerSerializer(ContainerBuilder $container): void

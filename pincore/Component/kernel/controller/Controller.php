@@ -8,6 +8,8 @@ use pinoox\component\http\Request;
 use pinoox\component\package\App;
 use pinoox\component\router\Collection;
 use pinoox\component\router\Router;
+use pinoox\component\template\View;
+use pinoox\component\template\ViewInterface;
 use Psr\Container\ContainerInterface;
 use pinoox\component\http\RedirectResponse;
 use pinoox\component\http\JsonResponse;
@@ -18,8 +20,15 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Closure;
 
-abstract class Controller implements ServiceSubscriberInterface
+abstract class Controller
 {
+    protected ViewInterface $view;
+
+    public function __construct()
+    {
+        $this->view = view();
+    }
+
     /**
      * @var ContainerInterface
      */
@@ -33,11 +42,6 @@ abstract class Controller implements ServiceSubscriberInterface
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         return $this->container = $container;
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return ['logger' => '?Psr\Log\LoggerInterface'];
     }
 
     protected function redirect(string $url, int $status = 302): RedirectResponse

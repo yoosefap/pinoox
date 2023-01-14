@@ -14,6 +14,7 @@
 namespace pinoox\app\com_pinoox_installer\controller;
 
 use pinoox\component\Dir;
+use pinoox\component\File;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\controller\Controller;
 use pinoox\component\package\App;
@@ -21,6 +22,7 @@ use pinoox\component\Response;
 use pinoox\component\router\Router;
 use pinoox\component\router\Route;
 use pinoox\component\template\engine\PhpTwigEngine;
+use pinoox\component\template\View;
 use Symfony\Component\Templating\DelegatingEngine;
 use pinoox\component\template\engine\PhpEngine;
 use pinoox\component\template\parser\TemplateNameParser;
@@ -28,34 +30,17 @@ use pinoox\component\template\engine\TwigEngine;
 
 class MainController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->view->set('_url', url('test/'));
+    }
+
     public function test(Route $route, Request $request)
     {
-        $folder = [App::get('theme'),'test'];
-        $pathTheme = Dir::path(App::get('path-theme'));
-
-        $parser = new TemplateNameParser();
-        $phpEngine = new PhpEngine($parser, $folder, $pathTheme);
-        $twigEngine = new TwigEngine($parser, $folder, $pathTheme);
-        $templating = new DelegatingEngine([
-            $phpEngine,
-            $twigEngine,
-            new PhpTwigEngine($parser, clone $phpEngine, clone $twigEngine),
+        return $this->view->render('test.twig', [
+            'test' => 'Yoosef',
         ]);
-
-        return $templating->render('index.php', [
-            'test' => 'Fabien',
-        ]);
-//        dd($templating->render('test.twig', [
-//            '_url' => \url(),
-//            'test' => 'Fabien',
-//        ])) ;
-        return $templating->render('index.php', [
-            '_url' => \url(),
-            'test' => 'Fabien',
-        ]);
-        // dd('MainController:test');
-        // return 'test';
-        // return self::$template->render('test.twig',['test' => 'lang2']);
     }
 
     public function _main(Request $request)
