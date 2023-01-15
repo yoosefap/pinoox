@@ -11,6 +11,7 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
+use pinoox\component\kernel\ContainerBuilder;
 use pinoox\component\package\App;
 use pinoox\component\worker\Config;
 use pinoox\component\Dir;
@@ -148,5 +149,17 @@ if (!function_exists('view')) {
             throw new Exception('not found view class in the container');
 
         return $view->ready($name, $parameters);
+    }
+}
+
+if (!function_exists('pincore')) {
+    /**
+     * Open pincore container
+     *
+     * @return ContainerBuilder
+     */
+    function pincore(): ContainerBuilder
+    {
+        return Container::pincore();
     }
 }

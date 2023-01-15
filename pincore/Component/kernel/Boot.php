@@ -103,12 +103,12 @@ class Boot
     private function registerListeners(ContainerBuilder $container): void
     {
         $container->register('listener.router', RouterListener::class)
-            ->setArgument('$matcher', Container::ref('matcher'))
-            ->setArgument('$requestStack', Container::ref('request_stack'))
-            ->setArgument('$context', null)
-            ->setArgument('$logger', null)
-            ->setArgument('$projectDir', null)
-            ->setArgument('$debug', false);
+            ->setArgument('matcher', Container::ref('matcher'))
+            ->setArgument('requestStack', Container::ref('request_stack'))
+            ->setArgument('context', null)
+            ->setArgument('logger', null)
+            ->setArgument('projectDir', null)
+            ->setArgument('debug', false);
 
         $container->register('listener.view', ViewListener::class);
 

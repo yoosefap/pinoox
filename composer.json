@@ -32,7 +32,8 @@
         "symfony/serializer": "6.0.x-dev",
         "symfony/property-access": "6.0.x-dev",
         "symfony/http-client": "6.0.x-dev",
-        "symfony/templating": "6.0.x-dev"
+        "symfony/templating": "6.0.x-dev",
+        "nette/php-generator": "4.0.x-dev"
 	},
     "autoload": {
         "psr-4": {

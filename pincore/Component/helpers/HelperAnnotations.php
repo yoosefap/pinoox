@@ -67,18 +67,19 @@ class HelperAnnotations
      *
      * @param string $description
      * @param array $tags
+     * @param string $preLine
      * @return string
      */
-    public static function generateDocBlock(string $description, array $tags): string
+    public static function generateDocBlock(string $description, array $tags = [], string $preLine = ''): string
     {
-        $result = '/**' . "\n";
-        $result .= '* ' . $description . "\n";
+        $result = $preLine . '/**' . "\n";
+        $result .= $preLine . ' * ' . $description . "\n";
 
         foreach ($tags as $key => $value) {
-            $result .= '* @' . $key . ' ' . $value . "\n";
+            $result .= $preLine . ' * @' . $key . ' ' . $value . "\n";
         }
 
-        $result .= '*/';
+        $result .= $preLine . ' */';
 
         return $result;
     }

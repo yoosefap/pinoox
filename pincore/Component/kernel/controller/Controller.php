@@ -5,6 +5,7 @@ namespace pinoox\component\kernel\controller;
 
 use pinoox\component\helpers\HelperString;
 use pinoox\component\http\Request;
+use pinoox\component\kernel\Container;
 use pinoox\component\package\App;
 use pinoox\component\router\Collection;
 use pinoox\component\router\Router;
@@ -26,11 +27,11 @@ abstract class Controller
 
     public function __construct()
     {
-        $this->view = view();
+        $this->setView(Container::pincore()->get('view'));
     }
 
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     protected ?ContainerInterface $container = null;
 
@@ -54,9 +55,13 @@ abstract class Controller
         return $this->redirect(Router::path($routeName, $parameters));
     }
 
-    protected function routeUrl($name, $params = [])
+    protected function routeUrl($name, $params = []): string
     {
-        return Router::path($name, $params);
+        try {
+            return Router::path($name, $params);
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
     /**
@@ -126,5 +131,14 @@ abstract class Controller
     protected function response(?string $content = '', int $status = 200, array $headers = []): Response
     {
         return new Response($content, $status, $headers);
+    }
+
+    private function initView()
+    {
+    }
+
+    private function setView(ViewInterface $view)
+    {
+        $this->view = $view;
     }
 }
