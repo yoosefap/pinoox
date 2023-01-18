@@ -15,14 +15,13 @@
 namespace pinoox\app\com_pinoox_manager\component;
 
 
-use pinoox\component\app\AppProvider;
 use pinoox\component\Cache;
+use pinoox\component\package\AppBuilder;
 use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\Lang;
 use pinoox\component\package\App;
-use pinoox\component\Router;
 use pinoox\component\Service;
 use pinoox\component\Url;
 use pinoox\component\User;
@@ -56,8 +55,9 @@ class Wizard
         self::runQuery($appDB, $data['package_name']);
         self::changeLang($data['package_name']);
         self::runService($data['package_name'], 'install');
-        self::setApp('com_pinoox_manager', true);
-        self::deletePackageFile($pinFile);
+        App::meeting('com_pinoox_manager', function () use ($pinFile) {
+            self::deletePackageFile($pinFile);
+        });
 
         return true;
     }
@@ -75,32 +75,33 @@ class Wizard
             Zip::extract($pinFile, $dir);
         }
 
-        $app = new AppProvider($configFile);
-        $iconPath = $app->icon;
+        $app = AppBuilder::file($configFile);
+
+        $iconPath = $app->get('icon');
 
         $icon = Url::file('resources/default.png');
         if (!empty($iconPath)) {
-            $iconFile = Dir::path($dir . '>' . $app->icon);
+            $iconFile = Dir::path($dir . '>' . $iconPath);
             if (!is_file($iconFile)) {
-                Zip::addEntries($app->icon);
+                Zip::addEntries($iconPath);
                 Zip::extract($pinFile, $dir);
             }
 
             if (is_file($iconFile))
-                $icon = Url::file($dir . '>' . $app->icon);
+                $icon = Url::file($dir . '>' . $iconPath);
         }
 
         return [
             'type' => 'app',
             'filename' => $filename,
-            'package_name' => $app->packageName,
-            'app' => $app->packageName,
-            'name' => $app->name,
-            'description' => $app->description,
-            'version' => $app->versionName,
-            'version_code' => $app->versionCode,
-            'developer' => $app->developer,
-            'path_icon' => $app->icon,
+            'package_name' => $app->get('package-name'),
+            'app' => $app->get('package-name'),
+            'name' => $app->get('name'),
+            'description' => $app->get('description'),
+            'version' => $app->get('version-name'),
+            'version_code' => $app->get('version-code'),
+            'developer' => $app->get('developer'),
+            'path_icon' => $app->get('icon'),
             'icon' => $icon,
             'size' => File::print_size($size, 1),
         ];
@@ -120,11 +121,10 @@ class Wizard
         $packageName = $data['package_name'];
         $versionCode = @$data['version_code'];
 
-        if (!Router::existApp($packageName))
+        if (!App::exists($packageName))
             return true;
 
-        $app = new AppProvider($packageName);
-        $versionCodeApp = $app->versionCode;
+        $versionCodeApp = AppBuilder::init($packageName)->get('version-code');
 
         if ($versionCodeApp == $versionCode) {
             self::$message = Lang::get('manager.version_already_installed');
@@ -170,28 +170,17 @@ class Wizard
         $lang = Lang::current();
         if (!Lang::exists($lang, $packageName))
             return false;
-        self::setApp($packageName);
-        App::set('lang', $lang);
-        App::save();
+        AppBuilder::init($packageName)->set('lang', $lang)->save();
         return true;
-    }
-
-    private static function setApp($packageName, $isAgain = false)
-    {
-        if (self::$isApp && !$isAgain) return;
-        self::$isApp = true;
-        Router::setApp($packageName);
-        App::app($packageName);
     }
 
     private static function runService($packageName, $state = 'install')
     {
-        $current = App::package();
-        self::setApp($packageName);
-        Cache::app($packageName);
-        Service::app($packageName);
-        Service::run('app>' . $state);
-        Router::setApp($current);
+        App::meeting($packageName, function () use ($packageName, $state) {
+            Cache::app($packageName);
+            Service::app($packageName);
+            Service::run('app>' . $state);
+        });
     }
 
     public static function deletePackageFile($pinFile)
@@ -223,19 +212,19 @@ class Wizard
         Zip::extract($pinFile, $appPath);
         File::remove_file($pinFile);
 
-
-        self::setApp($data['package_name']);
-        App::set('version-code', $data['version_code']);
-        App::set('version-name', $data['version']);
-        App::set('name', $data['name']);
-        App::set('developer', $data['developer']);
-        App::set('description', $data['description']);
-        App::set('icon', $data['path_icon']);
-        App::save();
+        AppBuilder::init($data['package_name'])
+            ->set('version-code', $data['version_code'])
+            ->set('version-name', $data['version'])
+            ->set('name', $data['name'])
+            ->set('developer', $data['developer'])
+            ->set('description', $data['description'])
+            ->set('icon', $data['path_icon'])
+            ->save();
         self::runService($data['package_name'], 'update');
 
-        self::setApp('com_pinoox_manager', true);
-        self::deletePackageFile($pinFile);
+        App::meeting('com_pinoox_manager', function () use ($pinFile) {
+            self::deletePackageFile($pinFile);
+        });
 
         return true;
 
@@ -324,7 +313,7 @@ class Wizard
 
     public static function is_installed($packageName)
     {
-        return Router::existApp($packageName);
+        return App::exists($packageName);
     }
 
     public static function is_downloaded($packageName)

@@ -249,7 +249,7 @@ class AppProvider extends AppSource
     /**
      * Call features app
      *
-     * Example) AppProvider::com_pinoox_manager('MainController')
+     * Example) App::com_pinoox_manager('MainController')
      *
      * @param string $app
      * @param $arguments

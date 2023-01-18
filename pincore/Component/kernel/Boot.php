@@ -13,9 +13,12 @@
 namespace pinoox\component\kernel;
 
 use Closure;
+use pinoox\component\Console;
 use pinoox\component\http\Request;
+use pinoox\component\kernel\listener\ExceptionListener;
 use pinoox\component\kernel\resolver\RouteValueResolver;
 use pinoox\component\template\View;
+use pinoox\component\Url;
 use Symfony\Component\HttpFoundation\Response;
 use pinoox\component\router\Router;
 use pinoox\component\kernel\resolver\ContainerControllerResolver;
@@ -58,6 +61,11 @@ class Boot
         $layer = AppRouter::find();
         App::setLayer($layer);
         $this->buildContainer($core);
+        if ( is_null(Url::request())){
+            Global $argv ;
+            Console::run($argv);
+            exit;
+        }
         App::run();
     }
 
@@ -111,6 +119,7 @@ class Boot
             ->setArgument('debug', false);
 
         $container->register('listener.view', ViewListener::class);
+        $container->register('listener.e', ExceptionListener::class);
 
         $container->register('listener.controller', ActionRoutesManageListener::class);
 
@@ -127,6 +136,7 @@ class Boot
             ->addMethodCall('addSubscriber', [Container::ref('listener.router')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.response')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.exception')])
+            ->addMethodCall('addSubscriber', [Container::ref('listener.e')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.controller')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.view')]);
     }

@@ -13,9 +13,10 @@
 
 namespace pinoox\component\kernel;
 
+use pinoox\component\package\App;
 use Symfony\Component\DependencyInjection\Reference;
 
-class Container extends ContainerBuilder
+class Container
 {
     const pincore = 'pincore';
 
@@ -66,5 +67,14 @@ class Container extends ContainerBuilder
     public static function pincore() : ContainerBuilder
     {
         return self::open(self::pincore);
+    }
+
+    public static function app(?string $packageName = null) : ContainerBuilder
+    {
+        $packageName = empty($packageName)? App::package() : $packageName;
+        if($packageName === '~')
+            return self::pincore();
+        else
+            return self::open($packageName);
     }
 }

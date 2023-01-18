@@ -45,12 +45,15 @@ class AppBuilder
      * AppBuilder constructor
      *
      * @param string $packageName
+     * @param bool $isFile
      * @throws Exception
      */
-    public function __construct(string $packageName)
+    public function __construct(string $packageName, bool $isFile = false)
     {
         $this->packageName = $packageName;
-        $this->initData();
+
+        if (!$isFile)
+            $this->initData();
     }
 
     /**
@@ -65,12 +68,9 @@ class AppBuilder
         if (!isset(self::$data[$this->packageName])) {
             $data = $this->getConfig();
 
-            if ($data === false)
-            {
+            if ($data === false) {
                 $this->createApp();
-            }
-            else
-            {
+            } else {
                 self::$data[$this->packageName] = $data;
             }
         }
@@ -165,6 +165,20 @@ class AppBuilder
         if (is_null($value)) return $data;
         $parts = explode('.', $value);
         return self::result($data, $parts);
+    }
+
+    /**
+     * App builder create by file
+     *
+     * @param string $file
+     * @return mixed|null
+     * @throws Exception
+     */
+    public static function file(string $file): AppBuilder
+    {
+        self::$data['file:' . $file] = Pinker::init($file)->pickup();
+        self::$obj = new AppBuilder('file:' . $file);
+        return self::$obj;
     }
 
     /**

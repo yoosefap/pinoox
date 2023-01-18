@@ -1,5 +1,5 @@
 # Pinoox
-apps
+../pinoox/apps
 !apps/com_pinoox_manager/*
 !apps/com_pinoox_welcome/*
 !apps/com_pinoox_installer/*

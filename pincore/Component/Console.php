@@ -799,13 +799,13 @@ class Console
     protected function chooseApp($packageName = null)
     {
         $this->cli = config('~cli');
-        if (empty($packageName) && isset($this->cli['package'])) {
+        if (empty($packageName) && isset($this->cli['package']) && $this->cli['package'] != '~') {
             $this->cli['namespace'] = 'pinoox\\app\\' . $this->cli['package'];
 
             $this->success('Using cli config ');
             $this->info('`' . $this->cli['package'] . '`');
             $this->newLine();
-        } else if (empty($packageName) || $packageName != 'pincore') {
+        } else if (empty($packageName) || !($packageName == 'pincore' || $packageName == '~')) {
             $this->cli = $this->chooseFromApps($packageName);
         } else {
             $this->cli['path'] = Dir::path('~pincore');

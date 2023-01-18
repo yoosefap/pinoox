@@ -21,13 +21,13 @@ class ViewListener implements EventSubscriberInterface
             $event->setResponse(new Response(strval($response)));
         } else if (is_array($response)) {
             $event->setResponse(new JsonResponse($response));
-        }else if ($response instanceof ViewInterface) {
+        } else if ($response instanceof ViewInterface) {
             $event->setResponse(new Response($response->getContentReady()));
         }
     }
 
-    public static function getSubscribedEvents() : array
+    public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::VIEW => 'onView'];
+        return [KernelEvents::VIEW => ['onView']];
     }
 }

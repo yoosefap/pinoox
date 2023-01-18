@@ -27,6 +27,6 @@ trait Table
             return $this->table;
         }
 
-        return AppProvider::get('packageName') . '_' . strtolower(str_replace('\\', '', class_basename($this)));
+        return App::get('packageName') . '_' . strtolower(str_replace('\\', '', class_basename($this)));
     }
 }

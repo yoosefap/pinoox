@@ -141,11 +141,11 @@ class File
      * @param bool $safe
      * @return bool
      */
-    public static function copy($file, $newFile,$safe = false)
+    public static function copy($file, $newFile, $safe = false)
     {
         if (!file_exists($file)) return false;
         $folder = dirname($newFile);
-        self::make_folder($folder, true,0777,$safe);
+        self::make_folder($folder, true, 0777, $safe);
 
         $c = @copy($file, $newFile);
 
@@ -319,7 +319,7 @@ class File
         foreach ($arBytes as $arItem) {
             if ($size >= $arItem["VALUE"]) {
                 $result = $size / $arItem["VALUE"];
-                $result = Lang::replace('~file.units.'.$arItem["UNIT"],str_replace(".", ",", strval(round($result, $round))));
+                $result = Lang::replace('~file.units.' . $arItem["UNIT"], str_replace(".", ",", strval(round($result, $round))));
                 break;
             }
         }
@@ -420,10 +420,10 @@ class File
 
             while (!feof($fp)) {
                 $h = fgets($fp);
-                if ($h == "\r\n" OR $h == "\n") break;
+                if ($h == "\r\n" or $h == "\n") break;
                 list($key, $value) = explode(":", $h, 2);
                 $headers[$key] = trim($value);
-                if ($code >= 300 AND $code < 400 AND strtolower($key) == "location" AND $redirect > 0) {
+                if ($code >= 300 and $code < 400 and strtolower($key) == "location" and $redirect > 0) {
                     return self::get_remote_file_size($headers[$key], $method, $data, --$redirect);
                 }
             }
@@ -632,7 +632,7 @@ class File
         $dirs = array_map(function ($item) use ($directory_seperator) {
             return $item . $directory_seperator;
         }, array_filter(glob($directory . "*"), 'is_dir'));
-        foreach ($dirs AS $dir) {
+        foreach ($dirs as $dir) {
             $dirs = array_merge($dirs, self::get_all_folders($dir, $directory_seperator));
         }
 
@@ -674,7 +674,7 @@ class File
         $get_files = scandir($directory);
         $get_files = array_filter($get_files);
         $get_files = array_diff($get_files, array(".", ".."));
- 
+
         foreach ($get_files as $get_file) {
             $file = $directory . $get_file;
             $ext = self::extension($file);
@@ -768,7 +768,8 @@ class File
         return mime_content_type($file);
     }
 
-    public static function extract_namespace($file) {
+    public static function extract_namespace($file)
+    {
         $ns = NULL;
         $handle = fopen($file, "r");
         if ($handle) {
@@ -782,5 +783,19 @@ class File
             fclose($handle);
         }
         return $ns;
+    }
+
+    public static function getBetweenLine($path, $start, $end): string
+    {
+        $result = '';
+        if (!is_file($path))
+            return $result;
+
+        $lines = file($path);
+        for ($i = $start; $i <= $end; $i++) {
+            $result .= $lines[$i];
+        }
+
+        return $result;
     }
 }

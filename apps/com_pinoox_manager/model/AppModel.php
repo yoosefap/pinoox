@@ -15,6 +15,7 @@ namespace pinoox\app\com_pinoox_manager\model;
 use Illuminate\Database\Eloquent\Model;
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\app\AppProvider;
+use pinoox\component\package\AppBuilder;
 use pinoox\component\worker\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
@@ -43,23 +44,22 @@ class AppModel extends Model
 
             if (!Router::existApp($package_key))
                 continue;
-            Router::setApp($package_key);
-            App::app($package_key);
+            $app = AppBuilder::init($package_key);
 
-            $isEnable = App::get('enable');
+            $isEnable = $app->get('enable');
             if (!$isEnable)
                 continue;
 
-            $isHidden = App::get('hidden');
+            $isHidden = $app->get('hidden');
             if ($isHidden)
                 continue;
 
-            $isRouter = App::get('router');
+            $isRouter = $app->get('router.type');
             if ($isCheckRouter && !$isRouter)
                 continue;
 
             if (!is_null($sysApp)) {
-                $sysAppState = App::get('sys-app');
+                $sysAppState = $app->get('sys-app');
                 if ($sysApp && !$sysAppState) {
                     continue;
                 } else if (!$sysApp && $sysAppState) {
@@ -70,22 +70,19 @@ class AppModel extends Model
             $result[$package_key] = [
                 'package_name' => $package_key,
                 'hidden' => $isHidden,
-                'dock' => App::get('dock'),
+                'dock' => $app->get('dock'),
                 'router' => $isRouter,
-                'name' => App::get('name'),
-                'description' => App::get('description'),
-                'version' => App::get('version-name'),
-                'version_code' => App::get('version-code'),
-                'developer' => App::get('developer'),
-                'open' => App::get('open'),
-                'sys_app' => App::get('sys-app'),
-                'icon' => Url::check(Url::file(App::get('icon'), $package_key), $icon_default),
+                'name' => $app->get('name'),
+                'description' => $app->get('description'),
+                'version' => $app->get('version-name'),
+                'version_code' => $app->get('version-code'),
+                'developer' => $app->get('developer'),
+                'open' => $app->get('open'),
+                'sys_app' => $app->get('sys-app'),
+                'icon' => Url::check(Url::file($app->get('icon'), $package_key), $icon_default),
                 'routes' => self::fetch_all_aliases_by_package_name($package_key)
             ];
         }
-
-        App::app('~');
-        Router::setApp($app);
         return $result;
     }
 
@@ -104,28 +101,25 @@ class AppModel extends Model
     public static function fetch_by_package_name($packageName)
     {
         $icon_default = Url::file('resources/default.png');
-        $app = App::package();
-        Router::setApp($packageName);
-        App::app($packageName);
         $result = null;
-        if (Router::existApp($packageName)) {
+        if (App::exists($packageName)) {
+
+            $app = AppBuilder::init($packageName);
             $result = [
-                'name' => App::get('name'),
-                'hidden' => App::get('hidden'),
-                'dock' => App::get('dock'),
-                'router' => App::get('router'),
-                'enable' => App::get('enable'),
-                'open' => App::get('open'),
-                'sys-app' => App::get('sys-app'),
-                'description' => App::get('description'),
-                'version' => App::get('version-name'),
-                'version_code' => App::get('version-code'),
-                'developer' => App::get('developer'),
+                'name' => $app->get('name'),
+                'hidden' => $app->get('hidden'),
+                'dock' => $app->get('dock'),
+                'router' => $app->get('router'),
+                'enable' => $app->get('enable'),
+                'open' => $app->get('open'),
+                'sys-app' => $app->get('sys-app'),
+                'description' =>$app->get('description'),
+                'version' =>$app->get('version-name'),
+                'version_code' => $app->get('version-code'),
+                'developer' => $app->get('developer'),
                 'icon' => Url::check(Url::file(App::get('icon'), $packageName), $icon_default),
             ];
         }
-        App::app('~');
-        Router::setApp($app);
 
         return $result;
     }

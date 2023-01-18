@@ -152,14 +152,15 @@ if (!function_exists('view')) {
     }
 }
 
-if (!function_exists('pincore')) {
+if (!function_exists('container')) {
     /**
-     * Open pincore container
+     * Open app container
      *
+     * @param string|null $packageName
      * @return ContainerBuilder
      */
-    function pincore(): ContainerBuilder
+    function container(?string $packageName = null): ContainerBuilder
     {
-        return Container::pincore();
+        return Container::app($packageName);
     }
 }

@@ -13,20 +13,13 @@
 
 namespace pinoox\app\com_pinoox_installer\controller;
 
-use pinoox\component\Dir;
-use pinoox\component\File;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\controller\Controller;
-use pinoox\component\package\App;
 use pinoox\component\Response;
 use pinoox\component\router\Router;
 use pinoox\component\router\Route;
-use pinoox\component\template\engine\PhpTwigEngine;
-use pinoox\component\template\View;
-use Symfony\Component\Templating\DelegatingEngine;
-use pinoox\component\template\engine\PhpEngine;
-use pinoox\component\template\parser\TemplateNameParser;
-use pinoox\component\template\engine\TwigEngine;
+use pinoox\portal\View1;
+
 
 class MainController extends Controller
 {
@@ -43,17 +36,10 @@ class MainController extends Controller
         ]);
     }
 
-    public function _main(Request $request)
+    public function _main()
     {
-        $folder = App::get('theme');
-        $pathTheme = Dir::path(App::get('path-theme'));
-        $loader = new \Twig\Loader\FilesystemLoader($folder, $pathTheme);
-
-//        $loader = new \Twig\Loader\ArrayLoader([
-//            'index.php' => (new Template($pathTheme,$folder))->getProcessedText('index'),
-//        ]);
-        $template = new \Twig\Environment($loader);
-        return $template->render('index.php', ['test' => 'lang2']);
+        return View1::fsdfsdf();
+       //return 'testr';
     }
 
     public function _exception()

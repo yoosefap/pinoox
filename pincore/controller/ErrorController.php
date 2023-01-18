@@ -11,7 +11,7 @@ class ErrorController extends Controller
 {
     public function exception(FlattenException $exception)
     {
-        $msg = 'Something went wrong! ('.$exception->getMessage().')';
+        $msg = 'Something went wrong! (' . $exception->getMessage() . ')';
 
         $response = new Response($msg, $exception->getStatusCode());
         $response->setResponseError(true);

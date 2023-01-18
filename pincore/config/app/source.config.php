@@ -15,7 +15,10 @@ return [
     'hidden' => false,
     'package-name' => 'com_pinoox_welcome',
     'open' => 'app-details',
-    'router' => 'multiple',
+    'router' => [
+        'type' => 'multiple',
+        'routes' => 'routes.php',
+    ],
     'domain' => true,
     'auto-null' => true,
     'global-data' => true,

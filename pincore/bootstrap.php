@@ -35,7 +35,7 @@ define('PINOOX_PATH_THUMB', 'thumbs/{name}_{size}.{ext}');
 |
 */
 $composer = require PINOOX_VENDOR_PATH . 'autoload.php';
-$loader = new ConstructStatic\Loader($composer);
+$loader = new \pinoox\component\kernel\LoaderManager($composer);
 
 /*
 |--------------------------------------------------------------------------
@@ -45,4 +45,4 @@ $loader = new ConstructStatic\Loader($composer);
 require PINOOX_FUNCTIONS_PATH . 'base.php';
 require PINOOX_FUNCTIONS_PATH . 'router' . DIRECTORY_SEPARATOR . 'routes.php';
 
-Loader::boot();
+Loader::boot($composer);
