@@ -3,7 +3,8 @@
     "description": "pinoox is a simple environment for web management and development. You can do whatever you want on the web and add your desire features to your website in a simple way",
     "keywords": [
         "PHP",
-        "PHP Framework"
+        "PHP Framework",
+        "pinoox"
     ],
     "type": "project",
     "homepage": "http://www.pinoox.com/",
@@ -14,27 +15,10 @@
             "email": "dev@pinoox.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-		"php": "^8.0",
-        "vladimmi/construct-static": "dev-master@dev",
-        "illuminate/database": "8.x-dev",
-        "illuminate/events": "8.x-dev",
-        "doctrine/dbal": "3.5.x-dev",
-        "symfony/finder": "6.0.x-dev",
-        "symfony/http-foundation": "6.0.x-dev",
-        "symfony/routing": "6.0.x-dev",
-        "symfony/var-dumper": "6.0.x-dev",
-        "symfony/http-kernel": "6.0.x-dev",
-        "symfony/error-handler": "6.0.x-dev",
-        "symfony/dependency-injection": "6.0.x-dev",
-        "twig/twig": "3.x-dev",
-        "symfony/serializer": "6.0.x-dev",
-        "symfony/property-access": "6.0.x-dev",
-        "symfony/http-client": "6.0.x-dev",
-        "symfony/templating": "6.0.x-dev",
-        "nette/php-generator": "4.0.x-dev"
-	},
+        "php": "^8.0.2",
+        "pinoox/pincore": "2.x-dev"
+    },
     "autoload": {
         "psr-4": {
             "pinoox\\": "pincore/",
@@ -46,8 +30,17 @@
             "pinoox\\test\\": "tests/"
         }
     },
+    "bin": ["pinoox"],
     "require-dev": {
         "phpunit/phpunit": "9.5.27",
-        "nunomaduro/collision": "v5.x-dev"
-    }
+        "nunomaduro/collision": "^5"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
