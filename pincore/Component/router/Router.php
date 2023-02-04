@@ -38,14 +38,6 @@ class Router
      */
     private array $actions = [];
 
-//    public function __construct($path, $routes)
-//    {
-//        $this->collection(
-//            path: $path,
-//            routes: $routes
-//        );
-//    }
-
     /**
      * add route
      *

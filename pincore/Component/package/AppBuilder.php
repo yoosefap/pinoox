@@ -14,8 +14,8 @@ namespace pinoox\component\package;
 
 use Exception;
 use pinoox\component\helpers\HelperArray;
-use pinoox\component\worker\Config;
-use pinoox\component\worker\Pinker;
+use pinoox\component\store\Config;
+use pinoox\component\store\Pinker;
 
 class AppBuilder
 {

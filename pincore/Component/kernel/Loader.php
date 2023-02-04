@@ -13,7 +13,7 @@
 namespace pinoox\component\kernel;
 
 use Composer\Autoload\ClassLoader;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Service;
 
 class Loader

@@ -14,7 +14,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Dir;
 use pinoox\component\Download;
 use pinoox\component\HelperHeader;

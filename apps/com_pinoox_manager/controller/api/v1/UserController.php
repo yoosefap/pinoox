@@ -12,7 +12,7 @@
 
 namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Date;
 use pinoox\component\Lang;
 use pinoox\component\app\AppProvider;

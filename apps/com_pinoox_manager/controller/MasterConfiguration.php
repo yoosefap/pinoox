@@ -13,7 +13,7 @@
 namespace pinoox\app\com_pinoox_manager\controller;
 
 use pinoox\app\com_pinoox_manager\model\LangModel;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Dir;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\ControllerInterface;

@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\app\AppProvider;
 use pinoox\component\package\AppBuilder;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\package\App;

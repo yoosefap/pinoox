@@ -12,7 +12,7 @@
 
 namespace pinoox\model;
 
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\DB;
 use pinoox\component\MagicTrait;
 use pinoox\component\source\Database;

@@ -11,13 +11,11 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\component\worker;
+namespace pinoox\component\store;
 
-use pinoox\component\Dir;
 use pinoox\component\helpers\HelperArray;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\package\App;
-use pinoox\component\package\AppBuilder;
 
 class Config
 {
@@ -40,21 +38,20 @@ class Config
      *
      * @var array
      */
-    private static array $data = [];
+    private array $data = [];
 
     /**
      * Instance class
      *
      * @var Config
      */
-    private static Config $obj;
+    private Config $obj;
 
     /**
-     * Instance class
      *
      * @var Config[]
      */
-    private static array $objects;
+    private array $objects;
 
     /**
      * Config constructor
@@ -69,9 +66,9 @@ class Config
     /**
      * Config init
      * @param string $name
-     * @return Config|null
+     * @return Config
      */
-    public static function init(string $name): Config
+    public function init(string $name): Config
     {
         $app = App::package();
         $key = $app . ':' . $name;
@@ -79,8 +76,8 @@ class Config
             self::$objects[$key] = new Config($name);
         }
 
-        self::$obj = self::$objects[$key];
-        return self::$obj;
+        $this->obj =  $this->objects[$key];
+        return $this;
     }
 
     /**
@@ -88,7 +85,7 @@ class Config
      *
      * @param string $name
      */
-    private function initData(string $name)
+    private function initData(string $name): void
     {
         $name = str_replace(['/', '\\'], '>', $name);
         $filename = $name;
@@ -117,7 +114,7 @@ class Config
      * @param mixed $value
      * @return Config
      */
-    public function setLinear(string $pointer, ?string $key, $value): Config
+    public function setLinear(string $pointer, ?string $key, mixed $value): Config
     {
         $data = $this->get($pointer);
         $data = is_array($data) ? $data : [];
@@ -133,7 +130,7 @@ class Config
      * @param string|null $value
      * @return mixed|null
      */
-    public function get(?string $value = null)
+    public function get(?string $value = null): mixed
     {
         $data = @self::$data[$this->key];
 
@@ -176,7 +173,7 @@ class Config
      * @param mixed $value
      * @return Config
      */
-    public function set(string $key, $value): Config
+    public function set(string $key, mixed $value): Config
     {
         HelperArray::pushingData($key, $value, 'set', self::$data[$this->key]);
         return self::$obj;
@@ -188,7 +185,7 @@ class Config
      * @param mixed|null $value
      * @return Config
      */
-    public function data($value): Config
+    public function data(mixed $value): Config
     {
         self::$data[$this->key] = $value;
         return self::$obj;
@@ -201,10 +198,10 @@ class Config
      * @param string|null $key
      * @return mixed|null
      */
-    public function getLinear(?string $pointer, ?string $key)
+    public function getLinear(?string $pointer, ?string $key): mixed
     {
         $data = $this->get($pointer);
-        return isset($data[$key]) ? $data[$key] : null;
+        return $data[$key] ?? null;
     }
 
     /**

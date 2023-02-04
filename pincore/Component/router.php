@@ -15,7 +15,7 @@ namespace pinoox\component;
 use pinoox\boot\Loader;
 use pinoox\component\app\AppProvider;
 use pinoox\component\helpers\HelperString;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use ReflectionClass;
 use ReflectionMethod;
 

@@ -15,7 +15,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 use pinoox\app\com_pinoox_manager\component\Notification;
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\Cache;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Download;
 use pinoox\component\Lang;
 use pinoox\component\Response;

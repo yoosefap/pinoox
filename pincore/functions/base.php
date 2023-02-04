@@ -13,7 +13,7 @@
 
 use pinoox\component\kernel\ContainerBuilder;
 use pinoox\component\package\App;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Dir;
 use pinoox\component\Lang;
 use pinoox\component\Service;

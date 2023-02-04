@@ -15,7 +15,7 @@ namespace pinoox\component\package;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\router\Router;
 use pinoox\component\Url;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 
 
 class AppRouter

@@ -4,7 +4,7 @@ namespace pinoox\command;
 
 
 use pinoox\app\com_pinoox_manager\component\Notification;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\HttpRequest;

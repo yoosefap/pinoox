@@ -11,7 +11,7 @@
  */
 
 
-namespace pinoox\component\worker;
+namespace pinoox\component\store;
 
 use pinoox\component\helpers\HelperAnnotations;
 use pinoox\component\File;
@@ -21,7 +21,7 @@ use pinoox\component\Dir;
 
 /**
  * Pinoox Baker
- * @package pinoox\component\worker
+ * @package pinoox\component\store
  */
 class Pinker
 {

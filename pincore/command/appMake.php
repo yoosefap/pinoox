@@ -230,7 +230,7 @@ class appMake extends Console implements CommandInterface
         $code2 = "<?php \n";
         $code2 .= $this->makeCopyWriteCode();
         $code2 .= $this->makeNameSpace('controller');
-        $code2 .= "use pinoox\component\worker\Config;\n\n";
+        $code2 .= "use pinoox\component\store\Config;\n\n";
         $code2 .= "class MainController extends MasterController\n";
         $code2 .= "{\n\n";
         $code2 .= "\tpublic function _main()\n";

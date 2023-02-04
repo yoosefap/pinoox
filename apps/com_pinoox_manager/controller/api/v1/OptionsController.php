@@ -13,7 +13,7 @@
 namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\component\app\AppProvider;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Dir;
 use pinoox\component\Response;
 

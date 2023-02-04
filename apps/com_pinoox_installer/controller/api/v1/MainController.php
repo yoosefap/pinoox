@@ -16,7 +16,7 @@ namespace pinoox\app\com_pinoox_installer\controller\api\v1;
 use pinoox\component\app\AppProvider;
 use pinoox\component\Cache;
 use pinoox\component\package\App;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\DB;
 use pinoox\component\Dir;
 use pinoox\component\helpers\HelperArray;

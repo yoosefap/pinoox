@@ -15,7 +15,7 @@
 namespace pinoox\app\com_pinoox_manager\service\app;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\interfaces\ServiceInterface;

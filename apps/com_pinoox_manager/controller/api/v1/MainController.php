@@ -14,7 +14,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\app\com_pinoox_manager\model\LangModel;
 use pinoox\component\app\AppProvider;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 use pinoox\component\Lang;
 use pinoox\component\Response;
 

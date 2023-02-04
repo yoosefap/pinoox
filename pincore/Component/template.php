@@ -16,7 +16,7 @@ use pinoox\component\package\App;
 use pinoox\component\helpers\HelperArray;
 use pinoox\component\helpers\HelperHeader;
 use pinoox\component\helpers\HelperString;
-use pinoox\component\worker\Config;
+use pinoox\component\store\Config;
 
 class Template
 {
