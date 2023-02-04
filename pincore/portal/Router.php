@@ -14,6 +14,7 @@
 
 namespace pinoox\portal;
 
+use pinoox\component\package\App;
 use pinoox\component\router\Collection as ObjectPortal1;
 use pinoox\component\source\Portal;
 
@@ -47,7 +48,8 @@ class Router extends Portal
     public static function __register(): void
     {
         self::__bind(\pinoox\component\router\Router::class)->addMethodCall('collection',[
-
+            App::path(),
+            App::get('router.routes'),
         ]);
     }
 

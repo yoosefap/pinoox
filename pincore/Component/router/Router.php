@@ -37,6 +37,13 @@ class Router
      * @var array
      */
     private array $actions = [];
+ 
+    public function __construct($path = '')
+    {
+        $this->collection(
+            path: $path,
+        );
+    } 
 
     /**
      * add route
@@ -150,6 +157,9 @@ class Router
      */
     private function callRoutes(Router|string|array|callable|null $routes): void
     {
+        if (empty($routes))
+            return;
+
         if ($routes instanceof Router) {
             $this->getMainCollection()->add($routes->getMainCollection());
         } else if (is_callable($routes)) {
@@ -167,7 +177,7 @@ class Router
     private function loadFiles(string|array $routes): void
     {
         if (is_string($routes)) {
-            $routes = Dir::path($routes);
+            $routes = !is_file($routes) ? Dir::path($routes) : $routes;
             if (is_file($routes))
                 include $routes;
         } else if (is_array($routes)) {

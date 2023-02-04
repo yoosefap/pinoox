@@ -2,6 +2,6 @@
 
 return [
     '~debugger',
-    '~router',
     '~console',
+    '~boot',
 ];

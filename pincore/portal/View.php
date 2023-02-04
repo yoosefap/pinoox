@@ -14,7 +14,6 @@
 
 namespace pinoox\portal;
 
-use pinoox\component\source\MethodBuilder;
 use pinoox\component\source\Portal;
 use pinoox\component\template\View as ObjectPortal1;
 
@@ -36,30 +35,6 @@ use pinoox\component\template\View as ObjectPortal1;
  */
 class View extends Portal
 {
-    public $methods = array();
-
-    public function rrr()
-    {
-        return 'good';
-    }
-
-    public function addMethod($methodName, $methodCallable)
-    {
-        if (!is_callable($methodCallable)) {
-            throw new \InvalidArgumentException('Second param must be callable');
-        }
-        $this->methods[$methodName] = \Closure::bind($methodCallable, $this, get_class());
-    }
-
-    public function __call($methodName, array $args) : mixed
-    {
-        if (isset($this->methods[$methodName])) {
-            return call_user_func_array($this->methods[$methodName], $args);
-        }
-
-        throw RunTimeException('There is no method with the given name to call');
-    }
-
     public static function __register(): void
     {
         self::__bind(ObjectPortal1::class);
@@ -93,10 +68,5 @@ class View extends Portal
             'set',
             'ready'
         ];
-    }
-
-    public static function __isHistory(): bool
-    {
-        return true;
     }
 }
