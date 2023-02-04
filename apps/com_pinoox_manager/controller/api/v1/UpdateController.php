@@ -15,7 +15,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 use pinoox\app\com_pinoox_manager\component\Notification;
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\Cache;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\Download;
 use pinoox\component\Lang;
 use pinoox\component\Response;
@@ -32,7 +32,7 @@ class UpdateController extends LoginConfiguration
     private function getVersions()
     {
         $server_version = Cache::get('version');
-        $client_version = Config::init('~pinoox')->get();
+        $client_version = Config::name('~pinoox')->get();
         $client_version = [
             'version_code' => $client_version['version_code'],
             'version_name' => $client_version['version_name'],
@@ -59,7 +59,7 @@ class UpdateController extends LoginConfiguration
     {
         Cache::clean('version');
         $server_version = Cache::get('version');
-        $clint_version = Config::init('~pinoox')->get();
+        $clint_version = Config::name('~pinoox')->get();
         $server_version_code = (isset($server_version['version_code'])) ? $server_version['version_code'] : 0;
         $isNewVersion = ($server_version_code > $clint_version['version_code']);
         if ($isNewVersion) {

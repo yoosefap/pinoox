@@ -11,13 +11,11 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\component\worker;
+namespace pinoox\component\store;
 
-use pinoox\component\Dir;
 use pinoox\component\helpers\HelperArray;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\package\App;
-use pinoox\component\package\AppBuilder;
 
 class Config
 {
@@ -27,6 +25,20 @@ class Config
      * @var string
      */
     private string $key;
+
+    /**
+     * name config
+     *
+     * @var string
+     */
+    private string $name;
+
+    /**
+     * app current
+     *
+     * @var ?string
+     */
+    private ?string $app = null;
 
     /**
      * filename data
@@ -43,44 +55,34 @@ class Config
     private static array $data = [];
 
     /**
-     * Instance class
-     *
-     * @var Config
-     */
-    private static Config $obj;
-
-    /**
-     * Instance class
-     *
-     * @var Config[]
-     */
-    private static array $objects;
-
-    /**
      * Config constructor
      *
-     * @param string $name
+     * @param string|null $name
      */
-    public function __construct(string $name)
+    public function __construct(?string $name = null)
     {
         $this->initData($name);
     }
 
-    /**
-     * Config init
-     * @param string $name
-     * @return Config|null
-     */
-    public static function init(string $name): Config
+    public function name(string $name): Config
     {
-        $app = App::package();
-        $key = $app . ':' . $name;
-        if (!isset(self::$objects[$key])) {
-            self::$objects[$key] = new Config($name);
-        }
+        $this->initData($name);
+        return $this;
+    }
 
-        self::$obj = self::$objects[$key];
-        return self::$obj;
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    public function getApp(): string
+    {
+        return !empty($this->app) ? $this->app : App::package();
     }
 
     /**
@@ -88,21 +90,31 @@ class Config
      *
      * @param string $name
      */
-    private function initData(string $name)
+    private function initData(string $name): void
     {
+        $this->name = $name;
+        $this->app = null;
+        $parts = explode(':', $name);
+        if (count($parts) === 2) {
+            $this->app = $parts[0];
+            $name = $parts[1];
+        }
+
         $name = str_replace(['/', '\\'], '>', $name);
         $filename = $name;
         if (HelperString::firstHas($name, '~')) {
             $filename = HelperString::firstDelete($filename, '~');
-            $app = '~';
+            $appDefault = '~';
         } else {
-            $app = App::package();
+            $appDefault = App::package();
         }
 
-        $filename = 'config/' . $filename . '.config.php';
-        $this->filename = ($app === '~') ? '~' . $filename : $filename;
+        $this->app = !empty($app) ? $app : $appDefault;
 
-        $this->key = $app . ':' . $name;
+        $file = 'config/' . $filename . '.config.php';
+        $this->filename = ($this->app === '~') ? '~' . $file : $file;
+
+        $this->key = $this->app . ':' . $filename;
         if (!isset(self::$data[$this->key])) {
             $value = Pinker::init($this->filename)->pickup();
             self::$data[$this->key] = $value;
@@ -117,14 +129,14 @@ class Config
      * @param mixed $value
      * @return Config
      */
-    public function setLinear(string $pointer, ?string $key, $value): Config
+    public function setLinear(string $pointer, ?string $key, mixed $value): Config
     {
         $data = $this->get($pointer);
         $data = is_array($data) ? $data : [];
         $data[$key] = $value;
         $this->set($pointer, $data);
 
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -133,11 +145,11 @@ class Config
      * @param string|null $value
      * @return mixed|null
      */
-    public function get(?string $value = null)
+    public function get(?string $value = null): mixed
     {
         $data = @self::$data[$this->key];
 
-        if (!empty($value)) {
+        if (!is_null($value)) {
             if (is_array($data)) {
                 $parts = explode('.', $value);
                 foreach ($parts as $value) {
@@ -176,10 +188,10 @@ class Config
      * @param mixed $value
      * @return Config
      */
-    public function set(string $key, $value): Config
+    public function set(string $key, mixed $value): Config
     {
         HelperArray::pushingData($key, $value, 'set', self::$data[$this->key]);
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -188,10 +200,10 @@ class Config
      * @param mixed|null $value
      * @return Config
      */
-    public function data($value): Config
+    public function data(mixed $value): Config
     {
         self::$data[$this->key] = $value;
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -199,12 +211,12 @@ class Config
      *
      * @param string|null $pointer
      * @param string|null $key
-     * @return mixed|null
+     * @return mixed
      */
-    public function getLinear(?string $pointer, ?string $key)
+    public function getLinear(?string $pointer, ?string $key): mixed
     {
         $data = $this->get($pointer);
-        return isset($data[$key]) ? $data[$key] : null;
+        return $data[$key] ?? null;
     }
 
     /**
@@ -216,7 +228,7 @@ class Config
     public function delete(string $key): Config
     {
         HelperArray::pushingData($key, null, 'del', self::$data[$this->key]);
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -233,7 +245,7 @@ class Config
         unset($data[$key]);
         $this->set($pointer, $data);
 
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -244,9 +256,9 @@ class Config
     public function reset(): Config
     {
         $value = Pinker::init($this->filename)->pickup();
-        $this->data($value);
+        self::data($value);
 
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -259,7 +271,7 @@ class Config
     public function add(string $key, string $value): Config
     {
         HelperArray::pushingData($key, $value, 'add', self::$data[$this->key]);
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -272,7 +284,7 @@ class Config
         $data = $this->get();
         Pinker::init($this->filename)->data($data)->bake();
 
-        return self::$obj;
+        return $this;
     }
 }
     

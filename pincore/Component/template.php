@@ -16,7 +16,7 @@ use pinoox\component\package\App;
 use pinoox\component\helpers\HelperArray;
 use pinoox\component\helpers\HelperHeader;
 use pinoox\component\helpers\HelperString;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 
 class Template
 {
@@ -970,7 +970,7 @@ class Template
         $file = implode('/', $params);
         $ext = File::extension($file);
         $ext = HelperString::firstDelete($ext,'.');
-        $mime = Config::init('~loader')->get($ext);
+        $mime = Config::name('~loader')->get($ext);
         HelperHeader::contentType($mime, 'UTF-8');
         self::phpToAssets($file);
     }

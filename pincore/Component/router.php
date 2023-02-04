@@ -15,7 +15,7 @@ namespace pinoox\component;
 use pinoox\boot\Loader;
 use pinoox\component\app\AppProvider;
 use pinoox\component\helpers\HelperString;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -46,7 +46,7 @@ class Router
 
     public static function build($key, $app)
     {
-        Config::init('~app')->set($key, $app);
+        Config::name('~app')->set($key, $app);
         App::app($app);
         self::start();
         self::call();
@@ -87,7 +87,7 @@ class Router
     private static function checkDomain($url = null)
     {
         $new_url = empty($url) ? self::$url : $url;;
-        $app_domain = Config::init('~domain')->get( Url::domain());
+        $app_domain = Config::name('~domain')->get( Url::domain());
         if (empty($app_domain)) {
             $info = self::getByPatternDomain();
             if (!empty($info)) {
@@ -115,9 +115,9 @@ class Router
 
     private static function getByPatternDomain()
     {
-        $domain = Config::init('~domain')->get( Url::domain());
+        $domain = Config::name('~domain')->get( Url::domain());
         if (is_null($domain)) {
-            $domains = Config::init('~domain')->get();
+            $domains = Config::name('~domain')->get();
 
             foreach ($domains as $pattern => $area) {
                 if (HelperString::has($pattern, '*')) {
@@ -185,7 +185,7 @@ class Router
             }
         }
 
-        $default_app = Config::init('~app')->get('*');
+        $default_app = Config::name('~app')->get('*');
         if (self::existApp($default_app, true)) {
             if (empty($url)) {
                 self::setApp($default_app);
@@ -204,7 +204,7 @@ class Router
     private static function getPackageNameApp($part)
     {
         if ($part === '*') return null;
-        return Config::init('~app')->getLinear(null,$part);
+        return Config::name('~app')->getLinear(null,$part);
     }
 
     public static function existApp($packageName, $isBake = false)
@@ -712,7 +712,7 @@ class Router
                 Loader::loadPath($classname, $path);
                 continue;
             }
-            Config::init('~loader')->set($classname, $path);
+            Config::name('~loader')->set($classname, $path);
         }
     }
 

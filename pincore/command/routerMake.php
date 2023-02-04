@@ -4,7 +4,7 @@ namespace pinoox\command;
 
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\CommandInterface;
@@ -71,14 +71,14 @@ class routerMake extends Console implements CommandInterface
 
     public function add($alias)
     {
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         if (empty($alias) || HelperString::has($alias, ['?', '\\', '>', '<', '!', '=', '~', '*', '#']))
             return [rlang('setting>router.write_correct_url'), false];
 
         if (isset($routes[$alias]))
             return [rlang('setting>router.this_url_exists_before'), false];
 
-        Config::init('~app')
+        Config::name('~app')
             ->set($alias, '')
             ->save();
 
@@ -90,7 +90,7 @@ class routerMake extends Console implements CommandInterface
         if ($alias == '*')
             return ['', false];
 
-        Config::init('~app')
+        Config::name('~app')
             ->delete($alias)
             ->save();
 
@@ -99,7 +99,7 @@ class routerMake extends Console implements CommandInterface
 
     public function setPackageName($alias, $packageName)
     {
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         if ($alias == 'manager')
             return [rlang('manager.request_not_valid'), false];
 
@@ -114,7 +114,7 @@ class routerMake extends Console implements CommandInterface
         if (!Validation::checkOne($alias, 'required') || !isset($routes[$alias]))
             return [rlang('setting>router.no_choose_any_route'), false];
 
-        Config::init('~app')
+        Config::name('~app')
             ->set($alias, $packageName)
             ->save();
 

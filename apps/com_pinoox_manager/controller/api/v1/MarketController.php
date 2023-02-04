@@ -14,7 +14,7 @@ namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\Dir;
 use pinoox\component\Download;
 use pinoox\component\HelperHeader;
@@ -43,7 +43,7 @@ class MarketController extends LoginConfiguration
             Response::json(Lang::get('manager.error_happened'), false);
 
         Wizard::deletePackageFile($pinFile);
-        Config::init('market')
+        Config::name('market')
             ->delete($packageName)
             ->save();
         Response::json(Lang::get('manager.delete_successfully'), true);
@@ -52,7 +52,7 @@ class MarketController extends LoginConfiguration
 
     private function getAuthParams($auth)
     {
-        $pinVer = Config::init('~pinoox')->get();
+        $pinVer = Config::name('~pinoox')->get();
         return [
             'token' => $auth['token'],
             'remote_url' => Url::site(),
@@ -93,7 +93,7 @@ class MarketController extends LoginConfiguration
             } else {
                 $path = path("downloads>apps>" . $packageName . ".pin");
                 Download::fetch('https://www.pinoox.com/api/manager/v1/market/download/' . $response['result']['hash'], $path)->process();
-                Config::init('market')
+                Config::name('market')
                     ->set($packageName, $response['result'])
                     ->save();
                 Response::json(rlang('manager.download_completed'), true);

@@ -37,13 +37,13 @@ class Router
      * @var array
      */
     private array $actions = [];
-
+ 
     public function __construct($path = '')
     {
         $this->collection(
             path: $path,
         );
-    }
+    } 
 
     /**
      * add route

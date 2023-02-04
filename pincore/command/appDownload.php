@@ -4,7 +4,7 @@ namespace pinoox\command;
 
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\Console;
 use pinoox\component\Download;
 use pinoox\component\helpers\HelperHeader;
@@ -118,7 +118,7 @@ class appDownload extends Console implements CommandInterface
 
     private function login()
     {
-        $token_key = Config::init('connect')->get('token_key');
+        $token_key = Config::name('connect')->get('token_key');
         if (!is_null($token_key)) {
             $data2 = HttpRequest::init('https://www.pinoox.com/api/manager/v1/account/getData', HttpRequest::POST, false)->params([
                 'remote_url' => 'http://pinoox-cli/',
@@ -131,7 +131,7 @@ class appDownload extends Console implements CommandInterface
             if ($data2['status']) {
                 return $token_key;
             } else {
-                Config::init('connect')
+                Config::name('connect')
                     ->set('token_key', null)
                     ->save();
                 $token_key = null;
@@ -150,7 +150,7 @@ class appDownload extends Console implements CommandInterface
             ])->send();
             $data3 = json_decode($data3, true);
             if ($data3['status']) {
-                Config::init('connect')
+                Config::name('connect')
                     ->set('token_key', $data3['result']['token'])
                     ->save();
                 return $data3['result']['token'];
@@ -172,7 +172,7 @@ class appDownload extends Console implements CommandInterface
         if (!empty($app))
             $this->error('This application exist in your applications!');
 
-        $version_name = Config::init('~pinoox')->get('version_name');
+        $version_name = Config::name('~pinoox')->get('version_name');
         $params = [
             'token' => $token,
             'remote_url' => 'http://pinoox-cli/',
@@ -188,7 +188,7 @@ class appDownload extends Console implements CommandInterface
                 $path = path("downloads>apps>" . $packageName . ".pin", 'com_pinoox_manager');
                 $_SERVER['HTTP_USER_AGENT'] = 'pinoox-cli';
                 Download::fetch('https://www.pinoox.com/api/manager/v1/market/download/' . $response['result']['hash'], $path)->process();
-                Config::init('market')
+                Config::name('market')
                     ->set($packageName, $response['result'])
                     ->save();
                 return true;

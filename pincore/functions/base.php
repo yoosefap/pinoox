@@ -13,7 +13,7 @@
 
 use pinoox\component\kernel\ContainerBuilder;
 use pinoox\component\package\App;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\Dir;
 use pinoox\component\Lang;
 use pinoox\component\Service;
@@ -79,7 +79,7 @@ if (!function_exists('config')) {
         $parts = explode('.', $key);
         $name = array_unshift($parts);
         $key = implode('.', $parts);
-        $config = Config::init($name);
+        $config = Config::name($name);
         $args = func_get_args();
         if (isset($args[1]))
             $config->set($key, $args[1]);

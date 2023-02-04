@@ -17,7 +17,7 @@ namespace pinoox\app\com_pinoox_manager\component;
 
 use pinoox\component\Cache;
 use pinoox\component\package\AppBuilder;
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\Lang;
@@ -140,7 +140,7 @@ class Wizard
     public static function runQuery($appDB, $packageName, $isRemoveFile = true, $isCopyUser = true)
     {
         if (is_file($appDB)) {
-            $prefix = Config::init('~database')->get('prefix');
+            $prefix = Config::name('~database')->get('prefix');
             $query = file_get_contents($appDB);
             $query = str_replace('{dbprefix}', $prefix . $packageName . '_', $query);
             $queryArr = explode(';', $query);
@@ -253,13 +253,13 @@ class Wizard
 
     private static function removeRoutes($packageName)
     {
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         foreach ($routes as $alias => $package) {
             if ($package == $packageName && $alias != '*') {
                 unset($routes[$alias]);
             }
         }
-        Config::init('~app')
+        Config::name('~app')
             ->data($routes)
             ->save();
     }

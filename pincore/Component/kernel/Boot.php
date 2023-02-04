@@ -70,7 +70,6 @@ class Boot
 
     private function buildContainer(ContainerBuilder $container): void
     {
-        \pinoox\portal\Router::post('/');
         $this->setParameters($container);
         $this->addEvents($container);
         $this->registerView($container);

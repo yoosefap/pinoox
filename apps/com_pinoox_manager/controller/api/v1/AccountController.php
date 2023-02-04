@@ -13,7 +13,7 @@
 
 namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\HelperString;
 use pinoox\component\HttpRequest;
 use pinoox\component\Request;
@@ -48,7 +48,7 @@ class AccountController extends LoginConfiguration
         );
         $array = json_decode($data, true);
         if ($array['status']) {
-            Config::init('connect')
+            Config::name('connect')
                 ->set('token_key', $array['result']['token'])
                 ->save();
         }
@@ -57,7 +57,7 @@ class AccountController extends LoginConfiguration
 
     public function getPinooxAuth()
     {
-        $token_key = Config::init('connect')->get('token_key');
+        $token_key = Config::name('connect')->get('token_key');
         $data = Request::sendPost(
             'https://www.pinoox.com/api/manager/v1/account/getData',
             [
@@ -93,7 +93,7 @@ class AccountController extends LoginConfiguration
 
         $array = json_decode($data, true);
         if (!empty($array['token_key'])) {
-            Config::init('connect')
+            Config::name('connect')
                 ->set('token_key', $array['token_key'])
                 ->save();
 
@@ -105,13 +105,13 @@ class AccountController extends LoginConfiguration
 
     public function getConnectData()
     {
-        $data = Config::init('connect')->get();
+        $data = Config::name('connect')->get();
         Response::json($data);
     }
 
     public function logout()
     {
-        Config::init('connect')
+        Config::name('connect')
             ->set('token_key', null)
             ->save();
     }

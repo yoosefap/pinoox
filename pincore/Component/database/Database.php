@@ -5,7 +5,6 @@ namespace pinoox\component\database;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
-use pinoox\component\Config;
 
 /**
  *      ****  *  *     *  ****  ****  *    *
@@ -19,6 +18,7 @@ use pinoox\component\Config;
  */
 
 use \Illuminate\Database\Schema\Builder;
+use pinoox\portal\Config;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 class Database

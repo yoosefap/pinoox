@@ -14,8 +14,8 @@ namespace pinoox\component\package;
 
 use Exception;
 use pinoox\component\helpers\HelperArray;
-use pinoox\component\worker\Config;
-use pinoox\component\worker\Pinker;
+use pinoox\portal\Config;
+use pinoox\component\store\Pinker;
 
 class AppBuilder
 {
@@ -118,7 +118,7 @@ class AppBuilder
 
     private function createApp()
     {
-        $source = Config::init('~app>source')->get();
+        $source = Config::name('~app>source')->get();
         $source['package-name'] = $this->packageName;
         self::$data[$this->packageName] = $source;
     }
@@ -160,7 +160,7 @@ class AppBuilder
     public function get(?string $value = null)
     {
         $app = self::$data[$this->packageName];
-        $source = Config::init('~app>source')->get();
+        $source = Config::name('~app>source')->get();
         $data = array_merge($source, $app);
         if (is_null($value)) return $data;
         $parts = explode('.', $value);

@@ -12,7 +12,7 @@
     
 namespace pinoox\service;
 
-use pinoox\component\worker\Config;
+use pinoox\portal\Config;
 use pinoox\component\interfaces\ServiceInterface;
 use pinoox\component\Session;
 use pinoox\model\PincoreModel;
