@@ -20,16 +20,7 @@ class Loader
 {
     public static function boot(ClassLoader $loader)
     {
-        $loaders = spl_autoload_functions();
-
-        foreach ($loaders as $l) {
-            // we need to replace only composer
-            if (is_array($l) && $l[0] instanceof ClassLoader) {
-                spl_autoload_unregister($l);
-            }
-        }
-       // spl_autoload_register([$this, 'loadClass'], true, true);
-
+        $manager = new LoaderManager($loader);
         self::loadServices();
     }
 
@@ -39,17 +30,6 @@ class Loader
         foreach ($services as $service) {
             Service::run($service);
         }
-    }
-
-    public function loadClass($className)
-    {
-        $result = $this->loader->loadClass($className);
-        if($result === true) {
-            //class loaded successfully
-            $this->callConstruct($className);
-            return true;
-        }
-        return null;
     }
 
     /**

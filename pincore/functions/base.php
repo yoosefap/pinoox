@@ -22,6 +22,7 @@ use pinoox\component\helpers\HelperString;
 use pinoox\component\worker\Pinker;
 use pinoox\component\kernel\Container;
 use pinoox\component\template\ViewInterface;
+use pinoox\portal\View;
 
 if (!function_exists('url')) {
     function url($link = null)
@@ -138,17 +139,11 @@ if (!function_exists('view')) {
      *
      * @param string $name
      * @param array $parameters
-     * @return ViewInterface
-     * @throws Exception
+     * @return View
      */
-    function view(string $name = '', array $parameters = []): ViewInterface
+    function view(string $name = '', array $parameters = []): View
     {
-        $view = Container::pincore()->get('view');
-
-        if (!($view instanceof ViewInterface))
-            throw new Exception('not found view class in the container');
-
-        return $view->ready($name, $parameters);
+        return View::ready($name, $parameters);
     }
 }
 
@@ -162,5 +157,17 @@ if (!function_exists('container')) {
     function container(?string $packageName = null): ContainerBuilder
     {
         return Container::app($packageName);
+    }
+}
+
+if (!function_exists('pincore')) {
+    /**
+     * Open pincore container
+     *
+     * @return ContainerBuilder
+     */
+    function pincore(): ContainerBuilder
+    {
+        return Container::pincore();
     }
 }

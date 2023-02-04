@@ -14,9 +14,11 @@ namespace pinoox\component\kernel;
 
 use Closure;
 use pinoox\component\Console;
+use pinoox\component\helpers\PhpFile;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\listener\ExceptionListener;
 use pinoox\component\kernel\resolver\RouteValueResolver;
+use pinoox\component\source\MethodBuilder;
 use pinoox\component\template\View;
 use pinoox\component\Url;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,8 +63,8 @@ class Boot
         $layer = AppRouter::find();
         App::setLayer($layer);
         $this->buildContainer($core);
-        if ( is_null(Url::request())){
-            Global $argv ;
+        if (is_null(Url::request())) {
+            global $argv;
             Console::run($argv);
             exit;
         }
@@ -71,6 +73,7 @@ class Boot
 
     private function buildContainer(ContainerBuilder $container): void
     {
+        \pinoox\portal\Router::post('/');
         $this->setParameters($container);
         $this->addEvents($container);
         $this->registerView($container);
@@ -136,7 +139,7 @@ class Boot
             ->addMethodCall('addSubscriber', [Container::ref('listener.router')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.response')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.exception')])
-            ->addMethodCall('addSubscriber', [Container::ref('listener.e')])
+            //  ->addMethodCall('addSubscriber', [Container::ref('listener.e')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.controller')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.view')]);
     }
@@ -202,7 +205,7 @@ class Boot
 
     private function registerView(ContainerBuilder $container)
     {
-        $container->register('view', View::class);
+        //$container->register('view', View::class);
     }
 
     private function registerSerializer(ContainerBuilder $container): void

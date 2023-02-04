@@ -20,62 +20,31 @@ use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Closure;
 use Exception;
 
-/**
- *
- * @method static void get(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void post(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void put(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void patch(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void delete(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void options(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void head(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void purge(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void trace(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- * @method static void connect(array|string $path, array|string|Closure $action = '', string $name = null, array $defaults = [], array $filters = [])
- */
 class Router
 {
     /**
      * current collection index
      * @var int
      */
-    private static int $current = -1;
+    private int $current = -1;
 
     /**
      * @var Collection[]
      */
-    private static array $collections = [];
+    private array $collections = [];
 
     /**
      * @var array
      */
-    private static array $actions = [];
+    private array $actions = [];
 
-    public static function __constructStatic()
-    {
-        self::collection(routes: function () {
-        });
-    }
-
-    /**
-     * init Router
-     */
-    public static function init()
-    {
-        self::reset();
-        $routePath = App::get('router.routes');
-        self::collection(path: App::path(), routes: $routePath);
-    }
-
-    /**
-     * reset Router
-     */
-    public static function reset()
-    {
-        self::$collections = [];
-        self::$actions = [];
-        self::$current = -1;
-    }
+//    public function __construct($path, $routes)
+//    {
+//        $this->collection(
+//            path: $path,
+//            routes: $routes
+//        );
+//    }
 
     /**
      * add route
@@ -87,7 +56,7 @@ class Router
      * @param array $defaults
      * @param array $filters
      */
-    public static function add(string|array $path, array|string|Closure $action = '', string $name = '', string|array $methods = [], array $defaults = [], array $filters = []): void
+    public function add(string|array $path, array|string|Closure $action = '', string $name = '', string|array $methods = [], array $defaults = [], array $filters = []): void
     {
         if (is_array($path)) {
             foreach ($path as $routeName => $p) {
@@ -97,36 +66,18 @@ class Router
                 $methods = isset($p['methods']) ? $p['methods'] : $methods;
                 $defaults = isset($p['defaults']) ? $p['defaults'] : $defaults;
                 $filters = isset($p['filters']) ? $p['filters'] : $filters;
-                self::add($path, $action, $routeName, $methods, $defaults, $filters);
+                $this->add($path, $action, $routeName, $methods, $defaults, $filters);
             }
-            return;
-        }
-
-        $route = new Route(
-            collection: self::currentCollection(),
-            path: $path,
-            action: $action,
-            name: $name,
-            methods: $methods,
-            defaults: $defaults,
-            filters: $filters,
-        );
-
-        self::currentRoutes()->add($route->getName(), $route->get(), $route->countAll());
-    }
-
-    /**
-     * call static for adding route by methods
-     *
-     * @param string $method
-     * @param array $arguments
-     */
-    public static function __callStatic(string $method, array $arguments)
-    {
-        if (RouteMethod::valid($method)) {
-            self::add(@$arguments[0], @$arguments[1], @$arguments[2], $method, @$arguments[3], @$arguments[4]);
         } else {
-            throw new BadMethodCallException('"' . $method . '" static method is not found in ' . __CLASS__ . ' class');
+            $this->currentCollection()->add(new Route(
+                collection: $this->currentCollection(),
+                path: $path,
+                action: $action,
+                name: $name,
+                methods: $methods,
+                defaults: $defaults,
+                filters: $filters,
+            ));
         }
     }
 
@@ -137,9 +88,9 @@ class Router
      * @param int|null $indexCollection
      * @return mixed
      */
-    public static function buildAction(mixed $action, ?int $indexCollection = null): mixed
+    public function buildAction(mixed $action, ?int $indexCollection = null): mixed
     {
-        $collection = isset(self::$collections[$indexCollection]) ? self::$collections[$indexCollection] : self::currentCollection();
+        $collection = isset($this->$collections[$indexCollection]) ? $this->collections[$indexCollection] : $this->currentCollection();
         return $collection->buildAction($action);
     }
 
@@ -149,11 +100,11 @@ class Router
      * @param string $name
      * @return mixed
      */
-    public static function getAction(string $name): mixed
+    public function getAction(string $name): mixed
     {
-        $name = self::buildNameAction($name, false);
-        if (isset(self::$actions[$name]))
-            return self::$actions[$name];
+        $name = $this->buildNameAction($name, false);
+        if (isset($this->actions[$name]))
+            return $this->actions[$name];
 
         return false;
     }
@@ -162,26 +113,25 @@ class Router
      * add collection
      *
      * @param string $path
+     * @param Router|string|array|callable|null $routes
      * @param mixed|null $controller
      * @param array|string $methods
      * @param array|string|Closure $action
-     * @param string|array|callable|null $routes
      * @param array $defaults
      * @param array $filters
      * @param string $prefixName
      */
-    public static function collection(string $path = '', mixed $controller = null, array|string $methods = [], array|string|Closure $action = '', string|array|callable|null $routes = null, $defaults = [], array $filters = [], string $prefixName = ''): void
+    public function collection(string $path = '', Router|string|array|callable|null $routes = null, mixed $controller = null, array|string $methods = [], array|string|Closure $action = '', $defaults = [], array $filters = [], string $prefixName = ''): void
     {
-        $cast = self::$current;
-        $prefixName = self::buildPrefixNameCollection($prefixName);
-        $defaults = self::buildDefaultsCollection($defaults);
-        $filters = self::buildFiltersCollection($filters);
-        $controller = self::buildControllerCollection($controller);
-        $prefixPath = self::buildPrefixPathCollection($path);
+        $cast = $this->current;
+        $prefixName = $this->buildPrefixNameCollection($prefixName);
+        $defaults = $this->buildDefaultsCollection($defaults);
+        $filters = $this->buildFiltersCollection($filters);
+        $controller = $this->buildControllerCollection($controller);
+        $prefixPath = $this->buildPrefixPathCollection($path);
 
-
-        self::$current = count(self::$collections);
-        self::$collections[self::$current] = new Collection(
+        $this->current = count($this->collections);
+        $this->collections[$this->current] = new Collection(
             path: $path,
             prefixPath: $prefixPath,
             cast: $cast,
@@ -193,28 +143,27 @@ class Router
             name: $prefixName,
         );
 
-        self::callRoutes($routes);
+        $this->callRoutes($routes);
 
-        $collection = self::currentCollection();
+        $collection = $this->currentCollection();
         if ($collection->cast !== -1) {
-            self::$current = $collection->cast;
-            $routeCollection = $collection->get();
-            if (!empty($collection->path))
-                $routeCollection->addPrefix($collection->path);
-            self::currentRoutes()->addCollection($routeCollection);
+            $this->current = $collection->cast;
+            $this->currentCollection()->add($collection);
         }
     }
 
     /**
      * run a routes collection
-     * @param $routes
+     * @param Router|string|array|callable|null $routes
      */
-    private static function callRoutes($routes): void
+    private function callRoutes(Router|string|array|callable|null $routes): void
     {
-        if (is_callable($routes)) {
-            $routes();
+        if ($routes instanceof Router) {
+            $this->getMainCollection()->add($routes->getMainCollection());
+        } else if (is_callable($routes)) {
+            $routes($this);
         } else {
-            self::loadFiles($routes);
+            $this->loadFiles($routes);
         }
     }
 
@@ -223,7 +172,7 @@ class Router
      *
      * @param string|array $routes
      */
-    private static function loadFiles(string|array $routes): void
+    private function loadFiles(string|array $routes): void
     {
         if (is_string($routes)) {
             $routes = Dir::path($routes);
@@ -231,7 +180,7 @@ class Router
                 include $routes;
         } else if (is_array($routes)) {
             foreach ($routes as $route) {
-                self::loadFiles($route);
+                $this->loadFiles($route);
             }
         }
     }
@@ -242,10 +191,10 @@ class Router
      * @param string $name
      * @param array|string|Closure $action
      */
-    public static function action(string $name, array|string|Closure $action): void
+    public function action(string $name, array|string|Closure $action): void
     {
-        $name = self::buildNameAction($name);
-        self::$actions[$name] = self::currentCollection()->buildAction($action);
+        $name = $this->buildNameAction($name);
+        $this->actions[$name] = $this->currentCollection()->buildAction($action);
     }
 
     /**
@@ -253,9 +202,9 @@ class Router
      *
      * @return RouteCollection
      */
-    private static function currentRoutes(): RouteCollection
+    private function currentRoutes(): RouteCollection
     {
-        return self::currentCollection()->routes;
+        return $this->currentCollection()->routes;
     }
 
     /**
@@ -263,9 +212,14 @@ class Router
      *
      * @return Collection
      */
-    public static function currentCollection(): Collection
+    public function currentCollection(): Collection
     {
-        return self::$collections[self::$current];
+        return $this->collections[$this->current];
+    }
+
+    public function getCollection($index = 0): ?Collection
+    {
+        return @$this->collections[$index];
     }
 
     /**
@@ -275,9 +229,9 @@ class Router
      * @param bool $isPrefix
      * @return string
      */
-    private static function buildNameAction(string $name, bool $isPrefix = true): string
+    private function buildNameAction(string $name, bool $isPrefix = true): string
     {
-        $prefixName = $isPrefix ? self::currentCollection()->name : '';
+        $prefixName = $isPrefix ? $this->currentCollection()->name : '';
         return App::package() . ':' . $prefixName . $name;
     }
 
@@ -287,9 +241,9 @@ class Router
      * @param $name
      * @return string
      */
-    private static function buildPrefixNameCollection($name): string
+    private function buildPrefixNameCollection($name): string
     {
-        $prefix = self::$current > -1 ? self::currentCollection()->name : '';
+        $prefix = $this->current > -1 ? $this->currentCollection()->name : '';
         return $prefix . $name;
     }
 
@@ -299,10 +253,10 @@ class Router
      * @param array $defaults
      * @return array
      */
-    private static function buildDefaultsCollection(array $defaults): array
+    private function buildDefaultsCollection(array $defaults): array
     {
-        if (self::$current > -1) {
-            $defaults = array_merge(self::currentCollection()->defaults, $defaults);
+        if ($this->current > -1) {
+            $defaults = array_merge($this->currentCollection()->defaults, $defaults);
         }
         return $defaults;
     }
@@ -313,10 +267,10 @@ class Router
      * @param array $filters
      * @return array
      */
-    private static function buildFiltersCollection(array $filters): array
+    private function buildFiltersCollection(array $filters): array
     {
-        if (self::$current > -1) {
-            $filters = array_merge(self::currentCollection()->filters, $filters);
+        if ($this->current > -1) {
+            $filters = array_merge($this->currentCollection()->filters, $filters);
         }
         return $filters;
     }
@@ -327,10 +281,10 @@ class Router
      * @param mixed $controller
      * @return mixed
      */
-    private static function buildControllerCollection(mixed $controller): mixed
+    private function buildControllerCollection(mixed $controller): mixed
     {
-        if (self::$current > -1) {
-            $controller = !empty($controller) ? $controller : self::currentCollection()->controller;
+        if ($this->current > -1) {
+            $controller = !empty($controller) ? $controller : $this->currentCollection()->controller;
         }
         return $controller;
     }
@@ -341,9 +295,9 @@ class Router
      * @param string $path
      * @return mixed
      */
-    private static function buildPrefixPathCollection(string $path): string
+    private function buildPrefixPathCollection(string $path): string
     {
-        $prefix = self::$current > -1 ? self::currentCollection()->prefixPath : '';
+        $prefix = $this->current > -1 ? $this->currentCollection()->prefixPath : '';
         return $prefix . $path;
     }
 
@@ -352,9 +306,9 @@ class Router
      *
      * @return Collection
      */
-    public static function getMainCollection(): Collection
+    public function getMainCollection(): Collection
     {
-        return self::$collections[0];
+        return $this->collections[0];
     }
 
     /**
@@ -365,7 +319,7 @@ class Router
      * @return string
      * @throws Exception
      */
-    public static function path($name, $params = []) : string
+    public function path($name, $params = []): string
     {
         $name = App::package() . ':' . $name;
         return Container::pincore()->get('url_generator')->generate($name, $params);

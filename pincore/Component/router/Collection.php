@@ -87,4 +87,26 @@ class Collection
 
         return $action;
     }
+
+    public function addRoute(Route $route)
+    {
+        $this->routes->add($route->getName(), $route->get(), $route->countAll());
+    }
+
+    public function addCollection(Collection $collection)
+    {
+        if (!empty($collection->path))
+            $this->routes->addPrefix($collection->path);
+
+        $this->routes->addCollection($collection->routes);
+    }
+
+    public function add(Route|Collection $input)
+    {
+        if ($input instanceof Route) {
+            $this->addRoute($input);
+        } else {
+            $this->addCollection($input);
+        }
+    }
 }

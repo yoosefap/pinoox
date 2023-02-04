@@ -19,14 +19,14 @@ use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\CommandInterface;
 
-class PortalRegister extends console implements CommandInterface
+class PortalUpdate extends console implements CommandInterface
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = "portal:register";
+    protected $signature = "portal:update";
 
     /**
      * The console command description.
@@ -64,14 +64,16 @@ class PortalRegister extends console implements CommandInterface
     {
         $packageName = $this->option('package');
         $packageName = empty($packageName) || $packageName == 'default'? null : $packageName;
-        $this->chooseApp($packageName);
+       // $this->chooseApp($packageName);
+        $this->chooseApp('pincore');
+
     }
 
     private function registerPortal(string $portalName, string $packageName): void
     {
         $path = $this->getPath($portalName);
-        PhpFile::registerPortal($path, $portalName,$packageName);
-        $this->success(sprintf('Portal register in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path)));
+        PhpFile::updatePortal($path, $portalName,$packageName);
+        $this->success(sprintf('Portal update in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path)));
         $this->newLine();
     }
 

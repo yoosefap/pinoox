@@ -12,6 +12,7 @@
 
 use pinoox\component\kernel\Loader;
 
+define('PINOOX_START', microtime(true));
 define('PINOOX_DEFAULT_LANG', 'en');
 define('PINOOX_PATH', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
 define('PINOOX_VENDOR_PATH', PINOOX_PATH . 'vendor' . DIRECTORY_SEPARATOR);
@@ -36,13 +37,5 @@ define('PINOOX_PATH_THUMB', 'thumbs/{name}_{size}.{ext}');
 */
 $composer = require PINOOX_VENDOR_PATH . 'autoload.php';
 $loader = new \pinoox\component\kernel\LoaderManager($composer);
-
-/*
-|--------------------------------------------------------------------------
-| Register Pinoox Loader
-|--------------------------------------------------------------------------
-*/
-require PINOOX_FUNCTIONS_PATH . 'base.php';
-require PINOOX_FUNCTIONS_PATH . 'router' . DIRECTORY_SEPARATOR . 'routes.php';
 
 Loader::boot($composer);

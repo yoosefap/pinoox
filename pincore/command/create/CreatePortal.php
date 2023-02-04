@@ -11,7 +11,7 @@
  */
 
 
-namespace pinoox\command\portal;
+namespace pinoox\command\create;
 
 
 use pinoox\component\helpers\PhpFile;
@@ -19,14 +19,14 @@ use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\interfaces\CommandInterface;
 
-class PortalCreate extends console implements CommandInterface
+class CreatePortal extends console implements CommandInterface
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = "portal:create";
+    protected $signature = "create:portal";
 
     /**
      * The console command description.
@@ -42,11 +42,11 @@ class PortalCreate extends console implements CommandInterface
      */
     protected $arguments = [
         ['PortalName', true, 'Portal Name'],
-        ['ComponentName', true, 'Component Name registered'],
     ];
 
     protected $options = [
         ['package', 'p', 'change package name for example:[--package=com_pinoox_welcome | --p=com_pinoox_welcome]', 'default'],
+        ['service', 's', 'change service name for example:[--service=view | --s=view]', ''],
     ];
 
     /**
@@ -57,16 +57,17 @@ class PortalCreate extends console implements CommandInterface
     {
         $this->setPackageName();
         $portalName = HelperString::toCamelCase($this->argument('PortalName'));
-        $componentName = $this->argument('ComponentName');
-        $this->createPortal($portalName, $componentName, $this->cli['package']);
+        $serviceName = $this->option('service');
+        $serviceName = !empty($serviceName) ? $serviceName : lcfirst($portalName);
+        $this->createPortal($portalName, $serviceName, $this->cli['package']);
     }
 
 
-    private function createPortal(string $portalName, string $componentName, string $packageName): void
+    private function createPortal(string $portalName, string $serviceName, string $packageName): void
     {
         $path = $this->getPath($portalName);
 
-        PhpFile::createPortal($path, $portalName, $componentName, $packageName, $this->cli['namespace']);
+        PhpFile::createPortal($path, $portalName, $serviceName, $packageName, $this->cli['namespace']);
         $this->success(sprintf('Portal created in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path)));
         $this->newLine();
     }
@@ -80,6 +81,6 @@ class PortalCreate extends console implements CommandInterface
     {
         $packageName = $this->option('package');
         $packageName = empty($packageName) || $packageName == 'default' ? null : $packageName;
-        $this->chooseApp($packageName);
+        $this->chooseApp('pincore');
     }
 }

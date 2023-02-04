@@ -17,13 +17,32 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "pinoox/pincore": "2.x-dev"
+        "doctrine/dbal": "^3.5",
+        "illuminate/database": "^8.0",
+        "illuminate/events": "^8.0",
+        "nette/php-generator": "^4.0",
+        "symfony/dependency-injection": "^6.0",
+        "symfony/error-handler": "^6.0",
+        "symfony/finder": "^6.0",
+        "symfony/http-client": "^6.0",
+        "symfony/http-foundation": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "symfony/property-access": "^6.0",
+        "symfony/routing": "6.0",
+        "symfony/serializer": "^6.0",
+        "symfony/templating": "^6.0",
+        "symfony/var-dumper": "^6.0",
+        "twig/twig": "^3"
     },
     "autoload": {
         "psr-4": {
             "pinoox\\": "pincore/",
             "pinoox\\app\\": "apps/"
-        }
+        },
+        "files": [
+            "pincore/functions/base.php",
+            "pincore/functions/router.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

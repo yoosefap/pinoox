@@ -28,12 +28,12 @@ function route(array|string $path, array|string|Closure $action = '', string $na
  * @param mixed|null $controller
  * @param array|string|null $methods
  * @param array|string|Closure $action
- * @param string|array|callable|null $routes
+ * @param string|array|callable|Router|null $routes
  * @param array $filters
  * @param array $defaults
  * @param string $prefixName
  */
-function collection(string $path = '', mixed $controller = null, array|string|null $methods = null, array|string|Closure $action = '', string|array|callable|null $routes = null, $filters = [], array $defaults = [], string $prefixName = ''): void
+function collection(string $path = '', mixed $controller = null, array|string|null $methods = null, array|string|Closure $action = '', string|array|callable|Router|null $routes = null, $filters = [], array $defaults = [], string $prefixName = ''): void
 {
     Router::collection($path, $controller, $methods, $action, $routes, $defaults, $filters, $prefixName);
 }

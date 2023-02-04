@@ -15,17 +15,14 @@ namespace pinoox\component\helpers;
 
 use Nette\PhpGenerator\ClassLike;
 use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile as PhpFileNette;
 use Nette\PhpGenerator\PhpNamespace;
-use Nette\PhpGenerator\Factory;
-use Nette\PhpGenerator\PsrPrinter;
-use PHPUnit\Framework\MockObject\MockMethod;
 use PHPUnit\Framework\MockObject\ReflectionException;
 use pinoox\component\File;
 use pinoox\component\kernel\Container;
 use pinoox\component\package\App;
 use pinoox\component\source\Portal;
+use ReflectionFunction;
 use ReflectionMethod;
 use SebastianBergmann\Type\ReflectionMapper;
 
@@ -41,24 +38,65 @@ class PhpFile
         return $source;
     }
 
-    public static function addCommentMethods(string $serviceName, ClassType|ClassLike $class, PhpNamespace $namespace, string $packageName = '~')
+    public static function addCommentMethods(string $portalName, string $serviceName, ClassType|ClassLike $class, PhpNamespace $namespace, string $packageName = '~')
     {
+        $isCallBack = true;
+        $callback = [];
+        $exclude = [];
+        $replace = [];
+
+        if (class_exists($portalName)) {
+            $isCallBack = call_user_func([$portalName, '__isCallBack']);
+            $callback = call_user_func([$portalName, '__callback']);
+            $exclude = call_user_func([$portalName, '__exclude']);
+            $replace = call_user_func([$portalName, '__compileReplaces']);
+        }
+
         if (App::exists($packageName)) {
             $container = Container::app($packageName);
         } else {
             $container = Container::pincore();
         }
         if ($container->hasDefinition($serviceName)) {
+            $voidMethods = [];
+            $num = 1;
             $className = $container->getDefinition($serviceName)->getClass();
             $reflection = $container->getReflectionClass($className);
             $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
             foreach ($methods as $method) {
-                if ($method->getName() === '__construct')
+                if (isset($replace[$method->getName()]) || HelperString::firstHas($method->getName(), '__') || in_array($method->getName(), $exclude))
                     continue;
                 if ($method instanceof ReflectionMethod) {
-                    $class->addComment(self::generateMethodComment($method, $namespace));
+                    $returnType = self::getReturnTypeMethod($method);
+                    if ($returnType === 'void' && $isCallBack && empty($callback)) {
+                        $voidMethods[] = $method->getName();
+                    }
+                    $class->addComment(self::generateMethodComment($portalName, $class->getName(), $method->getName(), $method, $namespace, $returnType, $isCallBack, $callback, $num));
                 }
             }
+
+            foreach ($replace as $methodName => $closure) {
+                try {
+                    $func = new ReflectionFunction($closure);
+                } catch (\ReflectionException $e) {
+                    continue;
+                }
+
+
+                if (in_array($methodName, $exclude))
+                    continue;
+                $returnType = self::getReturnTypeMethod($func);
+                if ($returnType === 'void' && $isCallBack && empty($callback)) {
+                    $voidMethods[] = $methodName;
+                }
+                $class->addComment(self::generateMethodComment($portalName, $class->getName(), $methodName, $func, $namespace, $returnType, $isCallBack, $callback, $num));
+            }
+
+            if (empty($callback))
+                self::addMethodCallBack($class, $voidMethods);
+
+            $class->addComment('@method static \\' . $className . ' object()');
+            $class->addComment("\n" . '@see \\' . $className);
         }
     }
 
@@ -70,15 +108,56 @@ class PhpFile
 
         $namespace = $source->addNamespace($namespaceString);
         $namespace->addUse(Portal::class);
+        $portalName = $namespaceString . '\\' . $className;
 
         $class = $namespace->addClass($className);
+        $class->setExtends(Portal::class);
+        self::addMethodName($class, $serviceName);
+        self::addMethodCallBack($class);
+        self::addMethodExclude($class);
 
-        self::addCommentMethods($serviceName, $class, $namespace,$packageName);
+        self::addCommentMethods($portalName, $serviceName, $class, $namespace, $packageName);
+        File::generate($path, $source);
+    }
 
-        $class
-            ->setExtends(Portal::class);
+    private static function addMethodCallBack(ClassType $class, array $items = [])
+    {
+        if (!empty($items)) {
+            $items = implode("',\n\t'", $items);
+            $body = "return [\n\t'" . $items . "'\t\n];";
+        } else {
+            $body = "return [];";
+        }
 
-        // add method in class
+
+        if ($class->hasMethod('__callback')) {
+            $class->removeMethod('__callback');
+        }
+
+        $method = $class->addMethod('__callback');
+        $method->addComment('Get method names for callback object.');
+        $method->addComment('@return string[]');
+        $method->setPublic()
+            ->setStatic()
+            ->setReturnType('array')
+            ->addBody($body);
+    }
+
+    private static function addMethodExclude(ClassType $class)
+    {
+        if (!$class->hasMethod('__exclude')) {
+            $method = $class->addMethod('__exclude');
+            $method->addComment('Get exclude method names .');
+            $method->addComment('@return string[]');
+            $method->setPublic()
+                ->setStatic()
+                ->setReturnType('array')
+                ->addBody("return [];");
+        }
+    }
+
+    private static function addMethodName(ClassType $class, $serviceName)
+    {
         $method = $class->addMethod('__name');
         $method->addComment('Get the registered name of the component.');
         $method->addComment('@return string');
@@ -86,11 +165,9 @@ class PhpFile
             ->setStatic()
             ->setReturnType('string')
             ->addBody("return '{$serviceName}';");
-
-        File::generate($path, $source);
     }
 
-    public static function registerPortal(string $path, string $className, string $packageName)
+    public static function updatePortal(string $path, string $className, string $packageName)
     {
         $source = PhpFileNette::fromCode(file_get_contents($path));
 
@@ -103,7 +180,8 @@ class PhpFile
                 $className = $class->getName();
                 $serviceName = call_user_func([$portalName, '__name']);
                 $class->setComment('');
-                self::addCommentMethods($serviceName, $class, $namespaceItems[0],$packageName);
+                self::addCommentMethods($portalName, $serviceName, $class, $namespaceItems[0], $packageName);
+
             }
         }
 
@@ -149,31 +227,66 @@ class PhpFile
         $source->setComment($copyright);
     }
 
-    public static function generateMethodComment(ReflectionMethod $method, PhpNamespace $namespace, int &$num = 1): string
+    public static function getReturnTypeMethod($method): string
     {
         $return = (new ReflectionMapper)->fromReturnType($method);
-        $return = !empty($return->asString()) ? $return->asString() : '';
+        return !empty($return->asString()) ? $return->asString() : '';
+    }
+
+    public static function generateMethodComment(string $portalName, string $portalClassName, string $methodName, ReflectionFunction|ReflectionMethod $method, PhpNamespace $namespace, string $return, bool $isCallBack = true, array $callback = [], int &$num = 1): string
+    {
+
+        if (($return === 'void' || in_array($methodName, $callback)) && $isCallBack) {
+            $return = $portalClassName;
+        }
+
         $args = str_replace("\n", '', self::getMethodParametersForDeclaration($method));
         $args = str_replace("array ()", '[]', $args);
+        if ($return === $portalName) {
+            $returnType = $portalClassName;
+        } else if (!empty($return) && class_exists($return)) {
+            if ($use = self::getUse($namespace, $return)) {
+                $returnType = $use;
+            } else {
+                $returnType = 'ObjectPortal' . $num;
+                $namespace->addUse($return, $returnType);
+                $num++;
+            }
 
-        if (!empty($return) && class_exists($return)) {
-            $returnType = 'ObjectPortal' . $num;
-            $namespace->addUse($return, $returnType);
-            $num++;
         } else {
             $returnType = $return;
         }
 
         $returnType = !empty($returnType) ? $returnType . ' ' : '';
         return HelperString::replaceData('@method static {return}{name}({args})', [
-            'name' => $method->getName(),
+            'name' => $methodName,
             'return' => $returnType,
             'args' => $args,
         ]);
     }
 
-    public static function getMethodParametersForDeclaration(ReflectionMethod $method): string
+    private static function hasUse(PhpNamespace $namespace, $class): bool
     {
+        $uses = $namespace->getUses();
+        return in_array($class, $uses);
+    }
+
+    private static function getUse(PhpNamespace $namespace, $class)
+    {
+        $uses = $namespace->getUses();
+        return array_search($class, $uses);
+    }
+
+    public static function getMethodParametersForDeclaration(ReflectionFunction|ReflectionMethod|\Closure $method): string
+    {
+        if ($method instanceof \Closure) {
+            try {
+                $method = new ReflectionFunction($method);
+            } catch (\ReflectionException $e) {
+                return '';
+            }
+        }
+
         $parameters = [];
         $types = (new ReflectionMapper)->fromParameterTypes($method);
 
@@ -192,7 +305,14 @@ class PhpFile
             $typeDeclaration = '';
 
             if (!$types[$i]->type()->isUnknown()) {
-                $typeDeclaration = $types[$i]->type()->asString() . ' ';
+                $typesString = $types[$i]->type()->asString();
+                $typesItems = explode('|', $typesString);
+                foreach ($typesItems as $key => $typesItem) {
+                    if (class_exists($typesItem))
+                        $typesItems[$key] = '\\' . $typesItem;
+                }
+                $typesString = implode('|', $typesItems);
+                $typeDeclaration = $typesString . ' ';
             }
 
             if ($parameter->isPassedByReference()) {

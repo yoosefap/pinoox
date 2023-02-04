@@ -15,7 +15,7 @@ class ExampleTest extends TestCase
     public function test_example()
     {
         $this->assertEquals(
-            2,
+            3,
             3
         );
     }
@@ -30,5 +30,18 @@ class ExampleTest extends TestCase
             2,
             2
         );
+
+    }    /**
+     * A basic test example.
+     *
+     * @return void
+     */
+    public function test_asd3()
+    {
+        $this->assertEquals(
+            2,
+            2
+        );
     }
+
 }

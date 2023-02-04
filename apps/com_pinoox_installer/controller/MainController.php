@@ -15,78 +15,27 @@ namespace pinoox\app\com_pinoox_installer\controller;
 
 use pinoox\component\http\Request;
 use pinoox\component\kernel\controller\Controller;
-use pinoox\component\Response;
-use pinoox\component\router\Router;
-use pinoox\component\router\Route;
-use pinoox\portal\View1;
+use pinoox\portal\View;
 
 
 class MainController extends Controller
 {
-    public function __construct()
+    public function home(Request $request)
     {
-        parent::__construct();
-        $this->view->set('_url', url('test/'));
-    }
+        View::set('home', 'test');
 
-    public function test(Route $route, Request $request)
-    {
-        return $this->view->render('test.twig', [
-            'test' => 'Yoosef',
+        View::render('home', [
+            'content' => 'hello world! pinoox',
         ]);
-    }
-
-    public function _main()
-    {
-        return View1::fsdfsdf();
-       //return 'testr';
-    }
-
-    public function _exception()
-    {
-        Response::redirect(url('lang'));
-    }
 
 
-    public function lang()
-    {
-        $this->_main();
-    }
+        View::get('home');
 
-    public function setup()
-    {
-        $this->_main();
-    }
+        dd(View::__history());
 
-    public function rules()
-    {
-        $this->_main();
-    }
-
-    public function prerequisites()
-    {
-        $this->_main();
-    }
-
-    public function db()
-    {
-        $this->_main();
-    }
-
-    public function user()
-    {
-        Response::redirect(url('db'));
-    }
-
-    public function dist()
-    {
-        $url = implode('/', Router::params());
-        if ($url === 'pinoox.js') {
-            HelperHeader::contentType('application/javascript', 'UTF-8');
-            self::$template->view('dist/pinoox.js');
-        } else {
-            $this->_main();
-        }
+        return view('home', [
+            'content' => 'hello world! pinoox',
+        ]);
     }
 }
     
