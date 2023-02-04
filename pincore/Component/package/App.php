@@ -209,7 +209,6 @@ class App
      */
     public static function run(): void
     {
-        Router::init();
         Boot::handle();
     }
 }

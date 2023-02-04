@@ -4,7 +4,7 @@
 namespace pinoox\router;
 
 use Closure;
-use pinoox\component\router\Router;
+use pinoox\portal\Router;
 
 /**
  * add route

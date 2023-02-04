@@ -31,7 +31,6 @@ class MainController extends Controller
 
         View::get('home');
 
-        dd(View::__history());
 
         return view('home', [
             'content' => 'hello world! pinoox',
