@@ -18,7 +18,7 @@ use Illuminate\Events\Dispatcher;
  */
 
 use \Illuminate\Database\Schema\Builder;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 class Database

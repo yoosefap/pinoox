@@ -15,7 +15,7 @@ namespace pinoox\component\package;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\router\Router;
 use pinoox\component\Url;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 
 
 class AppRouter
@@ -80,7 +80,7 @@ class AppRouter
      */
     public static function set($url, $packageName)
     {
-        Config::init('~app>router')
+        Config::name('~app>router')
             ->set($url, $packageName)
             ->save();
     }
@@ -92,7 +92,7 @@ class AppRouter
      */
     public static function delete(string $url)
     {
-        Config::init('~app>router')
+        Config::name('~app>router')
             ->delete($url)
             ->save();
     }
@@ -110,7 +110,7 @@ class AppRouter
             unset($routes[$key]);
         }
 
-        Config::init('~app>router')->data($routes)->save();
+        Config::name('~app>router')->data($routes)->save();
     }
 
     /**
@@ -121,7 +121,7 @@ class AppRouter
      */
     public static function get(?string $value = null)
     {
-        return Config::init('~app>router')
+        return Config::name('~app>router')
             ->get($value);
     }
 

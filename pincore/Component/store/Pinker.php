@@ -92,9 +92,9 @@ class Pinker
      * Set data for pinoox baker
      *
      * @param mixed $data
-     * @return Pinker
+     * @return Pinker|null
      */
-    public function data($data): ?Pinker
+    public function data(mixed $data): ?Pinker
     {
         $this->data = $data;
 
@@ -105,7 +105,7 @@ class Pinker
      * Set info for pinoox baker
      *
      * @param array $info
-     * @return Pinker
+     * @return Pinker|null
      */
     public function info(array $info): ?Pinker
     {
@@ -144,7 +144,7 @@ class Pinker
      * Set file for pinoox baker
      *
      * @param string $fileName
-     * @return Pinker
+     * @return Pinker|null
      */
     private function file(string $fileName): ?Pinker
     {
@@ -185,7 +185,7 @@ class Pinker
      * @param mixed $data
      * @return string
      */
-    private function format($data): string
+    private function format(mixed $data): string
     {
         $tags = $this->generateInformation();
         $docBlock = HelperAnnotations::generateDocBlock('Pinoox Baker', $tags);
@@ -195,7 +195,7 @@ class Pinker
             'return ' . var_export($data, true) . ';';
     }
 
-    private function transmutation()
+    private function transmutation(): mixed
     {
         $data = $this->generateData();
         $replaces = [];
@@ -257,7 +257,7 @@ class Pinker
      *
      * @return mixed
      */
-    private function generateData()
+    private function generateData() : mixed
     {
         $data = $this->data;
         if (is_array($data) && isset($data['__pinker__']) && $data['__pinker__'] == true) {

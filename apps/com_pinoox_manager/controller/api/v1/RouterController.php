@@ -13,7 +13,7 @@
 namespace pinoox\app\com_pinoox_manager\controller\api\v1;
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\HelperString;
 use pinoox\component\Request;
 use pinoox\component\Response;
@@ -24,7 +24,7 @@ class RouterController extends LoginConfiguration
 
     public function get()
     {
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         if (!empty($routes)) {
             foreach ($routes as $alias => $packageName) {
                 $app = AppModel::fetch_by_package_name($packageName);
@@ -39,14 +39,14 @@ class RouterController extends LoginConfiguration
     public function add()
     {
         $alias = Request::inputOne('alias');
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         if (empty($alias) || HelperString::has($alias, ['?', '\\', '>', '<', '!', '=', '~', '*', '#']))
             Response::json(rlang('setting>router.write_correct_url'), false);
 
         if (isset($routes[$alias]))
             Response::json(rlang('setting>router.this_url_exists_before'), false);
 
-        Config::init('~app')
+        Config::name('~app')
             ->set($alias, '')
             ->save();
 
@@ -59,7 +59,7 @@ class RouterController extends LoginConfiguration
         if ($alias == '*')
             Response::json('', false);
 
-        Config::init('~app')
+        Config::name('~app')
             ->delete($alias)
             ->save();
 
@@ -68,7 +68,7 @@ class RouterController extends LoginConfiguration
 
     public function setPackageName()
     {
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         $data = Request::input('alias,packageName');
 
         if ($data['alias'] == 'manager')
@@ -85,7 +85,7 @@ class RouterController extends LoginConfiguration
         if (!Validation::checkOne($data['alias'], 'required') || !isset($routes[$data['alias']]))
             Response::json(rlang('setting>router.no_choose_any_route'), false);
 
-        Config::init('~app')
+        Config::name('~app')
             ->set($data['alias'], $data['packageName'])
             ->save();
 

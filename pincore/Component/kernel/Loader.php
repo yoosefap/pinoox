@@ -13,7 +13,7 @@
 namespace pinoox\component\kernel;
 
 use Composer\Autoload\ClassLoader;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\Service;
 
 class Loader
@@ -26,7 +26,7 @@ class Loader
 
     private static function loadServices()
     {
-        $services = Config::init('~service')->get();
+        $services = Config::name('~service')->get();
         foreach ($services as $service) {
             Service::run($service);
         }

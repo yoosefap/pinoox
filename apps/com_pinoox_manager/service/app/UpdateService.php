@@ -15,7 +15,7 @@
 namespace pinoox\app\com_pinoox_manager\service\app;
 
 use pinoox\app\com_pinoox_manager\component\Wizard;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\interfaces\ServiceInterface;
@@ -28,7 +28,7 @@ class UpdateService implements ServiceInterface
 
     public function _run()
     {
-        Config::init('options')
+        Config::name('options')
             ->delete('pinoox_auth')
             ->save();
 
@@ -36,7 +36,7 @@ class UpdateService implements ServiceInterface
         if (!is_dir($dir))
             return;
 
-        $pinoox_version_code = Config::init('~pinoox')->get('version_code');
+        $pinoox_version_code = Config::name('~pinoox')->get('version_code');
         $files = File::get_files_by_pattern($dir, '*.db');
 
         foreach ($files as $file) {
@@ -54,7 +54,7 @@ class UpdateService implements ServiceInterface
         if (is_file($appDB)) {
             $packageName = 'com_pinoox_manager';
 
-            $prefix = Config::init('~database')->get('prefix');
+            $prefix = Config::name('~database')->get('prefix');
             $query = file_get_contents($appDB);
             $query = str_replace('{dbprefix}', $prefix . $packageName . '_', $query);
             $queryArr = explode(';', $query);

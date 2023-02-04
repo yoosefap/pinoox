@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use pinoox\app\com_pinoox_manager\component\Wizard;
 use pinoox\component\app\AppProvider;
 use pinoox\component\package\AppBuilder;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\Dir;
 use pinoox\component\File;
 use pinoox\component\package\App;
@@ -88,7 +88,7 @@ class AppModel extends Model
 
     public static function fetch_all_aliases_by_package_name($packageName)
     {
-        $routes = Config::init('~app')->get();
+        $routes = Config::name('~app')->get();
         $aliases = [];
         foreach ($routes as $alias => $package) {
             if ($package == $packageName) {
@@ -135,16 +135,16 @@ class AppModel extends Model
             foreach ($files as $file)
             {
                 $data = Wizard::pullDataPackage($file);
-                $package_name = Config::init('market')->get($data['package_name']);
+                $package_name = Config::name('market')->get($data['package_name']);
                 if (!Wizard::isValidNamePackage($data['package_name']) || !$package_name)
                 {
                     Wizard::deletePackageFile($file);
-                    Config::init('market')
+                    Config::name('market')
                         ->delete($data['package_name'])
                         ->save();
                     continue;
                 }
-                $data['market'] = Config::init('market')->get($data['package_name']);
+                $data['market'] = Config::name('market')->get($data['package_name']);
                 $result[] = $data;
             }
 

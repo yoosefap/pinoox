@@ -14,11 +14,14 @@
 
 namespace pinoox\portal;
 
+use pinoox\component\package\App;
 use pinoox\component\source\Portal;
 use pinoox\component\store\Config as ObjectPortal1;
 
 /**
- * @method static ObjectPortal1 init(string $name)
+ * @method static ObjectPortal1 name(string $name)
+ * @method static string getName()
+ * @method static string getKey()
  * @method static ObjectPortal1 setLinear(string $pointer, ?string $key, mixed $value)
  * @method static mixed get(?string $value = NULL)
  * @method static array getInfo(?string $key = NULL)
@@ -36,10 +39,22 @@ use pinoox\component\store\Config as ObjectPortal1;
  */
 class Config extends Portal
 {
+	/**
+	 * Instance class
+	 *
+	 * @var \pinoox\component\store\Config
+	 */
+	private static ObjectPortal1 $obj;
+
+	/** @var Config[] */
+	private static array $objects;
+
+
 	public static function __register(): void
 	{
-		self::__bind(ObjectPortal1::class);
+		self::__bind(ObjectPortal1::class)->setArguments(['~core']);
 	}
+
 
 	/**
 	 * Get the registered name of the component.

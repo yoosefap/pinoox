@@ -13,7 +13,7 @@ namespace pinoox\component\package;
 
 use pinoox\component\helpers\HelperString;
 use pinoox\component\Url;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 
 class AppDomain
 {
@@ -42,7 +42,7 @@ class AppDomain
     private static function checkDomain($url = null)
     {
         $new_url = empty($url) ? self::$url : $url;;
-        $app_domain = Config::init('~domain')->get(Url::domain());
+        $app_domain = Config::name('~domain')->get(Url::domain());
         if (empty($app_domain)) {
             $info = self::getByPatternDomain();
             if (!empty($info)) {
@@ -70,9 +70,9 @@ class AppDomain
 
     private static function getByPatternDomain()
     {
-        $domain = Config::init('~domain')->get(Url::domain());
+        $domain = Config::name('~domain')->get(Url::domain());
         if (is_null($domain)) {
-            $domains = Config::init('~domain')->get();
+            $domains = Config::name('~domain')->get();
 
             foreach ($domains as $pattern => $area) {
                 if (HelperString::has($pattern, '*')) {

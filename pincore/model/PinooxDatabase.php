@@ -12,7 +12,7 @@
 
 namespace pinoox\model;
 
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\DB;
 use pinoox\component\MagicTrait;
 use pinoox\component\source\Database;
@@ -29,7 +29,7 @@ class PinooxDatabase extends Database
 
     public static function __constructStatic()
     {
-        self::$config = Config::init('~database')->get();
+        self::$config = Config::name('~database')->get();
         self::$db = new DB(
             self::$config['host'],
             self::$config['username'],

@@ -16,7 +16,7 @@ namespace pinoox\app\com_pinoox_installer\controller\api\v1;
 use pinoox\component\app\AppProvider;
 use pinoox\component\Cache;
 use pinoox\component\package\App;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\DB;
 use pinoox\component\Dir;
 use pinoox\component\helpers\HelperArray;
@@ -112,8 +112,8 @@ class MainController extends MasterConfiguration
             Response::json(rlang('install.err_insert_tables'), false);
         }
 
-        $app = Config::init('app')->get();
-        Config::init('~app')
+        $app = Config::name('app')->get();
+        Config::name('~app')
             ->data($app)
             ->save();
 
@@ -147,7 +147,7 @@ class MainController extends MasterConfiguration
         $isConnected = DB::checkConnect($c['host'], $c['username'], $c['password'], $c['database']);
         if (!$isConnected) return false;
 
-        Config::init('~database')->data($c);
+        Config::name('~database')->data($c);
         $file = Dir::path("pinoox.db");
         if (!is_file($file))
             return false;
@@ -166,7 +166,7 @@ class MainController extends MasterConfiguration
         $user['app'] = 'com_pinoox_manager';
         UserModel::insert($user);
         PinooxDatabase::commit();
-        Config::init('~database')->save();
+        Config::name('~database')->save();
         return true;
     }
 

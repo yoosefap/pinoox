@@ -13,7 +13,7 @@
 namespace pinoox\app\com_pinoox_manager\controller;
 
 use pinoox\app\com_pinoox_manager\model\AppModel;
-use pinoox\component\store\Config;
+use pinoox\portal\Config;
 use pinoox\component\helpers\HelperHeader;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\Request;
