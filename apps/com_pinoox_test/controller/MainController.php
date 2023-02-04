@@ -5,25 +5,20 @@
  *      ****  *  *  *  *  *  *  *  *    *
  *      *     *  *   * *  *  *  *  *   *  *
  *      *     *  *    **  ****  ****  *    *
- * @author   Erfan Ebrahimi
- * @link http://www.erfanebrahimi.ir/
+ * @author   Pinoox
+ * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\service;
+namespace pinoox\app\com_pinoox_test\controller;
 
-use pinoox\component\database\Database;
-use pinoox\component\interfaces\ServiceInterface;
 
-class DatabaseService implements ServiceInterface
+use pinoox\component\kernel\controller\Controller;
+
+class MainController extends Controller
 {
-
-    public function _run()
+    public function index()
     {
-    }
-
-    public function _stop()
-    {
+        return 'com_pinoox_test <br><h1>Index</h1>';
     }
 }
-
