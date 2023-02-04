@@ -59,12 +59,6 @@ class Router extends Portal
      */
     public static function __name(): string
     {
-        path('~file.php'); // pincore/file.php
-
-        path('file.php'); // apps/{current_app}/file.php
-
-        path(['file.php','com_pinoox_app']); // apps/com_pinoox_app/file.php
-
         return 'router';
     }
 
