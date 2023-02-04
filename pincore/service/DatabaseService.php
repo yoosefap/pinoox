@@ -20,7 +20,6 @@ class DatabaseService implements ServiceInterface
 
     public function _run()
     {
-        Database::establish();
     }
 
     public function _stop()
