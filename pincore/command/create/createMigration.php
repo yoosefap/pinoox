@@ -68,8 +68,8 @@ class createMigration extends console implements CommandInterface
             $this->error($this->mc->getLastError());
 
         $this->toolkit = (new MigrationToolkit())
-            ->app_path($this->mc->app_path)
-            ->migration_path($this->mc->migration_path)
+            ->appPath($this->mc->appPath)
+            ->migrationPath($this->mc->migrationPath)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
             ->ready();
@@ -84,7 +84,7 @@ class createMigration extends console implements CommandInterface
         $fileName = HelperString::toUnderScore($className);
 
         //check availability
-        $files = File::get_files($this->mc->migration_path);
+        $files = File::get_files($this->mc->migrationPath);
 
         foreach ($files as $f) {
             $name = pathinfo($f, PATHINFO_FILENAME);
@@ -98,7 +98,7 @@ class createMigration extends console implements CommandInterface
         //create timestamp filename
         $exportFile = date('Ymdhis') . '_' . $fileName . '.php';
 
-        $exportPath = $this->mc->migration_path . $exportFile;
+        $exportPath = $this->mc->migrationPath . $exportFile;
 
         try {
             $builder = ClassBuilder::init($className)

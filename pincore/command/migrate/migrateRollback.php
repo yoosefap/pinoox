@@ -80,8 +80,8 @@ class migrateRollback extends console implements CommandInterface
             $this->error($this->mc->getLastError());
 
         $this->toolkit = (new MigrationToolkit())
-            ->app_path($this->mc->app_path)
-            ->migration_path($this->mc->migration_path)
+            ->appPath($this->mc->appPath)
+            ->migrationPath($this->mc->migrationPath)
             ->namespace($this->mc->namespace)
             ->package($this->mc->package)
             ->action('rollback')

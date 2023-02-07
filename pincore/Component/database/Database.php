@@ -23,27 +23,16 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 class Database
 {
-    private static $db;
     private Capsule $capsule;
 
-    public static function establish(): Database
+    public function __construct(array $config)
     {
-        if (empty(self::$db)) {
-            self::$db = new Database();
-        }
-        return self::$db;
-    }
-
-    public function __construct()
-    {
-        $config = Config::get('~database.development');
-
         $this->capsule = new Capsule;
 
         $this->capsule->addConnection($config);
 
         // Set the event dispatcher used by Eloquent models... (optional)
-        $this->capsule->setEventDispatcher(new Dispatcher(new Container()));
+        //$this->capsule->setEventDispatcher(new Dispatcher(new Container()));
 
         //Make this Capsule instance available globally.
         $this->capsule->setAsGlobal();
