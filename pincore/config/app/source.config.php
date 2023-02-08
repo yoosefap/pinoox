@@ -17,7 +17,10 @@ return [
     'open' => 'app-details',
     'router' => [
         'type' => 'multiple',
-        'routes' => 'routes.php',
+        'routes' => [
+            'router/routes.php',
+            'router/actions.php',
+        ],
     ],
     'domain' => true,
     'auto-null' => true,

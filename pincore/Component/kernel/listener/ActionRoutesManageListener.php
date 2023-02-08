@@ -16,7 +16,7 @@ namespace pinoox\component\kernel\listener;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\package\App;
 use pinoox\component\router\Route;
-use pinoox\component\router\Router;
+use pinoox\portal\Router;
 use pinoox\component\router\Collection;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

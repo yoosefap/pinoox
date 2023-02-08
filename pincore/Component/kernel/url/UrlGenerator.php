@@ -13,7 +13,7 @@
 
 namespace pinoox\component\kernel\url;
 
-use pinoox\component\router\Router;
+use pinoox\portal\Router;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGenerator as UrlGeneratorSymfony;
 use Symfony\Component\Routing\RequestContext;
