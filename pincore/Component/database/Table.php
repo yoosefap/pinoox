@@ -1,32 +1,21 @@
 <?php
 
-namespace pinoox\component\database;
-
-use pinoox\component\app\AppProvider;
-
 /**
  *      ****  *  *     *  ****  ****  *    *
  *      *  *  *  * *   *  *  *  *  *   *  *
  *      ****  *  *  *  *  *  *  *  *    *
  *      *     *  *   * *  *  *  *  *   *  *
  *      *     *  *    **  ****  ****  *    *
- * @author   Pinoox
- * @link https://www.pinoox.com/
- * @license  https://opensource.org/licenses/MIT MIT License
+ * @license    https://opensource.org/licenses/MIT MIT License
+ * @link       pinoox.com
+ * @copyright  pinoox
  */
-trait Table
-{
-    /**
-     * Get the table associated with the model.
-     *
-     * @return string
-     */
-    public function getTable(): string
-    {
-        if (isset($this->table)) {
-            return $this->table;
-        }
 
-        return App::get('packageName') . '_' . strtolower(str_replace('\\', '', class_basename($this)));
-    }
+namespace pinoox\component\database;
+
+use Illuminate\Database\Schema\Blueprint;
+
+class Table extends Blueprint
+{
+
 }

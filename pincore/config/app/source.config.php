@@ -47,4 +47,7 @@ return [
     'min-pin' => 0,
     'sys-app' => false,
     'dock' => true,
+    'db' => [
+        ''
+    ],
 ];

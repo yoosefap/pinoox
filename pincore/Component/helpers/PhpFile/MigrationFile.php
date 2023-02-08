@@ -34,18 +34,31 @@ class MigrationFile extends PhpFile
 
         $class = $namespace->addClass($className);
         $class->setExtends(MigrationBase::class);
-        self::addMethodName($class, 'up','Run the migrations.');
-        self::addMethodName($class, 'down','Reverse the migrations.');
+        self::addRunMethod($class, $className);
+        self::addDownMethod($class, $className);
 
         return File::generate($exportPath, $source);
     }
 
-    private static function addMethodName(ClassType $class, string $name, string $comment): void
+    private static function addRunMethod(ClassType $class, string $className): void
     {
-        $method = $class->addMethod($name);
+        $tableName = Str::camelToUnderscore($className, '_');
+        $method = $class->addMethod('up');
         $method->addComment('Run the migrations.');
         $method->setPublic()
             ->setReturnType('void')
-            ->addBody("//to do");
+            ->addBody('$this->schema->create("' . $tableName . '", function (Blueprint $table) {')
+            ->addBody("\t" . '$table->increments("id");' . "\n" . '});');
     }
+
+    private static function addDownMethod(ClassType $class, string $className): void
+    {
+        $tableName = Str::camelToUnderscore($className, '_');
+        $method = $class->addMethod('down');
+        $method->addComment('Reverse the migrations.');
+        $method->setPublic()
+            ->setReturnType('void')
+            ->addBody('$this->schema->dropIfExists("' . $tableName . '");');
+    }
+
 }

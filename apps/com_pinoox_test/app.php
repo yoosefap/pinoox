@@ -8,4 +8,7 @@ return array(
     'version-name' => '1.0.0',
     'version-code' => 1,
     'icon' => 'icon.png',
+    'db'=>[
+
+    ],
 );

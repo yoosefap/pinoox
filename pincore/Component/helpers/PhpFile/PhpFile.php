@@ -13,16 +13,10 @@
 
 namespace pinoox\component\helpers\PhpFile;
 
-use Nette\PhpGenerator\ClassLike;
-use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile as PhpFileNette;
 use Nette\PhpGenerator\PhpNamespace;
 use PHPUnit\Framework\MockObject\ReflectionException;
 use pinoox\component\File;
-use pinoox\component\helpers\HelperString;
-use pinoox\component\helpers\Str;
-use pinoox\component\kernel\Container;
-use pinoox\component\package\App;
 use ReflectionFunction;
 use ReflectionMethod;
 use SebastianBergmann\Type\ReflectionMapper;

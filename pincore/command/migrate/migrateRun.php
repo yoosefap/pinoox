@@ -5,7 +5,8 @@ namespace pinoox\command\migrate;
 
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
-use pinoox\component\migration\MigrationConfig;
+use pinoox\portal\MigrationConfig;
+use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;
 use pinoox\component\migration\MigrationToolkit;
 
@@ -69,6 +70,11 @@ class migrateRun extends console implements CommandInterface
     private $schema = null;
 
     /**
+     * @var MigConf
+     */
+    private MigConf $config;
+
+    /**
      * Execute the console command.
      *
      */
@@ -83,19 +89,18 @@ class migrateRun extends console implements CommandInterface
         $this->package = $this->argument('package');
         $this->chooseApp($this->package);//init cli
 
-        $this->mc = new MigrationConfig($this->cli['path'], $this->cli['package']);
-        $this->mc->load();
+        $this->config =  MigrationConfig::load($this->cli['path'], $this->cli['package']);
 
-        if ($this->mc->getErrors())
+        if ($this->config->getErrors())
             $this->error($this->mc->getLastError());
 
         $this->isInit = $this->option('i');
 
         $this->toolkit = (new MigrationToolkit())
-            ->appPath($this->mc->appPath)
-            ->migrationPath($this->mc->migrationPath)
-            ->namespace($this->mc->namespace)
-            ->package($this->mc->package)
+            ->appPath($this->config->appPath)
+            ->migrationPath($this->config->migrationPath)
+            ->namespace($this->config->namespace)
+            ->package($this->config->package)
             ->action($this->isInit ? 'init' : 'run')
             ->ready();
         
@@ -114,7 +119,7 @@ class migrateRun extends console implements CommandInterface
             $this->newLine();
         }
 
-        $batch = !$this->isInit && MigrationQuery::fetchLatestBatch($this->mc->package) ?? 0;
+        $batch = !$this->isInit && MigrationQuery::fetchLatestBatch($this->config->package) ?? 0;
 
         foreach ($migrations as $m) {
 

@@ -1,11 +1,5 @@
 <?php
 
-namespace pinoox\component\database;
-
-use Illuminate\Container\Container;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Events\Dispatcher;
-
 /**
  *      ****  *  *     *  ****  ****  *    *
  *      *  *  *  * *   *  *  *  *  *   *  *
@@ -17,9 +11,12 @@ use Illuminate\Events\Dispatcher;
  * @copyright  pinoox
  */
 
+namespace pinoox\component\database;
+
+use Illuminate\Database\Schema\Blueprint;
 use \Illuminate\Database\Schema\Builder;
-use pinoox\portal\Config;
-use Symfony\Component\VarDumper\Cloner\Data;
+use Illuminate\Database\Capsule\Manager as Capsule;
+
 
 class Database
 {
@@ -31,14 +28,12 @@ class Database
 
         $this->capsule->addConnection($config);
 
-        // Set the event dispatcher used by Eloquent models... (optional)
-        //$this->capsule->setEventDispatcher(new Dispatcher(new Container()));
-
         //Make this Capsule instance available globally.
         $this->capsule->setAsGlobal();
 
         // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
         $this->capsule->bootEloquent();
+
     }
 
     public function getSchema(): Builder
