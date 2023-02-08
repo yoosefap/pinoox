@@ -27,14 +27,11 @@ class MigrationConfig
     private array|null $config;
     public string|null $folders = self::DS . 'database' . self::DS . 'migrations' . self::DS;
 
-    public function __construct($appPath, $package)
-    {
-        $this->appPath = $appPath;
-        $this->package = $package;
-    }
 
-    public function load(): void
+    public function load(string $path, string $package): MigrationConfig
     {
+        $this->appPath = $path;
+        $this->package = $package;
         $this->migrationPath = $this->appPath . $this->folders;
 
         //namespace
@@ -52,8 +49,10 @@ class MigrationConfig
                 $this->setError($e);
             }
         }
+
+        return $this;
     }
-    
+
     public function isPrepareDB(): bool
     {
         $db = Database::getCapsule();
