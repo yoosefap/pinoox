@@ -2,7 +2,7 @@
 ../pinoox/apps
 !apps/com_pinoox_manager/*
 !apps/com_pinoox_welcome/*
-!apps/com_pinoox_installer/*
+!apps/com_pinoox_test/*
 !apps/com_pinoox_market/*
 upload
 uploads

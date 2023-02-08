@@ -1,11 +1,15 @@
 <?php
+//pinoox app file, generated at "2020-05-19 00:41"
 
-return array(
-    'package-name' => 'com_pinoox_test',
-    'name' => 'test',
-    'developer' => 'pinoox',
-    'description' => 'pinoox test',
-    'version-name' => '1.0.0',
-    'version-code' => 1,
-    'icon' => 'icon.png',
+return array (
+  'enable' => true,
+  'icon' => 'icon.png',
+  'name' => 'installer',
+  'theme' => 'default',
+  'version-name' => '1.4.4',
+  'version-code' => 6,
+  'lang' => 'en',
+  'user' => 'com_pinoox_manager',
 );
+
+//end of app

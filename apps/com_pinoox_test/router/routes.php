@@ -11,10 +11,14 @@
  */
 
 use function pinoox\router\{get};
-use pinoox\app\com_pinoox_welcome\controller\MainController;
 
 get(
     path: '/',
-    action: [MainController::class, 'index'],
-    name: 'index',
+    action: '@home',
+);
+
+get(
+    path: '/test',
+    action: fn() => view('test test terst'),
+
 );

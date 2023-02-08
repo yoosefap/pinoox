@@ -7,7 +7,7 @@ use pinoox\component\helpers\HelperString;
 use pinoox\component\http\Request;
 use pinoox\component\package\App;
 use pinoox\component\router\Collection;
-use pinoox\component\router\Router;
+use pinoox\portal\Router;
 use pinoox\component\template\ViewInterface;
 use Psr\Container\ContainerInterface;
 use pinoox\component\http\RedirectResponse;
