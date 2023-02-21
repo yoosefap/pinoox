@@ -5,7 +5,9 @@ namespace pinoox\command\migrate;
 
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
-use pinoox\component\migration\MigrationConfig;
+use pinoox\component\package\App;
+use pinoox\portal\MigrationConfig;
+use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;
 use pinoox\component\migration\MigrationToolkit;
 
@@ -45,6 +47,11 @@ class migrateRollback extends console implements CommandInterface
     ];
 
     /**
+     * @var MigConf
+     */
+    private MigConf $config;
+
+    /**
      * @var MigrationConfig
      */
     private $mc = null;
@@ -73,20 +80,19 @@ class migrateRollback extends console implements CommandInterface
     {
         $this->chooseApp($this->argument('package'));//init cli
 
-        $this->mc = new MigrationConfig($this->cli['path'], $this->cli['package']);
-        $this->mc->load();
+        $this->config = MigrationConfig::load($this->cli['path'], $this->cli['package']);
 
-        if ($this->mc->getErrors())
+        if ($this->config->getErrors())
             $this->error($this->mc->getLastError());
 
         $this->toolkit = (new MigrationToolkit())
-            ->appPath($this->mc->appPath)
-            ->migrationPath($this->mc->migrationPath)
-            ->namespace($this->mc->namespace)
-            ->package($this->mc->package)
+            ->appPath($this->config->appPath)
+            ->migrationPath($this->config->migrationPath)
+            ->namespace($this->config->namespace)
+            ->package($this->config->package)
             ->action('rollback')
             ->ready();
-        
+
         $this->schema = $this->toolkit->getSchema();
     }
 
@@ -99,7 +105,7 @@ class migrateRollback extends console implements CommandInterface
             $this->newLine();
         }
 
-        $batch = MigrationQuery::fetchLatestBatch($this->mc->package);
+        $batch = MigrationQuery::fetchLatestBatch($this->config->package);
 
         foreach ($migrations as $m) {
 
@@ -115,6 +121,12 @@ class migrateRollback extends console implements CommandInterface
             $this->info($m['fileName']);
             $this->newLine();
             $obj = new $m['classObject']();
+            try {
+                App::setPackageName($m['packageName']);
+                $obj->prefix = App::get('db.prefix');
+            } catch (\Exception $e) {
+                $this->error($e);
+            }
             $obj->down();
 
             MigrationQuery::delete($batch, $m['packageName']);

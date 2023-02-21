@@ -118,7 +118,7 @@ class MigrationToolkit
     {
         $isExists = $this->schema->hasTable('migration');
         if (!$isExists) {
-            $this->setError('Migration table not exists.');
+            $this->setError('Migration table not exists. First of all init migration table');
             return false;
         }
         return true;

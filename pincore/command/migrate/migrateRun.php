@@ -5,6 +5,7 @@ namespace pinoox\command\migrate;
 
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
+use pinoox\component\package\App;
 use pinoox\portal\MigrationConfig;
 use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;
@@ -49,12 +50,6 @@ class migrateRun extends console implements CommandInterface
     private $package;
 
     /**
-     * @var MigrationConfig
-     */
-    private $mc = null;
-
-
-    /**
      * @var boolean
      */
     private $isInit = true;
@@ -75,6 +70,11 @@ class migrateRun extends console implements CommandInterface
     private MigConf $config;
 
     /**
+     * @var MigrationConfig
+     */
+    private $mc = null;
+
+    /**
      * Execute the console command.
      *
      */
@@ -89,7 +89,7 @@ class migrateRun extends console implements CommandInterface
         $this->package = $this->argument('package');
         $this->chooseApp($this->package);//init cli
 
-        $this->config =  MigrationConfig::load($this->cli['path'], $this->cli['package']);
+        $this->config = MigrationConfig::load($this->cli['path'], $this->cli['package']);
 
         if ($this->config->getErrors())
             $this->error($this->mc->getLastError());
@@ -103,7 +103,7 @@ class migrateRun extends console implements CommandInterface
             ->package($this->config->package)
             ->action($this->isInit ? 'init' : 'run')
             ->ready();
-        
+
         if (!$this->toolkit->isSuccess()) {
             $this->error($this->toolkit->getErrors());
         }
@@ -122,12 +122,17 @@ class migrateRun extends console implements CommandInterface
         $batch = !$this->isInit && MigrationQuery::fetchLatestBatch($this->config->package) ?? 0;
 
         foreach ($migrations as $m) {
-
             $start_time = microtime(true);
             $this->warning('Migrating: ');
             $this->info($m['fileName']);
             $this->newLine();
             $obj = new $m['classObject']();
+            try {
+                App::setPackageName($m['packageName']);
+                $obj->prefix = App::get('db.prefix');
+            } catch (\Exception $e) {
+                $this->error($e);
+            }
             $obj->up();
 
             if (!$this->isInit) {
