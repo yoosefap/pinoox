@@ -14,9 +14,9 @@
 namespace pinoox\command\portal;
 
 
-use pinoox\component\helpers\PhpFile;
 use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
+use pinoox\component\helpers\PhpFile\PortalFile;
 use pinoox\component\interfaces\CommandInterface;
 
 class PortalUpdate extends console implements CommandInterface
@@ -72,7 +72,7 @@ class PortalUpdate extends console implements CommandInterface
     private function registerPortal(string $portalName, string $packageName): void
     {
         $path = $this->getPath($portalName);
-        PhpFile::updatePortal($path, $portalName,$packageName);
+        PortalFile::updatePortal($path, $portalName,$packageName);
         $this->success(sprintf('Portal update in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path)));
         $this->newLine();
     }

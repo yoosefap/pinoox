@@ -12,12 +12,12 @@
 
 namespace pinoox\component\migration;
 
-use Doctrine\DBAL\Schema\Schema;
 use Illuminate\Database\Capsule\Manager;
 use pinoox\component\File;
-use pinoox\component\HelperString;
-use pinoox\component\database\Database;
-use pinoox\model\MigrationModel;
+use pinoox\component\helpers\Str;
+use pinoox\component\package\App;
+use pinoox\portal\Config;
+use pinoox\portal\Database;
 
 class MigrationToolkit
 {
@@ -31,13 +31,13 @@ class MigrationToolkit
      * path of app
      * @var string
      */
-    private string $app_path;
+    private string $appPath;
 
     /**
      * path of migration files
      * @var string
      */
-    private string $migration_path;
+    private string $migrationPath;
 
     /**
      * package name of app
@@ -61,7 +61,7 @@ class MigrationToolkit
      * errors
      * @var array | string
      */
-    private $errors = [];
+    private string|array $errors = [];
 
     /**
      * migration files list
@@ -71,19 +71,13 @@ class MigrationToolkit
 
     public function __construct()
     {
-        $this->init();
+        $this->schema = Database::getSchema();
+        $this->cp = Database::getCapsule();
     }
 
-    public function init(): void
+    public function appPath($val): self
     {
-        $db = Database::establish();
-        $this->schema = $db->getSchema();
-        $this->cp = $db->getCapsule();
-    }
-
-    public function app_path($val): self
-    {
-        $this->app_path = $val;
+        $this->appPath = $val;
         return $this;
     }
 
@@ -108,13 +102,13 @@ class MigrationToolkit
         return $this;
     }
 
-    public function migration_path($val): self
+    public function migrationPath($val): self
     {
-        $this->migration_path = $val;
+        $this->migrationPath = $val;
         return $this;
     }
 
-    private function getFromDB(): mixed
+    private function getFromDB(): ?array
     {
         $batch = $this->action == 'rollback' ?
             MigrationQuery::fetchLatestBatch($this->package) : null;
@@ -122,11 +116,11 @@ class MigrationToolkit
         return MigrationQuery::fetchAllByBatch($batch, $this->package);
     }
 
-    private function isExistsMigrationTable()
+    private function isExistsMigrationTable(): bool
     {
-        $isExists = Database::establish()->getSchema()->hasTable('migration');
+        $isExists = $this->schema->hasTable('migration');
         if (!$isExists) {
-            $this->setError('Migration table not exists.');
+            $this->setError('Migration table not exists. First of all init migration table');
             return false;
         }
         return true;
@@ -138,7 +132,7 @@ class MigrationToolkit
 
         $migrations = $this->readyFromPath();
 
-        if ($this->action !='init' && $this->isExistsMigrationTable()) {
+        if ($this->action != 'init' && $this->isExistsMigrationTable()) {
             $migrations = $this->syncWithDB($migrations);
         }
 
@@ -158,7 +152,7 @@ class MigrationToolkit
 
     private function readyFromPath(): array
     {
-        $files = File::get_files($this->migration_path);
+        $files = File::get_files($this->migrationPath);
         return array_map(function ($f) {
             return [
                 'sync' => false,
@@ -172,15 +166,22 @@ class MigrationToolkit
     {
         $fileName = $this->getFileName($item);
         $className = $this->getClassName($fileName);
-        $isLoad = $this->loadMigrationClass($this->migration_path . $fileName . '.php');
+        $isLoad = $this->loadMigrationClass($this->migrationPath . $fileName . '.php');
         $classObject = $this->namespace . $className;
 
         return [$fileName, $className, $classObject, $isLoad];
     }
 
-
     private function build($sync, $className, $fileName, $classObject, $isLoad): array
     {
+        try {
+            $corePrefix = Database::getConfig('prefix');
+            $prefix = App::get('db.prefix') ?? '';
+            $prefix = $corePrefix . $prefix;
+        } catch (\Exception $e) {
+            $prefix = '';
+        }
+
         return [
             'sync' => $sync,
             'isLoad' => $isLoad,
@@ -188,6 +189,7 @@ class MigrationToolkit
             'className' => $className,
             'fileName' => $fileName,
             'classObject' => $classObject,
+            'dbPrefix' => $prefix,
         ];
     }
 
@@ -196,7 +198,7 @@ class MigrationToolkit
         return $this->migrations;
     }
 
-    public function getSchema()
+    public function getSchema(): \Illuminate\Database\Schema\Builder
     {
         return $this->schema;
     }
@@ -205,7 +207,7 @@ class MigrationToolkit
     {
         $timestamp = date('Ymdhis');
         $newFileName = $timestamp . '_' . $fileName;
-        rename($this->migration_path . $fileName . '.php', $this->migration_path . $newFileName . '.php');
+        rename($this->migrationPath . $fileName . '.php', $this->migrationPath . $newFileName . '.php');
         return $fileName;
     }
 
@@ -215,7 +217,7 @@ class MigrationToolkit
         if (!$justFilename) {
             $justFilename = $this->convertToTimestampPrefix($fileName);
         }
-        return HelperString::toCamelCase($justFilename);
+        return Str::toCamelCase($justFilename);
     }
 
     private function getFileName($file): string
@@ -228,7 +230,7 @@ class MigrationToolkit
 
     private function checkPaths(): bool
     {
-        if (empty($this->migration_path)) {
+        if (empty($this->migrationPath)) {
             $this->setError('migration path not defined');
             return false;
         }
@@ -257,7 +259,6 @@ class MigrationToolkit
     {
         $this->errors[] = $err;
     }
-
 
     private function loadMigrationClass($classFile): bool
     {

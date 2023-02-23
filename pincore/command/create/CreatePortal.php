@@ -14,9 +14,9 @@
 namespace pinoox\command\create;
 
 
-use pinoox\component\helpers\PhpFile;
 use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
+use pinoox\component\helpers\PhpFile\PortalFile;
 use pinoox\component\interfaces\CommandInterface;
 
 class CreatePortal extends console implements CommandInterface
@@ -67,7 +67,7 @@ class CreatePortal extends console implements CommandInterface
     {
         $path = $this->getPath($portalName);
 
-        PhpFile::createPortal($path, $portalName, $serviceName, $packageName, $this->cli['namespace']);
+        PortalFile::createPortal($path, $portalName, $serviceName, $packageName, $this->cli['namespace']);
         $this->success(sprintf('Portal created in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path)));
         $this->newLine();
     }
