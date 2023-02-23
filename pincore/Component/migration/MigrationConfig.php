@@ -13,50 +13,26 @@
 
 namespace pinoox\component\migration;
 
-use pinoox\component\Config;
-use pinoox\component\database\Database;
+use pinoox\component\kernel\Exception;
+use pinoox\portal\Database;
 
 class MigrationConfig
 {
-    private $errors = null;
-    public $app_path = null;
-    public $folders = null;
-    public $migration_path = null;
-    public $namespace = null;
-    public $package = null;
-    private $config = null;
     const DS = DIRECTORY_SEPARATOR;
+    private array|null $errors = null;
+    public string|null $appPath = null;
+    public string|null $migrationPath = null;
+    public string|null $namespace = null;
+    public string|null $package = null;
+    private array|null $config;
+    public string|null $folders = self::DS . 'database' . self::DS . 'migrations' . self::DS;
 
-    public function __construct($app_path, $package)
+
+    public function load(string $path, string $package): MigrationConfig
     {
-        $this->app_path = $app_path;
+        $this->appPath = $path;
         $this->package = $package;
-    }
-
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    public function getLastError()
-    {
-        return end($this->errors);
-    }
-
-    public function hasError()
-    {
-        return !empty($this->errors);
-    }
-
-    private function setError($err)
-    {
-        $this->errors[] = $err;
-    }
-
-    public function load()
-    {
-        $this->folders = self::DS . 'database' . self::DS . 'migrations' . self::DS;
-        $this->migration_path = $this->app_path . $this->folders;
+        $this->migrationPath = $this->appPath . $this->folders;
 
         //namespace
         if ($this->package == 'pincore') {
@@ -66,33 +42,39 @@ class MigrationConfig
         }
 
         //check database
-        $this->isPrepareDB();
-
-        $this->config = $this->getConfig();
-    }
-
-    private function getConfig()
-    {
-        $database = Config::get('~database');
-        if (empty($database)) {
-            $this->setError('database config not exists!');
-            return false;
-        }
-        if (empty($database['development'])) {
-            $this->setError('development params of database config is not set!');
-            return false;
+        if ($this->isPrepareDB()) {
+            try {
+                $this->config = Database::getConfig();
+            } catch (Exception $e) {
+                $this->setError($e);
+            }
         }
 
-        return $database;
+        return $this;
     }
 
     public function isPrepareDB(): bool
     {
-        $db = Database::establish();
-        if (empty($db->getCapsule()->getConnection())) {
+        $db = Database::getCapsule();
+        if (empty($db->getConnection())) {
             $this->setError('Database not connected');
             return false;
         }
         return true;
+    }
+
+    public function getLastError()
+    {
+        return !empty($this->errors) ? end($this->errors) : null;
+    }
+
+    private function setError($err): void
+    {
+        $this->errors[] = $err;
+    }
+
+    public function getErrors(): ?array
+    {
+        return $this->errors;
     }
 }

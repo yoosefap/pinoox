@@ -5,7 +5,10 @@ namespace pinoox\command\migrate;
 
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
-use pinoox\component\migration\MigrationConfig;
+use pinoox\component\package\App;
+use pinoox\portal\Database;
+use pinoox\portal\MigrationConfig;
+use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;
 use pinoox\component\migration\MigrationToolkit;
 
@@ -48,12 +51,6 @@ class migrateRun extends console implements CommandInterface
     private $package;
 
     /**
-     * @var MigrationConfig
-     */
-    private $mc = null;
-
-
-    /**
      * @var boolean
      */
     private $isInit = true;
@@ -67,6 +64,16 @@ class migrateRun extends console implements CommandInterface
      * @var MigrationToolkit
      */
     private $schema = null;
+
+    /**
+     * @var MigConf
+     */
+    private MigConf $config;
+
+    /**
+     * @var MigrationConfig
+     */
+    private $mc = null;
 
     /**
      * Execute the console command.
@@ -83,22 +90,21 @@ class migrateRun extends console implements CommandInterface
         $this->package = $this->argument('package');
         $this->chooseApp($this->package);//init cli
 
-        $this->mc = new MigrationConfig($this->cli['path'], $this->cli['package']);
-        $this->mc->load();
+        $this->config = MigrationConfig::load($this->cli['path'], $this->cli['package']);
 
-        if ($this->mc->getErrors())
+        if ($this->config->getErrors())
             $this->error($this->mc->getLastError());
 
         $this->isInit = $this->option('i');
 
         $this->toolkit = (new MigrationToolkit())
-            ->app_path($this->mc->app_path)
-            ->migration_path($this->mc->migration_path)
-            ->namespace($this->mc->namespace)
-            ->package($this->mc->package)
+            ->appPath($this->config->appPath)
+            ->migrationPath($this->config->migrationPath)
+            ->namespace($this->config->namespace)
+            ->package($this->config->package)
             ->action($this->isInit ? 'init' : 'run')
             ->ready();
-        
+
         if (!$this->toolkit->isSuccess()) {
             $this->error($this->toolkit->getErrors());
         }
@@ -114,15 +120,16 @@ class migrateRun extends console implements CommandInterface
             $this->newLine();
         }
 
-        $batch = !$this->isInit && MigrationQuery::fetchLatestBatch($this->mc->package) ?? 0;
+        $batch = !$this->isInit && MigrationQuery::fetchLatestBatch($this->config->package) ?? 0;
 
         foreach ($migrations as $m) {
-
             $start_time = microtime(true);
             $this->warning('Migrating: ');
             $this->info($m['fileName']);
             $this->newLine();
+
             $obj = new $m['classObject']();
+            $obj->prefix = $m['dbPrefix'];
             $obj->up();
 
             if (!$this->isInit) {

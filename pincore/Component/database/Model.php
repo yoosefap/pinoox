@@ -14,8 +14,19 @@ use \Illuminate\Database\Eloquent\Model as EloquentModel;
  * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
-
 abstract class Model extends EloquentModel
 {
-    use Table;
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public function getTable(): string
+    {
+        if (isset($this->table)) {
+            return $this->table;
+        }
+
+        return strtolower(str_replace('\\', '', class_basename($this)));
+    }
 }

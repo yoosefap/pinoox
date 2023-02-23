@@ -39,14 +39,14 @@ class Database extends Portal
     /**
      * @throws Exception
      */
-    public static function getConfig()
+    public static function getConfig($key = null)
     {
         //get configs
         $mode = Config::name('~pinoox')->get('mode');
         if (!($config = Config::name('~database')->getLinear(null, $mode)))
             throw new Exception('Database config "' . $mode . '" not defined');
 
-       return $config;
+        return $config[$key] ?? $config;
     }
 
     /**
