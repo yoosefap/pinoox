@@ -14,9 +14,9 @@
 namespace pinoox\component;
 
 
-use pinoox\app\com_pinoox_manager\model\AppModel;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\package\AppBuilder;
+use pinoox\portal\Database;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -817,6 +817,7 @@ class Console
     protected function chooseFromApps($packageName = null)
     {
         try {
+            $cp = Database::getCapsule();
             $package = !empty($packageName) ? $packageName : $this->argument('package');
             if ($package == null) {
                 $apps = AppModel::fetch_all(null, true);
@@ -845,5 +846,7 @@ class Console
             $this->error('Some error happened!');
         }
     }
+
+    private
 
 }

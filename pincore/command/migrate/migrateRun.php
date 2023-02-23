@@ -114,6 +114,7 @@ class migrateRun extends console implements CommandInterface
     private function runUp()
     {
         $migrations = $this->toolkit->getMigrations();
+        exit(var_dump($migrations));
 
         if (empty($migrations)) {
             $this->success('Nothing to migrate.');
