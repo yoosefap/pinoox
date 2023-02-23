@@ -121,12 +121,7 @@ class migrateRollback extends console implements CommandInterface
             $this->info($m['fileName']);
             $this->newLine();
             $obj = new $m['classObject']();
-            try {
-                App::setPackageName($m['packageName']);
-                $obj->prefix = App::get('db.prefix');
-            } catch (\Exception $e) {
-                $this->error($e);
-            }
+            $obj->prefix = $m['dbPrefix'];
             $obj->down();
 
             MigrationQuery::delete($batch, $m['packageName']);

@@ -15,6 +15,8 @@ namespace pinoox\component\migration;
 use Illuminate\Database\Capsule\Manager;
 use pinoox\component\File;
 use pinoox\component\helpers\Str;
+use pinoox\component\package\App;
+use pinoox\portal\Config;
 use pinoox\portal\Database;
 
 class MigrationToolkit
@@ -172,6 +174,14 @@ class MigrationToolkit
 
     private function build($sync, $className, $fileName, $classObject, $isLoad): array
     {
+        try {
+            $corePrefix = Database::getConfig('prefix');
+            $prefix = App::get('db.prefix') ?? '';
+            $prefix = $corePrefix . $prefix;
+        } catch (\Exception $e) {
+            $prefix = '';
+        }
+
         return [
             'sync' => $sync,
             'isLoad' => $isLoad,
@@ -179,6 +189,7 @@ class MigrationToolkit
             'className' => $className,
             'fileName' => $fileName,
             'classObject' => $classObject,
+            'dbPrefix' => $prefix,
         ];
     }
 

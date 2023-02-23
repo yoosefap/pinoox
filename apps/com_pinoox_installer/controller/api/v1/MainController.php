@@ -26,7 +26,6 @@ use pinoox\component\Response;
 use pinoox\component\Service;
 use pinoox\component\System;
 use pinoox\component\Validation;
-use pinoox\model\PincoreModel;
 use pinoox\model\PinooxDatabase;
 use pinoox\model\UserModel;
 

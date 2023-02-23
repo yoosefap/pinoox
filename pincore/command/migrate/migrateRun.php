@@ -6,6 +6,7 @@ namespace pinoox\command\migrate;
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\package\App;
+use pinoox\portal\Database;
 use pinoox\portal\MigrationConfig;
 use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;
@@ -126,13 +127,9 @@ class migrateRun extends console implements CommandInterface
             $this->warning('Migrating: ');
             $this->info($m['fileName']);
             $this->newLine();
+
             $obj = new $m['classObject']();
-            try {
-                App::setPackageName($m['packageName']);
-                $obj->prefix = App::get('db.prefix');
-            } catch (\Exception $e) {
-                $this->error($e);
-            }
+            $obj->prefix = $m['dbPrefix'];
             $obj->up();
 
             if (!$this->isInit) {

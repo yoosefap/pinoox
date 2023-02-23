@@ -19,7 +19,6 @@ use pinoox\component\migration\MigrationBase;
 
 class Esmaeil extends MigrationBase
 {
-
     /**
      * Run the migrations.
      */

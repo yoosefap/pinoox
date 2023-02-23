@@ -13,7 +13,6 @@
 
 namespace pinoox\component\database;
 
-use Illuminate\Database\Schema\Blueprint;
 use \Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
