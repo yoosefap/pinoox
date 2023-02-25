@@ -13,10 +13,8 @@
 
 namespace pinoox\component;
 
-
 use pinoox\component\helpers\HelperString;
 use pinoox\component\package\AppBuilder;
-use pinoox\portal\Database;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -282,7 +280,6 @@ class Console
         return $default;
     }
 
-
     /**
      * confirm operation
      * @param string $operation
@@ -477,7 +474,6 @@ class Console
         self::$ProgressBar = [];
     }
 
-
     protected static function moveUp($lines = 1)
     {
         echo self::$isHtml ? "" : (sprintf("\x1b[%dA", $lines));
@@ -507,7 +503,6 @@ class Console
     {
         echo self::$isHtml ? "" : (sprintf("\x1b[%d;%dH", $row + 1, $column));
     }
-
 
     /**
      * Clears all the output from the current line.
@@ -817,18 +812,11 @@ class Console
     protected function chooseFromApps($packageName = null)
     {
         try {
-            $cp = Database::getCapsule();
             $package = !empty($packageName) ? $packageName : $this->argument('package');
-            if ($package == null) {
-                $apps = AppModel::fetch_all(null, true);
-                $apps = array_keys($apps);
-                $appId = $this->choice('Please select package you want...', $apps);
-                $package = $apps[$appId] ?? null;
-                if ($package == null) {
-                    $this->error('Can not find selected package!');
-                }
+            if (empty($package)){
+                $this->error('enter the package name!');
             }
-            $app = AppModel::fetch_by_package_name($package);
+            $app = AppBuilder::init($package)->get();
             if (is_null($app)) $this->error(sprintf('Can not find app with name `%s`!', $package));
 
             $namespace = "pinoox\\app\\" . $package . "\\";
@@ -837,16 +825,8 @@ class Console
             return ['path' => $app_path, 'package' => $package, 'namespace' => $namespace];
 
         } catch (\Exception $exception) {
-            $this->danger('Something went wrong!');
-            $this->newLine();
-            $this->danger($exception->getMessage());
-            $this->newLine();
-            sleep(1);
-            gc_collect_cycles();
-            $this->error('Some error happened!');
+            $this->error($exception->getMessage());
         }
     }
-
-    private
 
 }

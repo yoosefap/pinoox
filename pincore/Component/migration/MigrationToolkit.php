@@ -15,6 +15,7 @@ namespace pinoox\component\migration;
 use Illuminate\Database\Capsule\Manager;
 use pinoox\component\File;
 use pinoox\component\helpers\Str;
+use pinoox\component\kernel\Exception;
 use pinoox\component\package\App;
 use pinoox\portal\Config;
 use pinoox\portal\Database;
@@ -118,7 +119,7 @@ class MigrationToolkit
 
     private function isExistsMigrationTable(): bool
     {
-        $isExists = $this->schema->hasTable('migration');
+        $isExists = $this->schema->hasTable('pincore_migration');
         if (!$isExists) {
             $this->setError('Migration table not exists. First of all init migration table');
             return false;
@@ -143,7 +144,11 @@ class MigrationToolkit
                 if ($this->action === 'rollback' && empty($m['sync'])) continue;
                 if ($this->action === 'run' && !empty($m['sync'])) continue;
 
-                $this->migrations[] = $this->build($m['sync'], $className, $fileName, $classObject, $isLoad);
+                try {
+                    $this->migrations[] = $this->build($m['sync'], $className, $fileName, $classObject, $isLoad);
+                } catch (Exception $e) {
+                    $this->setError($e);
+                }
             }
         }
 
@@ -172,16 +177,11 @@ class MigrationToolkit
         return [$fileName, $className, $classObject, $isLoad];
     }
 
+    /**
+     * @throws Exception
+     */
     private function build($sync, $className, $fileName, $classObject, $isLoad): array
     {
-        try {
-            $corePrefix = Database::getConfig('prefix');
-            $prefix = App::get('db.prefix') ?? '';
-            $prefix = $corePrefix . $prefix;
-        } catch (\Exception $e) {
-            $prefix = '';
-        }
-
         return [
             'sync' => $sync,
             'isLoad' => $isLoad,
@@ -189,7 +189,7 @@ class MigrationToolkit
             'className' => $className,
             'fileName' => $fileName,
             'classObject' => $classObject,
-            'dbPrefix' => $prefix,
+            'dbPrefix' => Database::getConfig('prefix') . ( $this->package !='pincore' ? $this->package . '_' : ''),
         ];
     }
 

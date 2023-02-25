@@ -19,7 +19,7 @@ class CreateMigrationTable extends MigrationBase
 {
     public function up()
     {
-        $this->schema->create('migration', function (Blueprint $table) {
+        $this->schema->create('pincore_migration', function (Blueprint $table) {
             $table->id();
             $table->string('migration');
             $table->integer('batch');
@@ -30,6 +30,6 @@ class CreateMigrationTable extends MigrationBase
 
     public function down()
     {
-        $this->schema->dropIfExists('migration');
+        $this->schema->dropIfExists('pincore_migration');
     }
 }
