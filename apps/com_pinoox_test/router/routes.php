@@ -20,5 +20,4 @@ get(
 get(
     path: '/test',
     action: fn() => view('test test terst'),
-
 );
