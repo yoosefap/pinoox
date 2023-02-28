@@ -9,16 +9,28 @@
  * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
-namespace pinoox\component\source;
 
-use pinoox\component\DB;
+namespace pinoox\component\manager;
 
-abstract class Database
+use Nette\Utils\Finder;
+use pinoox\component\File;
+use pinoox\component\Zip;
+
+class AppFileHandler
 {
-    /**
-     * Store an object of DB component
-     *
-     * @var DB;
-     */
-    public static $db;
+
+    public function install($file): void
+    {
+    }
+
+    public function export($path): void
+    {
+    }
+
+    public function findDirectories($path)
+    {
+        return Finder::findDirectories($path);
+    }
+
 }
+

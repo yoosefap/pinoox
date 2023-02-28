@@ -56,16 +56,20 @@ class Boot
     public function build()
     {
         self::$request = Request::createFromGlobals();
+
         $core = Container::pincore();
         $layer = AppRouter::find();
         App::setLayer($layer);
         $this->buildContainer($core);
         if (is_null(Url::request())) {
-            global $argv;
-            Console::run($argv);
-            exit;
+           /* global $argv;
+            Console::run($argv);*/
+            $t = new  Terminal();
+            $t->run();
+        } else {
+            App::run();
         }
-        App::run();
+
     }
 
     private function buildContainer(ContainerBuilder $container): void

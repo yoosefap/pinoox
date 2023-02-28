@@ -7,6 +7,7 @@ use mysql_xdevapi\Exception;
 use pinoox\component\ClassBuilder;
 use pinoox\component\console;
 use pinoox\component\File;
+use pinoox\component\helpers\Str;
 use pinoox\component\HelperString;
 use pinoox\component\interfaces\CommandInterface;
 
@@ -63,7 +64,7 @@ class createModel extends console implements CommandInterface
      */
     public function handle()
     {
-        $this->model = HelperString::toCamelCase($this->argument('model'));
+        $this->model = Str::toCamelCase($this->argument('model'));
         $package = $this->argument('package');
         $this->chooseApp($package);
         $this->setPath();

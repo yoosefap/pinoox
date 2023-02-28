@@ -41,7 +41,6 @@ class AppRouter
             }
             unset($apps['*']);
         }
-
         // set app current
         $url = empty($url) ? Url::parts() : $url;
         $parts = !empty($url) ? HelperString::explodeDropping('/', $url) : [];
@@ -128,7 +127,7 @@ class AppRouter
      * Get routes by Package Name
      *
      * @param string $packageName
-     * @return array|mixed|null
+     * @return array|null
      */
     public static function getPackage(string $packageName): ?array
     {

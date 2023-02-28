@@ -9,18 +9,33 @@
  * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
+
 namespace pinoox\component;
 
-use pinoox\component\helpers\HelperString;
+use pinoox\component\helpers\Str;
 use ZipArchive;
 
 class Zip
 {
-    private static $entries = null;
+    /**
+     * ZipArchive Object
+     */
+    private array|null $entries = [];
 
-    public static function folders($zippedFile, $isJustCurrent = false, $dir = null)
+    /**
+     * ZipArchive Object
+     * @var ZipArchive
+     */
+    private ZipArchive $zip;
+
+    public function __construct()
     {
-        $files = self::info($zippedFile, $isJustCurrent, $dir);
+        $this->zip = new ZipArchive();
+    }
+
+    public function folders($zippedFile, $isJustCurrent = false, $dir = null): array
+    {
+        $files = $this->info($zippedFile, $isJustCurrent, $dir);
         $result = [];
         foreach ($files as $index => $file) {
             if ($file['is_dir'])
@@ -29,22 +44,22 @@ class Zip
         return $result;
     }
 
-    public static function info($zippedFile, $isJustCurrent = false, $dir = null)
+    public function info($zippedFile, $isJustCurrent = false, $dir = null): ?array
     {
         if (!is_file($zippedFile)) return null;
-        $zip = new ZipArchive();
-        $zip->open($zippedFile);
+
+        $this->zip->open($zippedFile);
         $files = [];
-        for ($i = 0; $i < $zip->numFiles; $i++) {
-            $stat = $zip->statIndex($i);
+        for ($i = 0; $i < $this->zip->numFiles; $i++) {
+            $stat = $this->zip->statIndex($i);
 
             if ($isJustCurrent) {
-                if (!empty($dir) && !HelperString::lastHas($dir, '/')) $dir .= '/';
-                $string = HelperString::firstDelete($stat['name'], $dir);
-                $string = HelperString::lastDelete($string, '/');
-                if (!$string || HelperString::has($string, ['/', '\\']) || !HelperString::firstHas($stat['name'], $dir)) continue;
+                if (!empty($dir) && !Str::lastHas($dir, '/')) $dir .= '/';
+                $string = Str::firstDelete($stat['name'], $dir);
+                $string = Str::lastDelete($string, '/');
+                if (!$string || Str::has($string, ['/', '\\']) || !Str::firstHas($stat['name'], $dir)) continue;
             }
-            $isDir = (HelperString::lastHas($stat['name'], ['/', '\\']));
+            $isDir = (Str::lastHas($stat['name'], ['/', '\\']));
             $files[] = [
                 'filename' => $stat['name'],
                 'filesize' => $stat['size'],
@@ -56,9 +71,9 @@ class Zip
         return $files;
     }
 
-    public static function files($zippedFile, $isJustCurrent = false, $dir = null)
+    public function files($zippedFile, $isJustCurrent = false, $dir = null): array
     {
-        $files = self::info($zippedFile, $isJustCurrent, $dir);
+        $files = $this->info($zippedFile, $isJustCurrent, $dir);
         $result = [];
         foreach ($files as $index => $file) {
             if (!$file['is_dir'])
@@ -67,13 +82,12 @@ class Zip
         return $result;
     }
 
-    // create zip
-    public static function archive($source, $zipname = null, $overwrite = false, $no_file = array(), $exts = array(), $ext_action = "out")
+    public function archive($source, $zipName = null, $overwrite = false, $no_file = array(), $ext = array(), $ext_action = "out")
     {
-        $zipname = is_null($zipname) || empty($zipname) ? HelperString::get_unique_string(is_array($source) ? $source[0] : $source, 'md5') . '.zip' : $zipname;
+        $zipName = empty($zipName) ? Str::get_unique_string(is_array($source) ? $source[0] : $source, 'md5') . '.zip' : $zipName;
         if (is_array($source) || is_dir($source)) {
             if (!is_array($source))
-                $files = File::get_files($source, $no_file, $exts, $ext_action);
+                $files = File::get_files($source, $no_file, $ext, $ext_action);
             else {
                 $files = $source;
             }
@@ -85,29 +99,27 @@ class Zip
                     $valid_files[] = $f;
             if (empty($valid_files))
                 return false;
-            $zip = new ZipArchive();
-            $destination = pathinfo($source[0], PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR . $zipname;
+            $destination = pathinfo($source[0], PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR . $zipName;
             if (!file_exists($destination))
                 $overwrite = false;
-            if ($zip->open($destination, $overwrite ? ZipArchive::OVERWRITE : ZipArchive::CREATE) !== true)
+            if ($this->zip->open($destination, $overwrite ? ZipArchive::OVERWRITE : ZipArchive::CREATE) !== true)
                 return false;
             foreach ($valid_files as $file) {
-                $zip->addFile($file, basename($file));
+                $this->zip->addFile($file, basename($file));
             }
-            $zip->close();
-            return file_exists($destination) ? $zipname : false;
+            $this->zip->close();
+            return file_exists($destination) ? $zipName : false;
         } else if (is_file($source)) {
             if (!file_exists($source)) return false;
 
-            $zip = new ZipArchive();
-            $destination = str_replace(basename($source), '', $source) . $zipname;
+            $destination = str_replace(basename($source), '', $source) . $zipName;
             if (!file_exists($destination))
                 $overwrite = false;
-            if ($zip->open($destination, $overwrite ? ZipArchive::OVERWRITE : ZipArchive::CREATE) !== true)
+            if ($this->zip->open($destination, $overwrite ? ZipArchive::OVERWRITE : ZipArchive::CREATE) !== true)
                 return false;
-            $zip->addFile($source, basename($source));
-            $zip->close();
-            return file_exists($destination) ? $zipname : false;
+            $this->zip->addFile($source, basename($source));
+            $this->zip->close();
+            return file_exists($destination) ? $zipName : false;
         } else {
             return false;
         }
@@ -115,25 +127,25 @@ class Zip
     }
 
 
-    public static function addEntries($filename)
+    public function addEntries($filename): void
     {
-        if(!is_array(self::$entries))
-            self::$entries = [];
-        array_push(self::$entries,$filename);
+        if (!is_array($this->entries))
+            $this->entries = [];
+        $this->entries[] = $filename;
     }
 
-    public static function entries($filenames)
+    public function entries($filenames): void
     {
-        self::$entries = $filenames;
+        $this->entries = $filenames;
     }
 
-    public static function extract($zippedFile, $dir)
+    public function extract($zippedFile, $dir): bool
     {
         $zip = new ZipArchive;
         $res = $zip->open($zippedFile);
         if ($res === TRUE) {
-            $zip->extractTo($dir,self::$entries);
-            self::$entries = null;
+            $zip->extractTo($dir, $this->entries);
+            $this->entries = null;
             $zip->close();
             return true;
         } else {
@@ -141,18 +153,17 @@ class Zip
         }
     }
 
-    public static function remove($zippedFile, $path)
+    public function remove($zippedFile, $path): bool
     {
-        $zip = new ZipArchive;
-        if ($zip->open($zippedFile) === TRUE) {
+        if ($this->zip->open($zippedFile) === TRUE) {
             if (!is_array($path))
                 $path = [$path];
 
             foreach ($path as $p) {
-                $zip->deleteName($p);
+                $this->zip->deleteName($p);
             }
 
-            $zip->close();
+            $this->zip->close();
             return true;
         } else {
             return false;

@@ -1,8 +1,8 @@
 <?php
 
 return array(
-    'package' => 'com_pinoox_test',
-    'name' => 'test',
+    'package-name' => 'com_pinoox_installer',
+    'name' => 'installer',
     'developer' => 'pinoox',
     'description' => 'pinoox test',
     'version-name' => '1.0.0',

@@ -20,18 +20,18 @@ class AppLayer
      * create stack
      *
      * @param string $path
-     * @param string $packageName
+     * @param string|null $packageName
      */
-    public function __construct(private string $path, private string $packageName)
+    public function __construct(private string $path, private ?string $packageName)
     {
     }
 
     /**
      * get package name
      *
-     * @return string
+     * @return string|null
      */
-    public function getPackageName(): string
+    public function getPackageName(): ?string
     {
         return $this->packageName;
     }

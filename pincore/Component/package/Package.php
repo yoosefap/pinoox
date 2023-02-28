@@ -10,10 +10,11 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-use function pinoox\router\{route};
+namespace pinoox\component\package;
 
-route(
-    path: '/',
-    action: 'MainController:home',
-    methods: 'GET'
-);
+enum Package
+{
+    const com_pinoox_test = 'com_pinoox_test';
+    const com_pinoox_manager = 'com_pinoox_manager';
+    const com_pinoox_paper = 'com_pinoox_paper';
+}

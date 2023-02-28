@@ -17,8 +17,14 @@ use Exception;
 use pinoox\component\Dir;
 use pinoox\component\kernel\Boot;
 
+/**
+ * @const string com_pinoox_manager
+ *
+ */
+
 class App
 {
+
     /**
      * App structure
      *

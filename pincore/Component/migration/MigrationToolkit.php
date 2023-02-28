@@ -13,12 +13,10 @@
 namespace pinoox\component\migration;
 
 use Illuminate\Database\Capsule\Manager;
-use pinoox\component\File;
 use pinoox\component\helpers\Str;
 use pinoox\component\kernel\Exception;
-use pinoox\component\package\App;
-use pinoox\portal\Config;
 use pinoox\portal\Database;
+use Symfony\Component\Finder\Finder;
 
 class MigrationToolkit
 {
@@ -47,7 +45,7 @@ class MigrationToolkit
     private string $package;
 
     /**
-     * namespace
+     * namespace of app
      * @var string
      */
     private string $namespace;
@@ -82,15 +80,15 @@ class MigrationToolkit
         return $this;
     }
 
-    public function namespace($val): self
-    {
-        $this->namespace = $val;
-        return $this;
-    }
-
     public function package($val): self
     {
         $this->package = $val;
+        return $this;
+    }
+
+    public function namespace($val): self
+    {
+        $this->namespace = $val;
         return $this;
     }
 
@@ -127,7 +125,7 @@ class MigrationToolkit
         return true;
     }
 
-    public function ready(): self
+    public function load(): self
     {
         if (!$this->checkPaths()) return $this;
 
@@ -157,22 +155,26 @@ class MigrationToolkit
 
     private function readyFromPath(): array
     {
-        $files = File::get_files($this->migrationPath);
-        return array_map(function ($f) {
-            return [
+        $files = [];
+        $finder = new Finder();
+        $finder->in($this->migrationPath)->files();
+        foreach ($finder as $f) {
+            $files[] = [
                 'sync' => false,
-                'path' => $f,
-                'migration' => basename($f, '.php'),
+                'path' => $f->getRealPath(),
+                'migration' => $f->getBasename('.php'),
             ];
-        }, $files);
+        }
+        return $files;
     }
 
     private function extract($item): array
     {
+        $namespace = $this->namespace . str_replace([PINOOX_APP_PATH, $this->package, $item['migration'] . '.php'], '', $item['path']);
         $fileName = $this->getFileName($item);
         $className = $this->getClassName($fileName);
-        $isLoad = $this->loadMigrationClass($this->migrationPath . $fileName . '.php');
-        $classObject = $this->namespace . $className;
+        $isLoad = $this->loadMigrationClass($this->migrationPath . DS . $fileName . '.php');
+        $classObject = $namespace . $className;
 
         return [$fileName, $className, $classObject, $isLoad];
     }
@@ -189,7 +191,7 @@ class MigrationToolkit
             'className' => $className,
             'fileName' => $fileName,
             'classObject' => $classObject,
-            'dbPrefix' => Database::getConfig('prefix') . ( $this->package !='pincore' ? $this->package . '_' : ''),
+            'dbPrefix' => Database::getConfig('prefix') . ($this->package != 'pincore' ? $this->package . '_' : ''),
         ];
     }
 
@@ -198,10 +200,6 @@ class MigrationToolkit
         return $this->migrations;
     }
 
-    public function getSchema(): \Illuminate\Database\Schema\Builder
-    {
-        return $this->schema;
-    }
 
     private function convertToTimestampPrefix($fileName)
     {
@@ -232,10 +230,6 @@ class MigrationToolkit
     {
         if (empty($this->migrationPath)) {
             $this->setError('migration path not defined');
-            return false;
-        }
-        if (empty($this->namespace)) {
-            $this->setError('namespace not defined');
             return false;
         }
 
