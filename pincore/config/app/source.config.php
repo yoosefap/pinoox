@@ -13,7 +13,7 @@
 return [
     'enable' => true,
     'hidden' => false,
-    'package-name' => 'com_pinoox_welcome',
+    'package' => 'com_pinoox_welcome',
     'open' => 'app-details',
     'router' => [
         'type' => 'multiple',

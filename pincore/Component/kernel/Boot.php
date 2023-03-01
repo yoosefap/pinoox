@@ -62,10 +62,9 @@ class Boot
         App::setLayer($layer);
         $this->buildContainer($core);
         if (is_null(Url::request())) {
-           /* global $argv;
-            Console::run($argv);*/
-            $t = new  Terminal();
-            $t->run();
+            /* global $argv;
+             Console::run($argv);*/
+            (new Terminal())->run();
         } else {
             App::run();
         }

@@ -123,7 +123,7 @@ class Pinker
     public function getInfo(?string $key = null): ?array
     {
         $info = HelperAnnotations::getTagsCurrentBlock($this->file);
-        return !is_null($key)? @$info[$key] : $info;
+        return !is_null($key) ? @$info[$key] : $info;
     }
 
     /**
@@ -151,11 +151,12 @@ class Pinker
         $fileName = Dir::ds($fileName);
         if (!HelperString::firstHas($fileName, '~')) {
             $mainFile = Dir::path($fileName);
-            $file = Dir::path(self::folder . '/' . $fileName);
+            $file = Dir::path(self::folder . DS . $fileName);
         } else {
             $fileName = HelperString::firstDelete($fileName, '~');
-            $mainFile = Dir::path('~pincore/' . $fileName);
-            $file = Dir::path('~pincore/' . self::folder . '/' . $fileName);
+
+            $mainFile = Dir::path('~pincore' . DS . $fileName);
+            $file = Dir::path('~pincore' . DS . self::folder . DS . $fileName);
         }
 
         $this->file = $file;
@@ -257,7 +258,7 @@ class Pinker
      *
      * @return mixed
      */
-    private function generateData() : mixed
+    private function generateData(): mixed
     {
         $data = $this->data;
         if (is_array($data) && isset($data['__pinker__']) && $data['__pinker__'] == true) {

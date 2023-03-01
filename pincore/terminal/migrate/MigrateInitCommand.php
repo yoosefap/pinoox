@@ -24,32 +24,22 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrateCommand extends Terminal
+class MigrateInitCommand extends Terminal
 {
 
-    protected static $defaultName = 'migrate';
+    protected static $defaultName = 'migrate:init';
 
-    protected static $defaultDescription = 'Migrate schemas';
+    protected static $defaultDescription = 'Initialize migration repository and create tables';
 
-    private string $package;
-
-    private array $app;
 
     /**
      * @var MigrationToolkit
      */
     private $toolkit = null;
 
-    protected function configure(): void
-    {
-        $this->addArgument('package', InputArgument::REQUIRED, 'Enter the package name of app you want to migrate schemas');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);
-
-        $this->package = $input->getArgument('package');
 
         $this->init();
         $this->migrate();
@@ -60,12 +50,8 @@ class MigrateCommand extends Terminal
 
     private function init()
     {
-        try {
-            $this->app = AppManager::getApp($this->package);
-        } catch (Exception $e) {
-            $this->error($e->getMessage());
-        }
-
+        $pincore = AppManager::getApp(Package::pincore);
+dd($pincore);
         $this->toolkit = MigrationToolkit::appPath($this->app['path'])
             ->migrationPath($this->app['migration'])
             ->package($this->app['package'])

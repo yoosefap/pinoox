@@ -15,6 +15,5 @@ namespace pinoox\component\package;
 enum Package
 {
     const com_pinoox_test = 'com_pinoox_test';
-    const com_pinoox_manager = 'com_pinoox_manager';
-    const com_pinoox_paper = 'com_pinoox_paper';
+    const pincore = 'pincore';
 }

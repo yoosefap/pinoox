@@ -112,14 +112,14 @@ class AppBuilder
         if (empty($app) || !is_array($app))
             return false;
 
-        $app['package-name'] = $this->packageName;
+        $app['package'] = $this->packageName;
         return $app;
     }
 
     private function createApp()
     {
         $source = Config::name('~app>source')->get();
-        $source['package-name'] = $this->packageName;
+        $source['package'] = $this->packageName;
         self::$data[$this->packageName] = $source;
     }
 

@@ -12,6 +12,10 @@
 
 namespace pinoox\component\manager;
 
+use pinoox\component\kernel\Exception;
+use pinoox\component\package\AppBuilder;
+use pinoox\component\package\Package;
+use pinoox\component\store\Pinker;
 use Symfony\Component\Finder\Finder;
 
 class AppManager
@@ -21,13 +25,18 @@ class AppManager
      *
      */
     private string $basePath;
-    private string $path;
 
     /**
-     * installed apps list
+     *  apps list
      *
      */
     private array $apps;
+
+    /**
+     * app
+     *
+     */
+    private array $app;
 
     public function __construct()
     {
@@ -57,6 +66,23 @@ class AppManager
      */
     public function getApp($packageName): array|null
     {
+        if ($packageName === Package::pincore) {
+            $this->findPincore();
+        } else {
+            $this->findApp($packageName);
+        }
+        return $this->app;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function findApp($packageName): void
+    {
+        if (!is_dir($this->basePath . $packageName)) {
+            throw new \Exception("The \"$packageName\" package could not found ");
+        }
+
         $finder = new Finder();
         $finder->depth(0)->directories()->in($this->basePath . $packageName);
         $iterator = $finder->getIterator();
@@ -67,12 +93,19 @@ class AppManager
             throw new \Exception('The "app.php" file could not found in "' . $packageName . '"');
         };
 
-        $app = include($appPath);
+        $app = AppBuilder::init($packageName)->get();
         $app['path'] = $folder->getPath();
-        $app['migration'] = $app['path']  .DS. $this->getMigrationPath($app);
+        $app['migration'] = $app['path'] . DS . $this->getMigrationPath($app);
         $app['namespace'] = $this->getNamespace($app);
 
-        return $app;
+        $this->app = $app;
+    }
+
+    private function findPincore(): void
+    {
+        $pincore['pinoox'] = Pinker::init('~pincore/pinoox.config')->pickup();
+        $pincore['app'] = Pinker::init('~pincore/app.config')->pickup();
+        $this->app = $pincore;
     }
 
     private function getMigrationPath($app): string
