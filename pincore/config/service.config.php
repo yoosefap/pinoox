@@ -3,5 +3,6 @@
 return [
     '~debugger',
     '~console',
+    '~database',
     '~boot',
 ];

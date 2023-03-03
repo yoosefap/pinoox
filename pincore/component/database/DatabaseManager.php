@@ -13,11 +13,11 @@
 
 namespace pinoox\component\database;
 
+use Illuminate\Database\Connection;
 use \Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-
-class Database
+class DatabaseManager
 {
     private Capsule $capsule;
 
@@ -32,7 +32,11 @@ class Database
 
         // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
         $this->capsule->bootEloquent();
+    }
 
+    public function setPrefix(string $prefix): void
+    {
+        $this->capsule->getConnection()->setTablePrefix($prefix);
     }
 
     public function getSchema(): Builder
@@ -44,5 +48,11 @@ class Database
     {
         return $this->capsule;
     }
+
+    public function run(): Connection
+    {
+        return $this->capsule->getConnection();
+    }
+
 
 }

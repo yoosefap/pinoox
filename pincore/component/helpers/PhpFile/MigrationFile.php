@@ -18,47 +18,46 @@ use Nette\PhpGenerator\ClassType;
 use pinoox\component\File;
 use pinoox\component\helpers\Str;
 use pinoox\component\migration\MigrationBase;
+use pinoox\component\package\Package;
 
 class MigrationFile extends PhpFile
 {
 
-    public static function create(string $exportPath, string $className, string $package): bool
+    public static function create(string $exportPath, string $className, string $package, string $namespace): bool
     {
-        //$namespaceString = ($packageName == '~' || $packageName == 'pincore' || empty($packageName)) ? 'pinoox\portal' : $namespace . 'portal';
-        $namespaceStr = "pinoox\\app\\" . $package . "\\database\\migrations";
         $source = self::source();
 
-        $namespace = $source->addNamespace($namespaceStr);
+        $namespace = $source->addNamespace($namespace);
         $namespace->addUse(Blueprint::class);
         $namespace->addUse(MigrationBase::class);
 
         $class = $namespace->addClass($className);
         $class->setExtends(MigrationBase::class);
-        self::addRunMethod($class, $className);
-        self::addDownMethod($class, $className);
+        self::addRunMethod($class, $className, $package);
+        self::addDownMethod($class, $className, $package);
 
         return File::generate($exportPath, $source);
     }
 
-    private static function addRunMethod(ClassType $class, string $className): void
+    private static function addRunMethod(ClassType $class, string $className, string $package): void
     {
         $tableName = Str::camelToUnderscore($className, '_');
         $method = $class->addMethod('up');
         $method->addComment('Run the migrations.');
         $method->setPublic()
             ->setReturnType('void')
-            ->addBody('$this->schema->create("' . $tableName . '", function (Blueprint $table) {')
+            ->addBody('$this->schema->create("' . $package . '_' . $tableName . '", function (Blueprint $table) {')
             ->addBody("\t" . '$table->increments("id");' . "\n" . '});');
     }
 
-    private static function addDownMethod(ClassType $class, string $className): void
+    private static function addDownMethod(ClassType $class, string $className, string $package): void
     {
         $tableName = Str::camelToUnderscore($className, '_');
         $method = $class->addMethod('down');
         $method->addComment('Reverse the migrations.');
         $method->setPublic()
             ->setReturnType('void')
-            ->addBody('$this->schema->dropIfExists("' . $tableName . '");');
+            ->addBody('$this->schema->dropIfExists("' . $package . '_' . $tableName . '");');
     }
 
 }

@@ -13,14 +13,11 @@
 
 namespace pinoox\terminal\migrate;
 
-use pinoox\component\kernel\Exception;
-use pinoox\component\migration\MigrationQuery;
 use pinoox\component\package\Package;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -37,6 +34,8 @@ class MigrateInitCommand extends Terminal
      */
     private $toolkit = null;
 
+    private $pincore = null;
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);
@@ -47,15 +46,14 @@ class MigrateInitCommand extends Terminal
         return Command::SUCCESS;
     }
 
-
     private function init()
     {
-        $pincore = AppManager::getApp(Package::pincore);
-dd($pincore);
-        $this->toolkit = MigrationToolkit::appPath($this->app['path'])
-            ->migrationPath($this->app['migration'])
-            ->package($this->app['package'])
-            ->namespace($this->app['namespace'])
+        $this->pincore = AppManager::getApp(Package::pincore);
+        $this->toolkit = MigrationToolkit::appPath($this->pincore['path'])
+            ->migrationPath($this->pincore['migration'])
+            ->package($this->pincore['package'])
+            ->namespace($this->pincore['namespace'])
+            ->action('init')
             ->load();
 
         if (!$this->toolkit->isSuccess()) {
@@ -71,8 +69,6 @@ dd($pincore);
             $this->success('Nothing to migrate.');
         }
 
-        $batch = MigrationQuery::fetchLatestBatch($this->app['package']) ?? 0;
-
         foreach ($migrations as $m) {
             $start_time = microtime(true);
             $this->success('Migrating: ');
@@ -80,10 +76,7 @@ dd($pincore);
             $this->newline();
 
             $obj = new $m['classObject']();
-            $obj->prefix = $m['dbPrefix'];
             $obj->up();
-
-            MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
 
             $end_time = microtime(true);
             $exec_time = $end_time - $start_time;

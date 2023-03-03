@@ -14,6 +14,7 @@ namespace pinoox\component;
 
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -46,6 +47,16 @@ class Terminal extends Command
         $this->output->write("<info>$message</info>");
     }
 
+    #[NoReturn] protected function question($message): void
+    {
+        $this->output->write("<question>$message</question>");
+    }
+
+    #[NoReturn] protected function warning($message): void
+    {
+        $this->output->write("<comment>$message</comment>");
+    }
+
     #[NoReturn] protected function newline(): void
     {
         $this->output->writeln('');
@@ -56,14 +67,13 @@ class Terminal extends Command
         exit;
     }
 
-    #[NoReturn] protected function question($message): void
+    protected function table($columns, $rows)
     {
-        $this->output->writeln("<question>$message</question>");
+        $table = new Table($this->output);
+        $table->setHeaders($columns)
+            ->setRows($rows);
+        $table->render();
     }
 
-    #[NoReturn] protected function warning($message): void
-    {
-        $this->output->writeln("<comment>$message</comment>");
-    }
 
 }

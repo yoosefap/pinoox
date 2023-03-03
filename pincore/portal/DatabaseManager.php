@@ -18,22 +18,24 @@ use Illuminate\Database\Capsule\Manager as ObjectPortal2;
 use Illuminate\Database\Schema\Builder as ObjectPortal1;
 use pinoox\component\kernel\Exception;
 use pinoox\component\source\Portal;
+use Illuminate\Database\Connection;
 
 /**
  * @method static ObjectPortal1 getSchema()
  * @method static ObjectPortal2 getCapsule()
- * @method static \pinoox\component\database\Database object()
+ * @method static Connection run()
+ * @method static \pinoox\component\database\DatabaseManager object()
  *
- * @see \pinoox\component\database\Database
+ * @see \pinoox\component\database\DatabaseManager
  */
-class Database extends Portal
+class DatabaseManager extends Portal
 {
     /**
      * @throws Exception
      */
     public static function __register(): void
     {
-        self::__bind(\pinoox\component\database\Database::class)->setArguments([self::getConfig()]);
+        self::__bind(\pinoox\component\database\DatabaseManager::class)->setArguments([self::getConfig()]);
     }
 
     /**
@@ -56,25 +58,5 @@ class Database extends Portal
     public static function __name(): string
     {
         return 'database';
-    }
-
-
-    /**
-     * Get exclude method names .
-     * @return string[]
-     */
-    public static function __exclude(): array
-    {
-        return [];
-    }
-
-
-    /**
-     * Get method names for callback object.
-     * @return string[]
-     */
-    public static function __callback(): array
-    {
-        return [];
     }
 }

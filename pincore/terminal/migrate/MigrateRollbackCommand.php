@@ -13,22 +13,22 @@
 
 namespace pinoox\terminal\migrate;
 
-use pinoox\component\kernel\Exception;
-use pinoox\component\migration\MigrationQuery;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
+use pinoox\component\migration\MigrationQuery;
 use pinoox\portal\MigrationToolkit;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrateCommand extends Terminal
+
+class MigrateRollbackCommand extends Terminal
 {
 
-    protected static $defaultName = 'migrate';
+    protected static $defaultName = "migrate:rollback";
 
-    protected static $defaultDescription = 'Migrate schemas';
+    protected static $defaultDescription = 'Rollback the database migrations';
 
     private string $package;
 
@@ -51,7 +51,7 @@ class MigrateCommand extends Terminal
         $this->package = $input->getArgument('package');
 
         $this->init();
-        $this->migrate();
+        $this->reverse();
 
         return Command::SUCCESS;
     }
@@ -60,7 +60,7 @@ class MigrateCommand extends Terminal
     {
         try {
             $this->app = AppManager::getApp($this->package);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
 
@@ -68,6 +68,7 @@ class MigrateCommand extends Terminal
             ->migrationPath($this->app['migration'])
             ->package($this->app['package'])
             ->namespace($this->app['namespace'])
+            ->action('rollback')
             ->load();
 
         if (!$this->toolkit->isSuccess()) {
@@ -75,35 +76,43 @@ class MigrateCommand extends Terminal
         }
     }
 
-    private function migrate()
+    private function reverse()
     {
         $migrations = $this->toolkit->getMigrations();
 
         if (empty($migrations)) {
-            $this->success('Nothing to migrate.');
+            $this->success('Nothing to rollback.');
+            $this->stop();
         }
 
-        $batch = MigrationQuery::fetchLatestBatch($this->app['package']) ?? 0;
+        $batch = MigrationQuery::fetchLatestBatch($this->app['package']);
 
         foreach ($migrations as $m) {
+
+            if (!$m['isLoad']) {
+                $this->error('Migration not found: '.$m['fileName']);
+                $this->newLine();
+                continue;
+            }
+
             $start_time = microtime(true);
-            $this->warning('Migrating: ');
-            $this->warning($m['fileName']);
-            $this->newline();
-
+            $this->warning('Rolling back: ');
+            $this->info($m['fileName']);
+            $this->newLine();
             $obj = new $m['classObject']();
-            $obj->up();
+            $obj->down();
 
-            MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
+            MigrationQuery::delete($batch, $m['packageName']);
 
             $end_time = microtime(true);
             $exec_time = $end_time - $start_time;
 
             //end migrating
-            $this->success('Migrated: ' . $m['fileName']);
-            $this->info(' (' . substr($exec_time, 0, 5) . 'ms)');
-            $this->newline();
+            $this->success('Rolled back: ');
+            $this->info($m['fileName'] . ' (' . substr($exec_time, 0, 5) . 'ms)');
+            $this->newLine();
         }
 
     }
+
 }

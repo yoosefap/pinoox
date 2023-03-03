@@ -8,7 +8,7 @@ return [
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
-        'collation' => 'utf8mb4_bin',
+        'collation' => 'utf8_general_ci',
         'prefix' => '',
     ],
 

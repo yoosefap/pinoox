@@ -15,7 +15,7 @@ namespace pinoox\component\migration;
 use Illuminate\Database\Capsule\Manager;
 use pinoox\component\helpers\Str;
 use pinoox\component\kernel\Exception;
-use pinoox\portal\Database;
+use pinoox\portal\DatabaseManager;
 use Symfony\Component\Finder\Finder;
 
 class MigrationToolkit
@@ -70,8 +70,8 @@ class MigrationToolkit
 
     public function __construct()
     {
-        $this->schema = Database::getSchema();
-        $this->cp = Database::getCapsule();
+        $this->schema = DatabaseManager::getSchema();
+        $this->cp = DatabaseManager::getCapsule();
     }
 
     public function appPath($val): self
@@ -93,6 +93,7 @@ class MigrationToolkit
     }
 
     /**
+     * actions: init, run, rollback
      * @return $this
      */
     public function action($action): self
@@ -134,7 +135,7 @@ class MigrationToolkit
         if ($this->action != 'init' && $this->isExistsMigrationTable()) {
             $migrations = $this->syncWithDB($migrations);
         }
-
+        
         if (!empty($migrations)) {
             foreach ($migrations as $m) {
                 list($fileName, $className, $classObject, $isLoad) = $this->extract($m);
@@ -148,6 +149,7 @@ class MigrationToolkit
                     $this->setError($e);
                 }
             }
+
         }
 
         return $this;
@@ -170,7 +172,9 @@ class MigrationToolkit
 
     private function extract($item): array
     {
-        $namespace = $this->namespace . str_replace([PINOOX_APP_PATH, $this->package, $item['migration'] . '.php'], '', $item['path']);
+        $path = $this->package == 'pincore' ? PINOOX_CORE_PATH : PINOOX_APP_PATH;
+        $filename = $item['migration'] . '.php';
+        $namespace  = trim($this->namespace . DS . str_replace([$filename, $path, $this->package . DS], '', $item['path']));
         $fileName = $this->getFileName($item);
         $className = $this->getClassName($fileName);
         $isLoad = $this->loadMigrationClass($this->migrationPath . DS . $fileName . '.php');
@@ -191,7 +195,7 @@ class MigrationToolkit
             'className' => $className,
             'fileName' => $fileName,
             'classObject' => $classObject,
-            'dbPrefix' => Database::getConfig('prefix') . ($this->package != 'pincore' ? $this->package . '_' : ''),
+            // 'dbPrefix' => Database::getConfig('prefix') . ($this->package != 'pincore' ? $this->package . '_' : ''),
         ];
     }
 

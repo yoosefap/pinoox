@@ -84,9 +84,7 @@ class MigrateStatusCommand extends Terminal
 
         $this->success('Migration status:');
         $this->newLine();
-        //$this->table(['Migration', 'Batch', 'Status'], $this->getRows($migrations));
-        //todo: show table
-        dd('show table');
+       $this->table(['Migration', 'Batch', 'Status'], $this->getRows($migrations));
     }
 
     private function getRows($migrations)

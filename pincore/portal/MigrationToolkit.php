@@ -14,7 +14,6 @@
 
 namespace pinoox\portal;
 
-use Illuminate\Database\Schema\Builder as ObjectPortal2;
 use pinoox\component\migration\MigrationToolkit as ObjectPortal1;
 use pinoox\component\source\Portal;
 

@@ -17,15 +17,20 @@ namespace pinoox\app\com_pinoox_test\database\migrations;
 use Illuminate\Database\Schema\Blueprint;
 use pinoox\component\migration\MigrationBase;
 
-class Test extends MigrationBase
+class User extends MigrationBase
 {
 	/**
 	 * Run the migrations.
 	 */
 	public function up(): void
 	{
-		$this->schema->create($this->table('test'), function (Blueprint $table) {
+		$this->schema->create("com_pinoox_test_user", function (Blueprint $table) {
 			$table->increments("id");
+			$table->string("username");
+			$table->string("password");
+
+            $table->rememberToken();
+            $table->timestamps();
 		});
 	}
 
@@ -35,6 +40,6 @@ class Test extends MigrationBase
 	 */
 	public function down(): void
 	{
-		$this->schema->dropIfExists($this->table('test'));
+		$this->schema->dropIfExists("com_pinoox_test_user");
 	}
 }
