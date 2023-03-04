@@ -2,8 +2,6 @@
 
 namespace pinoox\terminal\create;
 
-use pinoox\component\File;
-use pinoox\component\helpers\PhpFile\MigrationFile;
 use pinoox\component\helpers\PhpFile\ModelFile;
 use pinoox\component\helpers\Str;
 use pinoox\component\Terminal;
@@ -12,9 +10,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use pinoox\portal\MigrationToolkit;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 
 class CreateModelCommand extends Terminal
@@ -32,12 +27,6 @@ class CreateModelCommand extends Terminal
     private string $modelFolder;
 
     private string $modelFileName;
-
-
-    /**
-     * @var MigrationToolkit
-     */
-    private $toolkit = null;
 
     protected function configure(): void
     {
@@ -59,7 +48,6 @@ class CreateModelCommand extends Terminal
         return Command::SUCCESS;
     }
 
-
     private function init()
     {
 
@@ -69,18 +57,7 @@ class CreateModelCommand extends Terminal
             $this->error($e->getMessage());
         }
 
-        $this->toolkit = MigrationToolkit::appPath($this->app['path'])
-            ->migrationPath($this->app['migration'])
-            ->package($this->app['package'])
-            ->namespace($this->app['namespace'])
-            ->load();
-
-        if (!$this->toolkit->isSuccess()) {
-            $this->error($this->toolkit->getErrors());
-        }
-
         $this->modelFolder = $this->app['path'] . DS . 'model';
-
     }
 
     private function create()
@@ -124,6 +101,4 @@ class CreateModelCommand extends Terminal
 
         return $this->modelFolder . DS . $this->modelFileName;
     }
-
-
 }

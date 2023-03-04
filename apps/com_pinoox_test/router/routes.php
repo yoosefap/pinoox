@@ -17,3 +17,8 @@ route(
     action: 'MainController:home',
     methods: 'GET'
 );
+route(
+    path: '/add',
+    action: 'MainController:add',
+    methods: 'GET'
+);
