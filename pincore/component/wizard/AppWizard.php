@@ -10,27 +10,24 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\component\manager;
+namespace pinoox\component\wizard;
 
-use Nette\Utils\Finder;
-use pinoox\component\File;
-use pinoox\component\Zip;
-
-class AppFileHandler
+class AppWizard extends Wizard implements WizardInterface
 {
 
-    public function install($file): void
+    public function __construct(string $path, string $filename)
     {
+        parent::__construct($path, $filename);
+        $this->type('app');
     }
 
-    public function export($path): void
+    public function type(string $type)
     {
+        $this->type = $type;
     }
 
-    public function findDirectories($path)
+    public function install()
     {
-        return Finder::findDirectories($path);
+        // TODO: Implement install() method.
     }
-
 }
-

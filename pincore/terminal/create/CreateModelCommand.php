@@ -50,14 +50,13 @@ class CreateModelCommand extends Terminal
 
     private function init()
     {
-
         try {
             $this->app = AppManager::getApp($this->package);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
 
-        $this->modelFolder = $this->app['path'] . DS . 'model';
+        $this->modelFolder = $this->app['path'] . 'model';
     }
 
     private function create()
@@ -76,10 +75,10 @@ class CreateModelCommand extends Terminal
 
             if ($isCreated) {
                 //print success messages
-                $this->success(sprintf('Model created in "%s"', str_replace(['\\', '/'], DS, $this->modelFolder . DS . $this->modelFileName)));
+                $this->success(sprintf('Model created in "%s"', str_replace(['\\', '/'], DS, $exportPath)));
                 $this->newLine();
             } else {
-                $this->error(sprintf('Same file exist in "%s"!', str_replace(['\\', '/'], DS, $this->modelFolder . DS . $this->modelFileName)));
+                $this->error(sprintf('Same file exist in "%s"!', str_replace(['\\', '/'], DS, $exportPath)));
             }
         } catch (\Exception $e) {
             $this->error($e);

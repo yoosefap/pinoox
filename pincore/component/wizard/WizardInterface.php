@@ -10,20 +10,13 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-use function pinoox\router\{route};
 
-route(
-    path: '/',
-    action: 'MainController:home',
-    methods: 'GET'
-);
-route(
-    path: '/add',
-    action: 'MainController:add',
-    methods: 'GET'
-);
-route(
-    path: '/wizard',
-    action: 'MainController:wizard',
-    methods: 'GET'
-);
+namespace pinoox\component\wizard;
+
+interface WizardInterface
+{
+    public function type(string $type);
+
+    public function install();
+
+}

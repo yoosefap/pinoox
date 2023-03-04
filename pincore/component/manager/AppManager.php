@@ -98,7 +98,7 @@ class AppManager
 
         $this->injectBasicParams(array: $app,
             package: $packageName,
-            path: $folder->getPath(),
+            path: $folder->getPath() . DS,
             migration: $folder->getPath() . DS . $this->getMigrationPath($app),
             namespace: $this->getNamespace($app)
         );

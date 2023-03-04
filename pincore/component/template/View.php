@@ -10,9 +10,7 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-
 namespace pinoox\component\template;
-
 
 use pinoox\component\Dir;
 use pinoox\component\package\App;

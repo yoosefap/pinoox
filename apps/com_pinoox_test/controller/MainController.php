@@ -16,6 +16,7 @@ namespace pinoox\app\com_pinoox_test\controller;
 use pinoox\app\com_pinoox_test\model\Product;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\controller\Controller;
+use pinoox\component\wizard\AppWizard;
 
 class MainController extends Controller
 {
@@ -27,19 +28,26 @@ class MainController extends Controller
         $p->summary = 'best mobile around the world';
         $p->content = 'best mobile around the world......';
         $p->save();
-        return '<h2>New Product Added</h2> <br> <a href="'.$request->getBaseUrl().'">show list</a>';
+
+        return '<h2>New Product Added</h2> <br> <a href="' . $request->getBaseUrl() . '">show list</a>';
     }
 
     public function home(Request $request)
     {
         $products = Product::all();
-        $html = '<a href="'.$request->getBaseUrl().'/add">add new</a>';
+        $html = '<a href="' . $request->getBaseUrl() . '/add">add new</a>';
         foreach ($products as $product) {
             $html .= '<h2>' . $product->product_name . '</h2> <p>' . $product->summary . '</p>';
             $html .= '<br>';
         }
         return $html;
 
+    }
+
+    public function wizard()
+    {
+        $wizard = new AppWizard(PINOOX_PATH, 'com_pinoox_welcome.pin');
+        return dd($wizard->glance());
     }
 }
     

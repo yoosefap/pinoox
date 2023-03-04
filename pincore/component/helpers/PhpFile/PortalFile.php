@@ -29,23 +29,21 @@ use ReflectionMethod;
 class PortalFile extends PhpFile
 {
 
-    public static function createPortal(string $path, string $className, string $serviceName, string $packageName = '', string $namespace = ''): void
+    public static function createPortal(string $path, string $portalName, string $service, string $package = '', string $namespace = ''): bool
     {
-        $namespaceString = ($packageName == '~' || $packageName == 'pincore' || empty($packageName)) ? 'pinoox\portal' : $namespace . 'portal';
         $source = self::source();
 
-        $namespace = $source->addNamespace($namespaceString);
+        $namespace = $source->addNamespace($namespace);
         $namespace->addUse(Portal::class);
-        $portalName = $namespaceString . '\\' . $className;
 
-        $class = $namespace->addClass($className);
+        $class = $namespace->addClass($portalName);
         $class->setExtends(Portal::class);
-        self::addMethodName($class, $serviceName);
+        self::addMethodName($class, $service);
         self::addMethodCallBack($class);
         self::addMethodExclude($class);
 
-        self::addCommentMethods($portalName, $serviceName, $class, $namespace, $packageName);
-        File::generate($path, $source);
+        self::addCommentMethods($portalName, $service, $class, $namespace, $package);
+        return File::generate($path, $source);
     }
 
     public static function updatePortal(string $path, string $className, string $packageName): void
