@@ -49,12 +49,16 @@ class MainController extends Controller
     {
         $wizard = AppWizard::open(PINOOX_PATH . 'installs\com_pinoox_welcome.pin');
 
-        return dd(
-            $wizard->isUpdateAvailable(),
-            $wizard->install(),
-            $wizard->getMeta(),
-            $wizard->getInfo()
-        );
+        try {
+            return dd(
+                $wizard->isUpdateAvailable(),
+                $wizard->install(),
+                $wizard->getMeta(),
+                $wizard->getInfo()
+            );
+        } catch (ZipEntryNotFoundException $e) {
+            return $e->getMessage();
+        }
     }
 }
     

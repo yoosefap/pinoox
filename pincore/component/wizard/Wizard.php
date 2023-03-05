@@ -178,18 +178,16 @@ class Wizard
      * getEntry used for fetch specific file from .pin
      *
      * @param string $targetFile
-     * @return bool
+     * @return void
      * @throws Exception
      */
-    private function hasEntry(string $targetFile): bool
+    private function hasEntry(string $targetFile): void
     {
         $has = $this->zip->hasEntry($targetFile);
 
         if (!$has) {
-            $this->setError("Doesn't exists '" . $targetFile . "' in the package!");
-            return false;
+            $this->setError("Doesn't exists '" . $targetFile . "' inside the package!");
         }
-        return true;
     }
 
     protected function checkUpdate(): bool
