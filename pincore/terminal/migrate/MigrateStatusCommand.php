@@ -13,7 +13,6 @@
 
 namespace pinoox\terminal\migrate;
 
-use pinoox\component\package\Package;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
@@ -59,7 +58,7 @@ class MigrateStatusCommand extends Terminal
 
     private function init()
     {
-        $this->app = AppManager::getApp(Package::com_pinoox_test);
+        $this->app = AppManager::getApp( $this->package);
 
         $this->toolkit = MigrationToolkit::appPath($this->app['path'])
             ->migrationPath($this->app['migration'])

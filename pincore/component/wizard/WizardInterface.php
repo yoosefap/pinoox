@@ -19,4 +19,6 @@ interface WizardInterface
 
     public function install();
 
+    public function isUpdateAvailable(): bool;
+
 }

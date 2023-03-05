@@ -12,12 +12,14 @@
 
 namespace pinoox\component\wizard;
 
+use PhpZip\Exception\ZipException;
+use pinoox\component\kernel\Exception;
+
 class AppWizard extends Wizard implements WizardInterface
 {
 
-    public function __construct(string $path, string $filename)
+    public function __construct()
     {
-        parent::__construct($path, $filename);
         $this->type('app');
     }
 
@@ -26,8 +28,39 @@ class AppWizard extends Wizard implements WizardInterface
         $this->type = $type;
     }
 
-    public function install()
+    /**
+     * @throws ZipException
+     */
+    public function install(): array
     {
-        // TODO: Implement install() method.
+        $zip = $this->extract($this->packagePath);
+        return [
+            'message' =>  'Package was installed successfully',
+            'listFiles' => $zip->getListFiles(),
+        ];
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isUpdateAvailable(): bool
+    {
+        if (!$this->isUpdate) return false;
+
+        $info = $this->getExistsPackageInfo();
+        return $info['version-code'] < $this->getInfo()['version-code'];
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getExistsPackageInfo(): bool|array
+    {
+        $existsInfo = include PINOOX_APP_PATH . $this->package . DS . $this->targetFile();
+        if (empty($existsInfo)) {
+            $this->setError('The package is not valid because there is no essential file inside (Doesn\'t exists "' . $this->targetFile() . '" in "' . $this->package . '")');
+            return false;
+        }
+        return $existsInfo;
     }
 }

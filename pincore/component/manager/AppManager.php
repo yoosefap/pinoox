@@ -13,7 +13,6 @@
 namespace pinoox\component\manager;
 
 use pinoox\component\package\AppBuilder;
-use pinoox\component\package\Package;
 use pinoox\portal\Config;
 use Symfony\Component\Finder\Finder;
 
@@ -67,7 +66,7 @@ class AppManager
      */
     public function getApp($packageName): array|null
     {
-        if ($packageName === Package::pincore) {
+        if ($packageName === 'pincore') {
             $this->findPincore();
         } else {
             $this->findApp($packageName);

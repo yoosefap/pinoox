@@ -9,11 +9,15 @@
  * @link https://www.pinoox.com/
  * @license  https://opensource.org/licenses/MIT MIT License
  */
+namespace pinoox\app\com_pinoox_welcome\controller;
 
-namespace pinoox\component\package;
+use pinoox\component\Download;
 
-enum Package
+class MainController extends MasterConfiguration
 {
-    const com_pinoox_test = 'com_pinoox_test';
-    const pincore = 'pincore';
+
+    public function _main()
+    {
+        self::$template->show('hello');
+    }
 }

@@ -18,7 +18,6 @@ use Nette\PhpGenerator\ClassType;
 use pinoox\component\File;
 use pinoox\component\helpers\Str;
 use pinoox\component\migration\MigrationBase;
-use pinoox\component\package\Package;
 
 class MigrationFile extends PhpFile
 {

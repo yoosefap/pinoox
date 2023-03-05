@@ -13,10 +13,11 @@
 
 namespace pinoox\app\com_pinoox_test\controller;
 
+use PhpZip\Exception\ZipEntryNotFoundException;
 use pinoox\app\com_pinoox_test\model\Product;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\controller\Controller;
-use pinoox\component\wizard\AppWizard;
+use pinoox\portal\AppWizard;
 
 class MainController extends Controller
 {
@@ -46,8 +47,14 @@ class MainController extends Controller
 
     public function wizard()
     {
-        $wizard = new AppWizard(PINOOX_PATH, 'com_pinoox_welcome.pin');
-        return dd($wizard->glance());
+        $wizard = AppWizard::open(PINOOX_PATH . 'installs\com_pinoox_welcome.pin');
+
+        return dd(
+            $wizard->isUpdateAvailable(),
+            $wizard->install(),
+            $wizard->getMeta(),
+            $wizard->getInfo()
+        );
     }
 }
     

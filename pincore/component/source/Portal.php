@@ -349,20 +349,17 @@ abstract class Portal
      * bind service
      *
      * @param string|object|null $class class object or class name
-     * @param array $args
+     * @param string|null $id
      * @return Definition|null
      */
-    final public static function __bind(string|object|null $class = null, array $args = []): ?Definition
+    final public static function __bind(string|object|null $class = null, string $id = null): ?Definition
     {
-        $name = static::__name();
+        $name = !empty($id) ? $id : static::__name();
         if (is_object($class)) {
             self::__container()->set($name, $class);
         } else {
-            $definition = self::__container()->register($name, $class);
-            $definition->setArguments($args);
-            return $definition;
+            return self::__container()->register($name, $class);
         }
-
         return null;
     }
 }
