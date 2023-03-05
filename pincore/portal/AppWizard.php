@@ -19,8 +19,8 @@ use pinoox\component\wizard\Wizard as ObjectPortal1;
 
 /**
  * @method static type(string $type)
- * @method static install()
- * @method static AppWizard path(string $path)
+ * @method static array install()
+ * @method static bool isUpdateAvailable()
  * @method static ObjectPortal1 open(string $path)
  * @method static ?array getInfo()
  * @method static mixed getErrors($last = false)
@@ -47,15 +47,4 @@ class AppWizard extends Portal
 	}
 
 
-	/**
-	 * Get method names for callback object.
-	 * @return string[]
-	 */
-	public static function __callback(): array
-	{
-		return [
-			'path',
-			'filename'
-		];
-	}
 }
