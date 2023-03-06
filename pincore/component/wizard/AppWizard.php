@@ -35,9 +35,35 @@ class AppWizard extends Wizard implements WizardInterface
     {
         $zip = $this->extract($this->packagePath);
         return [
-            'message' =>  'Package was installed successfully',
+            'message' => 'Package was installed successfully',
             'listFiles' => $zip->getListFiles(),
         ];
+    }
+
+    public function open(string $path): Wizard
+    {
+        parent::open($path);
+
+        //extract target file (app.php)
+        $this->extractTemp($this->targetFile());
+        $this->loadTargetFileFromPin();
+
+        //extract icon
+        $this->extractTemp($this->getIconPath());
+        $this->addIcon();
+
+        return $this;
+    }
+
+    private function addIcon(): void
+    {
+        if (!isset($this->info)) return;
+        $this->info['icon_path'] = $this->tmpPathPackage . DS . $this->info['icon'];
+    }
+
+    private function getIconPath()
+    {
+        return $this->info['icon'] ?? null;
     }
 
     /**
@@ -47,20 +73,12 @@ class AppWizard extends Wizard implements WizardInterface
     {
         if (!$this->isUpdate) return false;
 
-        $info = $this->getExistsPackageInfo();
-        return $info['version-code'] < $this->getInfo()['version-code'];
+        $existsInfo = $this->getExistsPackageInfo();
+        return $existsInfo['version-code'] <= $this->getInfo()['version-code'];
     }
 
-    /**
-     * @throws Exception
-     */
-    private function getExistsPackageInfo(): bool|array
+    public function getInfo(): array|null
     {
-        $existsInfo = include PINOOX_APP_PATH . $this->package . DS . $this->targetFile();
-        if (empty($existsInfo)) {
-            $this->setError('The package is not valid because there is no essential file inside (Doesn\'t exists "' . $this->targetFile() . '" in "' . $this->package . '")');
-            return false;
-        }
-        return $existsInfo;
+        return $this->info;
     }
 }

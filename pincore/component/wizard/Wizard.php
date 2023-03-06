@@ -18,7 +18,7 @@ use PhpZip\ZipFile;
 use pinoox\component\kernel\Exception;
 use pinoox\portal\Zip;
 
-class Wizard
+abstract class Wizard
 {
     protected string $path;
 
@@ -36,7 +36,7 @@ class Wizard
 
     protected string $tmpPathPackage;
 
-    private array $info;
+    protected array $info;
 
     protected bool $isUpdate = false;
 
@@ -56,11 +56,14 @@ class Wizard
 
         $this->filename = basename($this->path);
 
-        $this->package = basename($this->filename, '.pin');
-
-        $this->packagePath = PINOOX_APP_PATH . $this->package . DS;
-
         $this->createTmp();
+    }
+
+    protected function setPackage(): void
+    {
+
+        $this->package = $this->info['package'];
+        $this->packagePath = PINOOX_APP_PATH . $this->package . DS;
     }
 
     /**
@@ -75,28 +78,15 @@ class Wizard
         $targetFile = $this->targetFile();
         $this->hasEntry($targetFile);
 
-        //extract target file (app.php | meta.json)
-        $this->extractTemp($targetFile);
-        $this->loadInfo();
-
-        //extract icon
-        $this->extractTemp($this->getIconPath());
-        $this->addIcon();
-
-        $this->checkUpdate();
-
         return $this;
     }
 
-    private function extractTemp(...$files): void
+    protected function extractTemp(...$files): void
     {
         Zip::extractTo($this->tmpPathPackage, $files);
     }
 
-    public function getInfo(): array|null
-    {
-        return $this->info;
-    }
+    protected abstract function getInfo(): array|null;
 
     /**
      * @throws Exception
@@ -121,11 +111,6 @@ class Wizard
         if (!is_dir($this->tmpPathPackage)) mkdir($this->tmpPathPackage);
     }
 
-    private function loadInfo(): void
-    {
-        $this->info = include $this->tmpPathPackage . DS . 'app.php';
-    }
-
     /**
      * @throws ZipEntryNotFoundException
      */
@@ -139,17 +124,6 @@ class Wizard
             'uncompressedSize' => $entry->getUncompressedSize(),
             'time' => $entry->getATime(),
         ];
-    }
-
-    private function addIcon(): void
-    {
-        if (!isset($this->info)) return;
-        $this->info['icon_path'] = $this->tmpPathPackage . DS . $this->info['icon'];
-    }
-
-    private function getIconPath()
-    {
-        return $this->info['icon'] ?? null;
     }
 
     /**
@@ -203,5 +177,31 @@ class Wizard
         return $this->zip->extractTo($path)->deleteFromRegex('~^\.~');
     }
 
+
+    /**
+     * @throws Exception
+     */
+    protected function getExistsPackageInfo(): bool|array
+    {
+        $existsInfo = include PINOOX_APP_PATH . $this->package . DS . $this->targetFile();
+        if (empty($existsInfo)) {
+            $this->setError('The package is not valid because there is no essential file inside (Doesn\'t exists "' . $this->targetFile() . '" in "' . $this->package . '")');
+            return false;
+        }
+        return $existsInfo;
+    }
+
+    protected function loadTargetFileFromPin(): void
+    {
+        if ($this->type == 'template') {
+            $this->info = json_decode(file_get_contents($this->tmpPathPackage . DS . $this->targetFile()), true);
+        } else {
+            $this->info = include $this->tmpPathPackage . DS . $this->targetFile();
+        }
+
+        $this->setPackage();
+
+        $this->checkUpdate();
+    }
 
 }

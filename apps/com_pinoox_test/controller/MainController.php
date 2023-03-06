@@ -18,6 +18,7 @@ use pinoox\app\com_pinoox_test\model\Product;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\controller\Controller;
 use pinoox\portal\AppWizard;
+use pinoox\portal\TemplateWizard;
 
 class MainController extends Controller
 {
@@ -45,7 +46,7 @@ class MainController extends Controller
 
     }
 
-    public function wizard()
+    public function app()
     {
         $wizard = AppWizard::open(PINOOX_PATH . 'installs\com_pinoox_welcome.pin');
 
@@ -59,6 +60,13 @@ class MainController extends Controller
         } catch (ZipEntryNotFoundException $e) {
             return $e->getMessage();
         }
+    }
+
+    public function template()
+    {
+        $wizard = TemplateWizard::open(PINOOX_PATH.'installs\welcome.pin');
+   
+        return dd($wizard->getInfo(), $wizard->install());
     }
 }
     

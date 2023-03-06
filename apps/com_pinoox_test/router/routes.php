@@ -23,7 +23,12 @@ route(
     methods: 'GET'
 );
 route(
-    path: '/wizard',
-    action: 'MainController:wizard',
+    path: '/app',
+    action: 'MainController:app',
+    methods: 'GET'
+);
+route(
+    path: '/template',
+    action: 'MainController:template',
     methods: 'GET'
 );

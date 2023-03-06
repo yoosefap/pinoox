@@ -1,11 +1,12 @@
 {
   "name": "welcome",
-  "app": "com_pinoox_welcome",
+  "package": "com_pinoox_welcome",
   "cover": "cover.jpg",
   "developer": "pinoox team",
   "copyright": "MIT",
-  "version": "1.0",
-  "app_version": "1.0",
+  "version-name": "1.0",
+  "version-code": 1,
+  "version-package": 4,
   "title": {
     "en": "welcome",
     "fa": "خوش آمدگویی"
