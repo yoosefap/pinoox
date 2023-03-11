@@ -14,11 +14,10 @@
 namespace pinoox\component;
 
 
-use pinoox\app\com_pinoox_manager\model\AppModel;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\package\AppBuilder;
 use ReflectionClass;
-use Symfony\Component\Finder\Finder;
+use pinoox\portal\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 class Console

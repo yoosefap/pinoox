@@ -10,14 +10,12 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-use function pinoox\router\{get};
 
-get(
-    path: '/',
-    action: '@home',
-);
+namespace pinoox\component\package;
 
-//get(
-//    path: '/test',
-//    action: fn() => view('test test terst'),
-//);
+
+interface AppReferenceInterface
+{
+    public function getPackageName(): ?string;
+    public function getPath(): ?string;
+}

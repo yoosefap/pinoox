@@ -16,76 +16,9 @@ use Closure;
 use Exception;
 use pinoox\component\Dir;
 use pinoox\component\kernel\Boot;
-use pinoox\component\package\loader\ArrayLoader;
-use pinoox\component\package\loader\ChainLoader;
-use pinoox\component\package\loader\PackageLoader;
-use pinoox\component\package\parser\AppNameParser;
-use pinoox\component\template\engine\DelegatingEngine;
-use pinoox\component\template\engine\PhpEngine;
-use pinoox\component\template\engine\PhpTwigEngine;
-use pinoox\component\template\engine\TwigEngine;
-use pinoox\component\template\parser\TemplateNameParser;
-use Twig\Extension\DebugExtension;
-use Twig\Extension\StringLoaderExtension;
 
-class App
+class App1
 {
-
-    public function __construct()
-    {
-        $loader = new ChainLoader([
-            new ArrayLoader([
-            ]),
-            new PackageLoader('apps', PINOOX_PATH),
-        ]);
-
-        $parser = new AppNameParser();
-    }
-
-    /**
-     * Set View
-     * @param string|array|null $folders
-     * @param string|null $pathTheme
-     */
-    public function setApp(string|array $folders = null, string $pathTheme = null)
-    {
-        // theme names
-        $folders = !empty($folders) ? $folders : App::get('theme');
-
-        // base path
-        $pathTheme = !empty($pathTheme) ? $pathTheme : Dir::path(App::get('path-theme'));
-
-        // template name parser
-        $this->parser = new TemplateNameParser();
-
-        // instance engines
-        $this->phpEngine = new PhpEngine($this->parser, $folders, $pathTheme); // .php engine
-        $this->twigEngine = new TwigEngine($this->parser, $folders, $pathTheme); // .twig engine
-        $this->phpTwigEngine = new PhpTwigEngine($this->parser, $this->phpEngine, $this->twigEngine); // .twig.php engine
-
-        // set main template engine
-        $this->template = new DelegatingEngine([
-            $this->phpEngine,
-            $this->twigEngine,
-            $this->phpTwigEngine
-        ]);
-
-        // add twig extensions
-        $this->twigEngine->template->enableDebug();
-        $this->twigEngine->addExtension(new DebugExtension());
-        $this->twigEngine->addExtension(new StringLoaderExtension());
-
-        // add twig functions
-        $this->twigEngine->addInternalFunction([
-            'url',
-            'furl',
-            'lang' => 'rlang',
-            'config',
-            'app',
-            'dd',
-        ]);
-    }
-
     /**
      * App structure
      *

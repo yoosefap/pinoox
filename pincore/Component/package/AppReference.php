@@ -14,15 +14,18 @@
 namespace pinoox\component\package;
 
 
-class AppLayer
+use pinoox\component\package\loader\LoaderInterface;
+
+class AppReference implements AppReferenceInterface
 {
+
     /**
      * create stack
      *
-     * @param string $path
      * @param string|null $packageName
+     * @param string|null $path
      */
-    public function __construct(private string $path, private ?string $packageName)
+    public function __construct(private ?string $packageName,private ?string $path = null)
     {
     }
 
@@ -37,32 +40,12 @@ class AppLayer
     }
 
     /**
-     * get path
+     * get package name
      *
-     * @return string
+     * @return string|null
      */
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
-    }
-
-    /**
-     * set path
-     *
-     * @param string $path
-     */
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * set package name
-     *
-     * @param string $packageName
-     */
-    public function setPackageName(string $packageName): void
-    {
-        $this->packageName = $packageName;
     }
 }

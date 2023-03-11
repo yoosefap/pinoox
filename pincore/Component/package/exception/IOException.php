@@ -11,12 +11,14 @@
  */
 
 
-namespace pinoox\component\helpers;
+namespace pinoox\component\kernel\exception;
 
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
-class Path
+/**
+ * The exception that is thrown when an I/O error occurs.
+ */
+class IOException extends FileNotFoundException
 {
-    public function __construct(private ?string $app = null)
-    {
-    }
+
 }

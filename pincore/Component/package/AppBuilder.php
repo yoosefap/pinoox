@@ -15,7 +15,7 @@ namespace pinoox\component\package;
 use Exception;
 use pinoox\component\helpers\HelperArray;
 use pinoox\portal\Config;
-use pinoox\component\store\Pinker;
+use pinoox\portal\Pinker;
 
 class AppBuilder
 {
@@ -106,7 +106,7 @@ class AppBuilder
     private function getConfig()
     {
         $app = App::meeting($this->packageName, function () {
-            return Pinker::init('app.php')->pickup();
+            return Pinker::file('app.php')->pickup();
         });
 
         if (empty($app) || !is_array($app))
@@ -171,13 +171,13 @@ class AppBuilder
      * App builder create by file
      *
      * @param string $file
-     * @return mixed|null
+     * @return AppBuilder
      * @throws Exception
      */
     public static function file(string $file): AppBuilder
     {
-        self::$data['file:' . $file] = Pinker::init($file)->pickup();
-        self::$obj = new AppBuilder('file:' . $file);
+        self::$data['file:' . $file] = Pinker::file($file)->pickup();
+        self::$obj = new AppBuilder('file:' . $file,true);
         return self::$obj;
     }
 
@@ -211,7 +211,7 @@ class AppBuilder
     {
         $data = self::$data[$this->packageName];
         App::meeting($this->packageName, function () use ($data) {
-            Pinker::init('app.php')->data($data)->bake();
+            Pinker::file('app.php')->data($data)->bake();
         });
 
         return self::$obj;

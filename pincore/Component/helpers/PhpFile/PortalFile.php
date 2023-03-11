@@ -131,7 +131,7 @@ class PortalFile extends PhpFile
             ->addBody($body);
     }
 
-    public static function generateMethodComment(string $name, string $className, string $methodName, ReflectionFunction|ReflectionMethod $method, PhpNamespace $namespace, string $return, bool $isCallBack = true, array $callback = [], int &$num = 1): string
+    public static function generateMethodComment(string $name, string $className, string $serviceName, string $methodName, ReflectionFunction|ReflectionMethod $method, PhpNamespace $namespace, string $return, bool $isCallBack = true, array $callback = [], int &$num = 1): string
     {
 
         if (($return === 'void' || in_array($methodName, $callback)) && $isCallBack) {
@@ -142,7 +142,9 @@ class PortalFile extends PhpFile
         $args = str_replace("array ()", '[]', $args);
         if ($return === $name) {
             $returnType = $className;
-        } else if (!empty($return) && class_exists($return)) {
+        } else if ($return === 'static') {
+            $returnType = '\\'.$serviceName;
+        } else if (!empty($return) && class_exists($return) || interface_exists($return) || trait_exists($return)) {
             if ($use = self::getUse($namespace, $return)) {
                 $returnType = $use;
             } else {
@@ -196,7 +198,7 @@ class PortalFile extends PhpFile
                     if ($returnType === 'void' && $isCallBack && empty($callback)) {
                         $voidMethods[] = $method->getName();
                     }
-                    $class->addComment(self::generateMethodComment($name, $class->getName(), $method->getName(), $method, $namespace, $returnType, $isCallBack, $callback, $num));
+                    $class->addComment(self::generateMethodComment($name, $class->getName(), $className, $method->getName(), $method, $namespace, $returnType, $isCallBack, $callback, $num));
                 }
             }
 
@@ -214,7 +216,7 @@ class PortalFile extends PhpFile
                 if ($returnType === 'void' && $isCallBack && empty($callback)) {
                     $voidMethods[] = $methodName;
                 }
-                $class->addComment(self::generateMethodComment($name, $class->getName(), $methodName, $func, $namespace, $returnType, $isCallBack, $callback, $num));
+                $class->addComment(self::generateMethodComment($name, $class->getName(), $className, $methodName, $func, $namespace, $returnType, $isCallBack, $callback, $num));
             }
 
             if (empty($callback))

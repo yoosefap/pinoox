@@ -116,9 +116,9 @@ class AppRouter
      * Get routes
      *
      * @param string|null $value
-     * @return array|mixed|null
+     * @return mixed
      */
-    public static function get(?string $value = null)
+    public static function get(?string $value = null): mixed
     {
         return Config::name('~app>router')
             ->get($value);

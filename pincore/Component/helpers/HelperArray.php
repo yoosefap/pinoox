@@ -505,20 +505,14 @@ class HelperArray
      * Write data in config
      *
      * @param string $key
-     * @param mixed|null $value
+     * @param mixed $value
      * @param string $action
      * @param array $data
      */
-    public static function pushingData(string $key, $value, string $action, array &$data)
+    public static function pushingData(string $key, mixed $value, string $action, array &$data)
     {
-        list(
-            'app' => $app,
-            'name' => $name,
-            'parts' => $parts
-            ) = self::getInfoPushing($key);
-
         $temp = &$data;
-        array_unshift($parts, $name);
+        $parts = explode('.', $key);
         $countKeys = count($parts) - 1;
         $key = null;
         for ($i = 0; $i <= $countKeys; $i++) {
@@ -549,29 +543,30 @@ class HelperArray
         }
     }
 
-    /**
-     * get information for pushing data
-     *
-     * @param $value
-     * @return array
-     */
-    private static function getInfoPushing($value): array
+    public static function setData()
     {
-        $parts = explode('.', $value);
-        $name = array_shift($parts);
-        $name = str_replace(['/', '\\'], '>', $name);
-        if (HelperString::firstHas($name, '~')) {
-            $app = '~';
+
+    }
+
+    public static function pullingData(string $key, array $data): mixed
+    {
+        if (is_null($key)) return $data;
+
+        $parts = explode('.', $key);
+        if (is_array($data)) {
+            foreach ($parts as $value) {
+                if (isset($data[$value])) {
+                    $data = $data[$value];
+                } else {
+                    $data = null;
+                    break;
+                }
+            }
         } else {
-            $app = App::package();
+            $data = null;
         }
 
-
-        return [
-            'app' => $app,
-            'name' => $name,
-            'parts' => $parts
-        ];
+        return $data;
     }
 
 }

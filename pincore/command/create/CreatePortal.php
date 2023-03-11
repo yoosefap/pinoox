@@ -14,9 +14,11 @@
 namespace pinoox\command\create;
 
 
+use JetBrains\PhpStorm\ArrayShape;
 use pinoox\component\Console;
 use pinoox\component\helpers\HelperString;
 use pinoox\component\helpers\PhpFile\PortalFile;
+use pinoox\component\helpers\Str;
 use pinoox\component\interfaces\CommandInterface;
 
 class CreatePortal extends console implements CommandInterface
@@ -65,16 +67,32 @@ class CreatePortal extends console implements CommandInterface
 
     private function createPortal(string $portalName, string $serviceName, string $packageName): void
     {
-        $path = $this->getPath($portalName);
+        list(
+            'path' => $path,
+            'className' => $portalName,
+            'namespace' => $namespace
+            ) = $this->getStructure($portalName);
 
-        PortalFile::createPortal($path, $portalName, $serviceName, $packageName, $this->cli['namespace']);
+        PortalFile::createPortal($path, $portalName, $serviceName, $packageName, $namespace);
         $this->success(sprintf('Portal created in "%s".', str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path)));
         $this->newLine();
     }
 
-    private function getPath(string $portalName): string
+    #[ArrayShape(['path' => "string", 'className' => "string", 'namespace' => "mixed|string"])] private function getStructure(string $portalName): array
     {
-        return $this->cli['path'] . '\\portal\\' . ucfirst($portalName) . '.php';
+        $parts = Str::multiExplode(['/', '>','\\'], $portalName);
+        $portalName = array_pop($parts);
+        $folder = implode('\\', $parts);
+        $className = ucfirst($portalName);
+
+        $basePath = $this->cli['path'] . '\\portal\\';
+        $basePath = !empty($folder) ? $basePath . $folder . '\\' : $basePath;
+
+        $namespace = $this->cli['namespace'];
+        $namespace = !empty($folder) ? $namespace . '\\' . $folder : $namespace;
+
+        $pathFile = $basePath . $className . '.php';
+        return ['path' => $pathFile, 'className' => $className, 'namespace' => $namespace];
     }
 
     private function setPackageName()

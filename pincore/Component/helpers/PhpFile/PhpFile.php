@@ -26,7 +26,6 @@ class PhpFile
     public static function source(bool $isCopyright = true): PhpFileNette
     {
         $source = new PhpFileNette();
-
         if ($isCopyright)
             self::setCopyright($source);
 
@@ -105,7 +104,7 @@ class PhpFile
                 $typesString = $types[$i]->type()->asString();
                 $typesItems = explode('|', $typesString);
                 foreach ($typesItems as $key => $typesItem) {
-                    if (class_exists($typesItem))
+                    if (class_exists($typesItem) || interface_exists($typesItem) || trait_exists($typesItem))
                         $typesItems[$key] = '\\' . $typesItem;
                 }
                 $typesString = implode('|', $typesItems);

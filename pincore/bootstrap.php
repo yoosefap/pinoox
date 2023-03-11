@@ -14,7 +14,7 @@ use pinoox\component\kernel\Loader;
 
 define('PINOOX_START', microtime(true));
 define('PINOOX_DEFAULT_LANG', 'en');
-define('PINOOX_PATH', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
+define('PINOOX_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('PINOOX_VENDOR_PATH', PINOOX_PATH . 'vendor' . DIRECTORY_SEPARATOR);
 define('PINOOX_CORE_PATH', __DIR__ . DIRECTORY_SEPARATOR);
 define('PINOOX_FUNCTIONS_PATH', PINOOX_CORE_PATH . 'functions' . DIRECTORY_SEPARATOR);

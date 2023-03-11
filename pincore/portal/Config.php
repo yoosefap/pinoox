@@ -52,7 +52,7 @@ class Config extends Portal
 
 	public static function __register(): void
 	{
-		self::__bind(ObjectPortal1::class)->setArguments(['~core']);
+		self::__bind(ObjectPortal1::class)->setArguments([Pinker::__ref(),'~core']);
 	}
 
 

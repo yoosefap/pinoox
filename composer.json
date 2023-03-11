@@ -21,6 +21,7 @@
         "illuminate/database": "^8.0",
         "illuminate/events": "^8.0",
         "nette/php-generator": "^4.0",
+        "symfony/asset": "^6.2",
         "symfony/dependency-injection": "^6.0",
         "symfony/error-handler": "^6.0",
         "symfony/finder": "^6.0",

@@ -48,6 +48,13 @@ class Config
     private string $filename;
 
     /**
+     * Pinker instance
+     *
+     * @var Pinker
+     */
+    private Pinker $pinker;
+
+    /**
      * Data config
      *
      * @var array
@@ -57,10 +64,12 @@ class Config
     /**
      * Config constructor
      *
+     * @param Pinker $pinker
      * @param string|null $name
      */
-    public function __construct(?string $name = null)
+    public function __construct(Pinker $pinker, ?string $name = null)
     {
+        $this->pinker = $pinker;
         $this->initData($name);
     }
 
@@ -112,11 +121,12 @@ class Config
         $this->app = !empty($app) ? $app : $appDefault;
 
         $file = 'config/' . $filename . '.config.php';
-        $this->filename = ($this->app === '~') ? '~' . $file : $file;
+        $file = ($this->app === '~') ? '~' . $file : $file;
+        $this->pinker->file($file);
 
         $this->key = $this->app . ':' . $filename;
         if (!isset(self::$data[$this->key])) {
-            $value = Pinker::init($this->filename)->pickup();
+            $value = $this->pinker->pickup();
             self::$data[$this->key] = $value;
         }
     }
@@ -178,7 +188,7 @@ class Config
      */
     public function getInfo(?string $key = null): array
     {
-        return Pinker::init($this->filename)->getInfo($key);
+        return $this->pinker->getInfo($key);
     }
 
     /**
@@ -255,7 +265,7 @@ class Config
      */
     public function reset(): Config
     {
-        $value = Pinker::init($this->filename)->pickup();
+        $value = $this->pinker->pickup();
         self::data($value);
 
         return $this;
@@ -282,7 +292,7 @@ class Config
     public function save(): Config
     {
         $data = $this->get();
-        Pinker::init($this->filename)->data($data)->bake();
+        $this->pinker->data($data)->bake();
 
         return $this;
     }

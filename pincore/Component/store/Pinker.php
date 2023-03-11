@@ -31,12 +31,6 @@ class Pinker
     const folder = 'pinker';
 
     /**
-     * Instance class
-     * @var Pinker|null
-     */
-    private static ?Pinker $obj = null;
-
-    /**
      * Data for pinoox baker
      * @var mixed
      */
@@ -56,9 +50,9 @@ class Pinker
 
     /**
      * File baked storage location
-     * @var string
+     * @var string|null
      */
-    private string $file;
+    private ?string $bakedFile = null;
 
     /**
      * File baked storage location
@@ -68,50 +62,29 @@ class Pinker
 
 
     /**
-     * PinooxBaker constructor
-     * @param string $fileName
-     */
-    public function __construct(string $fileName)
-    {
-        $this->file($fileName);
-    }
-
-    /**
-     * PinooxBaker init
-     * @param string $fileName
-     * @return Pinker|null
-     */
-    public static function init(string $fileName): ?Pinker
-    {
-        self::$obj = new Pinker($fileName);
-
-        return self::$obj;
-    }
-
-    /**
      * Set data for pinoox baker
      *
      * @param mixed $data
-     * @return Pinker|null
+     * @return Pinker
      */
-    public function data(mixed $data): ?Pinker
+    public function data(mixed $data): Pinker
     {
         $this->data = $data;
 
-        return self::$obj;
+        return $this;
     }
 
     /**
      * Set info for pinoox baker
      *
      * @param array $info
-     * @return Pinker|null
+     * @return Pinker
      */
-    public function info(array $info): ?Pinker
+    public function info(array $info): Pinker
     {
         $this->info = $info;
 
-        return self::$obj;
+        return $this;
     }
 
     /**
@@ -122,8 +95,8 @@ class Pinker
      */
     public function getInfo(?string $key = null): ?array
     {
-        $info = HelperAnnotations::getTagsCurrentBlock($this->file);
-        return !is_null($key)? @$info[$key] : $info;
+        $info = HelperAnnotations::getTagsCurrentBlock($this->bakedFile);
+        return !is_null($key) ? @$info[$key] : $info;
     }
 
     /**
@@ -132,42 +105,66 @@ class Pinker
      * @param bool $status
      * @return Pinker
      */
-    public function dumping(bool $status = true): ?Pinker
+    public function dumping(bool $status = true): Pinker
     {
         $this->dumping = $status;
 
-        return self::$obj;
+        return $this;
     }
 
+    public function __construct(?string $mainFile = null, ?string $bakedFile = null)
+    {
+        $this->mainFile = $mainFile;
+        $this->bakedFile = $bakedFile;
+    }
 
     /**
      * Set file for pinoox baker
      *
      * @param string $fileName
-     * @return Pinker|null
+     * @return Pinker
      */
-    private function file(string $fileName): ?Pinker
+    public function file(string $fileName): Pinker
     {
         $fileName = Dir::ds($fileName);
         if (!HelperString::firstHas($fileName, '~')) {
             $mainFile = Dir::path($fileName);
-            $file = Dir::path(self::folder . '/' . $fileName);
+            $bakedFile = Dir::path(self::folder . '/' . $fileName);
         } else {
             $fileName = HelperString::firstDelete($fileName, '~');
             $mainFile = Dir::path('~pincore/' . $fileName);
-            $file = Dir::path('~pincore/' . self::folder . '/' . $fileName);
+            $bakedFile = Dir::path('~pincore/' . self::folder . '/' . $fileName);
         }
 
-        $this->file = $file;
+        $this->bakedFile = $bakedFile;
         $this->mainFile = is_file($mainFile) ? $mainFile : null;
+        return $this;
+    }
 
-        return self::$obj;
+    /**
+     * @param string $fileName
+     * @return static
+     */
+    public static function create(string $fileName): static
+    {
+        $fileName = Dir::ds($fileName);
+        if (!HelperString::firstHas($fileName, '~')) {
+            $mainFile = Dir::path($fileName);
+            $bakedFile = Dir::path(self::folder . '/' . $fileName);
+        } else {
+            $fileName = HelperString::firstDelete($fileName, '~');
+            $mainFile = Dir::path('~pincore/' . $fileName);
+            $bakedFile = Dir::path('~pincore/' . self::folder . '/' . $fileName);
+        }
+
+        $mainFile = is_file($mainFile) ? $mainFile : null;
+        return new Pinker($mainFile, $bakedFile);
     }
 
     /**
      * Bake file
      */
-    public function bake(): ?Pinker
+    public function bake(): Pinker
     {
         if (!$this->dumping) {
             $config = $this->format($this->generateData());
@@ -175,8 +172,8 @@ class Pinker
             $config = $this->transmutation();
         }
 
-        File::generate($this->file, $config);
-        return self::$obj;
+        File::generate($this->bakedFile, $config);
+        return $this;
     }
 
     /**
@@ -257,7 +254,7 @@ class Pinker
      *
      * @return mixed
      */
-    private function generateData() : mixed
+    private function generateData(): mixed
     {
         $data = $this->data;
         if (is_array($data) && isset($data['__pinker__']) && $data['__pinker__'] == true) {
@@ -293,7 +290,7 @@ class Pinker
      */
     public function remove()
     {
-        File::remove_file($this->file);
+        File::remove_file($this->bakedFile);
     }
 
     /**
@@ -303,12 +300,12 @@ class Pinker
      */
     private function getData()
     {
-        if (!is_file($this->file) && !empty($this->mainFile)) {
+        if (!is_file($this->bakedFile) && !empty($this->mainFile)) {
             $this->data = (include $this->mainFile);
             $this->bake();
         }
 
-        return is_file($this->file) ? (include $this->file) : null;
+        return is_file($this->bakedFile) ? (include $this->bakedFile) : null;
     }
 
     /**
@@ -318,7 +315,7 @@ class Pinker
      * @param array $info
      * @return array
      */
-    public static function build($data, array $info = []): array
+    public function build($data, array $info = []): array
     {
         if (is_callable($data)) {
             $data = $data();

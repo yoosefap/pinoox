@@ -16,6 +16,7 @@ use Closure;
 use pinoox\component\Console;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\listener\ExceptionListener;
+use pinoox\component\kernel\listener\RouteListener;
 use pinoox\component\kernel\resolver\RouteValueResolver;
 use pinoox\component\Url;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,6 +57,7 @@ class Boot
     public function build()
     {
         self::$request = Request::createFromGlobals();
+
         $core = Container::pincore();
         $layer = AppRouter::find();
         App::setLayer($layer);
@@ -117,6 +119,7 @@ class Boot
             ->setArgument('projectDir', null)
             ->setArgument('debug', false);
 
+        $container->register('listener.route', RouteListener::class);
         $container->register('listener.view', ViewListener::class);
         $container->register('listener.e', ExceptionListener::class);
 
@@ -133,6 +136,7 @@ class Boot
     {
         $container->register('dispatcher', EventDispatcher::class)
             ->addMethodCall('addSubscriber', [Container::ref('listener.router')])
+            ->addMethodCall('addSubscriber', [Container::ref('listener.route')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.response')])
             ->addMethodCall('addSubscriber', [Container::ref('listener.exception')])
             //  ->addMethodCall('addSubscriber', [Container::ref('listener.e')])
