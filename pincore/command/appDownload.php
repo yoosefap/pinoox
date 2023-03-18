@@ -3,7 +3,6 @@
 namespace pinoox\command;
 
 
-use pinoox\app\com_pinoox_manager\model\AppModel;
 use pinoox\portal\Config;
 use pinoox\component\Console;
 use pinoox\component\Download;

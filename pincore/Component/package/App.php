@@ -28,19 +28,13 @@ use pinoox\component\template\parser\TemplateNameParser;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\StringLoaderExtension;
 
+/**
+ * @const string com_pinoox_manager
+ *
+ */
+
 class App
 {
-
-    public function __construct()
-    {
-        $loader = new ChainLoader([
-            new ArrayLoader([
-            ]),
-            new PackageLoader('apps', PINOOX_PATH),
-        ]);
-
-        $parser = new PathParser();
-    }
 
     /**
      * Set View

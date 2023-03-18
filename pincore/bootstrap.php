@@ -12,6 +12,7 @@
 
 use pinoox\component\kernel\Loader;
 
+define('DS', DIRECTORY_SEPARATOR);
 define('PINOOX_START', microtime(true));
 define('PINOOX_DEFAULT_LANG', 'en');
 define('PINOOX_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
@@ -23,7 +24,9 @@ define('PINOOX_COMPONENT_PATH', PINOOX_CORE_PATH . 'component' . DIRECTORY_SEPAR
 define('PINOOX_SERVICE_PATH', PINOOX_CORE_PATH . 'service' . DIRECTORY_SEPARATOR);
 define('PINOOX_CONFIG_PATH', PINOOX_CORE_PATH . 'config' . DIRECTORY_SEPARATOR);
 define('PINOOX_LANG_PATH', PINOOX_CORE_PATH . 'lang' . DIRECTORY_SEPARATOR);
+define('PINOOX_APP_PATH', realpath(__DIR__ . DS . '..') . DS . 'apps' . DS);
 define('PINOOX_PATH_THUMB', 'thumbs/{name}_{size}.{ext}');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +35,7 @@ define('PINOOX_PATH_THUMB', 'thumbs/{name}_{size}.{ext}');
 |
 | Composer provides a convenient, automatically generated class loader for
 | this application. We just need to utilize it! We'll simply require it
-| into the script here so we don't need to manually load our classes.
+| into the script here, so we don't need to manually load our classes.
 |
 */
 $composer = require PINOOX_VENDOR_PATH . 'autoload.php';

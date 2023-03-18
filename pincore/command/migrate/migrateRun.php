@@ -6,7 +6,7 @@ namespace pinoox\command\migrate;
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\package\App;
-use pinoox\portal\Database;
+use pinoox\portal\DatabaseManager;
 use pinoox\portal\MigrationConfig;
 use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;
@@ -36,7 +36,6 @@ class migrateRun extends console implements CommandInterface
      * @var array
      */
     protected $arguments = [
-        ['package', false, 'package name of app that you want to migrate.', null],
     ];
 
     /**
@@ -46,6 +45,7 @@ class migrateRun extends console implements CommandInterface
      */
     protected $options = [
         ['init', 'i', 'to run init', false],
+        ['package', 'p', 'package name of app that you want to migrate.', false],
     ];
 
     private $package;
@@ -87,7 +87,8 @@ class migrateRun extends console implements CommandInterface
 
     private function init()
     {
-        $this->package = $this->argument('package');
+
+        $this->package = $this->option('i');
         $this->chooseApp($this->package);//init cli
 
         $this->config = MigrationConfig::load($this->cli['path'], $this->cli['package']);
@@ -114,7 +115,6 @@ class migrateRun extends console implements CommandInterface
     private function runUp()
     {
         $migrations = $this->toolkit->getMigrations();
-
         if (empty($migrations)) {
             $this->success('Nothing to migrate.');
             $this->newLine();

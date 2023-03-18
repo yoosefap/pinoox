@@ -2,7 +2,6 @@
 
 namespace pinoox\command\create;
 
-use pinoox\component\ClassBuilder;
 use pinoox\component\console;
 use pinoox\component\File;
 use pinoox\component\helpers\PhpFile\MigrationFile;
@@ -40,6 +39,15 @@ class createMigration extends console implements CommandInterface
     ];
 
     /**
+     * The console command Options.
+     *
+     * @var array
+     */
+    protected $options = [
+        ['package', 'p', 'package name of app that you want to migrate.', false],
+    ];
+
+    /**
      * @var MigrationToolkit
      */
     private MigrationToolkit $toolkit;
@@ -61,7 +69,7 @@ class createMigration extends console implements CommandInterface
 
     private function init()
     {
-        $this->chooseApp($this->argument('package'));//init cli
+        $this->chooseApp($this->option('p'));//init cli
 
         $this->config = MigrationConfig::load($this->cli['path'], $this->cli['package']);
 

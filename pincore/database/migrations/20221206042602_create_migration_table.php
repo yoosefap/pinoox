@@ -19,17 +19,17 @@ class CreateMigrationTable extends MigrationBase
 {
     public function up()
     {
-            $this->schema->create('test', function (Blueprint $table) {
-                $table->id();
-                $table->string('migration');
-                $table->integer('batch');
-                $table->string('app');
-            });
+        $this->schema->create('pincore_migration', function (Blueprint $table) {
+            $table->id();
+            $table->string('migration');
+            $table->integer('batch');
+            $table->string('app');
+        });
 
     }
 
     public function down()
     {
-        $this->schema->dropIfExists($this->table('migration'));
+        $this->schema->dropIfExists('pincore_migration');
     }
 }
