@@ -18,7 +18,10 @@ use pinoox\component\Validation;
 
 final class PackageLoader implements LoaderInterface
 {
-    public function __construct(private string $basePath = '')
+    public function __construct(
+        private string $appFile,
+        private string $basePath = ''
+    )
     {
     }
 
@@ -34,6 +37,6 @@ final class PackageLoader implements LoaderInterface
 
     public function exists(string $packageName): bool
     {
-        return is_file($this->getPathPackage($packageName) . DIRECTORY_SEPARATOR . 'app.php');
+        return is_file($this->getPathPackage($packageName) . DIRECTORY_SEPARATOR . $this->appFile);
     }
 }

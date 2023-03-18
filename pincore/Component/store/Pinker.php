@@ -17,7 +17,7 @@ use pinoox\component\helpers\HelperAnnotations;
 use pinoox\component\File;
 use pinoox\component\helpers\HelperObject;
 use pinoox\component\helpers\HelperString;
-use pinoox\component\Dir;
+use pinoox\component\helpers\Str;
 
 /**
  * Pinoox Baker
@@ -26,21 +26,26 @@ use pinoox\component\Dir;
 class Pinker
 {
     /**
-     * name of the folder to store Pinoox baker data
-     */
-    const folder = 'pinker';
-
-    /**
      * Data for pinoox baker
      * @var mixed
      */
     private $data = null;
 
     /**
+     * @var bool
+     */
+    private bool $isOutputData = false;
+
+    /**
      * Data dump status
      * @var mixed
      */
     private $dumping = false;
+
+    /**
+     * @var bool
+     */
+    private bool $isCamelToUnderscore = false;
 
     /**
      * Info for pinoox baker
@@ -50,15 +55,15 @@ class Pinker
 
     /**
      * File baked storage location
-     * @var string|null
+     * @var string
      */
-    private ?string $bakedFile = null;
+    private string $bakedFile = '';
 
     /**
      * File baked storage location
-     * @var string|null
+     * @var string
      */
-    private ?string $mainFile = null;
+    private string $mainFile = '';
 
 
     /**
@@ -70,7 +75,7 @@ class Pinker
     public function data(mixed $data): Pinker
     {
         $this->data = $data;
-
+        $this->isOutputData = true;
         return $this;
     }
 
@@ -112,53 +117,21 @@ class Pinker
         return $this;
     }
 
-    public function __construct(?string $mainFile = null, ?string $bakedFile = null)
+    public function __construct(string $mainFile = '', string $bakedFile = '')
     {
         $this->mainFile = $mainFile;
         $this->bakedFile = $bakedFile;
     }
 
     /**
-     * Set file for pinoox baker
-     *
-     * @param string $fileName
-     * @return Pinker
-     */
-    public function file(string $fileName): Pinker
-    {
-        $fileName = Dir::ds($fileName);
-        if (!HelperString::firstHas($fileName, '~')) {
-            $mainFile = Dir::path($fileName);
-            $bakedFile = Dir::path(self::folder . '/' . $fileName);
-        } else {
-            $fileName = HelperString::firstDelete($fileName, '~');
-            $mainFile = Dir::path('~pincore/' . $fileName);
-            $bakedFile = Dir::path('~pincore/' . self::folder . '/' . $fileName);
-        }
-
-        $this->bakedFile = $bakedFile;
-        $this->mainFile = is_file($mainFile) ? $mainFile : null;
-        return $this;
-    }
-
-    /**
-     * @param string $fileName
+     * create pinker object
+     * @param string|null $mainFile
+     * @param string|null $bakedFile
      * @return static
      */
-    public static function create(string $fileName): static
+    public static function create(?string $mainFile = null, ?string $bakedFile = null): static
     {
-        $fileName = Dir::ds($fileName);
-        if (!HelperString::firstHas($fileName, '~')) {
-            $mainFile = Dir::path($fileName);
-            $bakedFile = Dir::path(self::folder . '/' . $fileName);
-        } else {
-            $fileName = HelperString::firstDelete($fileName, '~');
-            $mainFile = Dir::path('~pincore/' . $fileName);
-            $bakedFile = Dir::path('~pincore/' . self::folder . '/' . $fileName);
-        }
-
-        $mainFile = is_file($mainFile) ? $mainFile : null;
-        return new Pinker($mainFile, $bakedFile);
+        return new static($mainFile, $bakedFile);
     }
 
     /**
@@ -166,13 +139,16 @@ class Pinker
      */
     public function bake(): Pinker
     {
-        if (!$this->dumping) {
-            $config = $this->format($this->generateData());
-        } else {
-            $config = $this->transmutation();
+        if (!empty($this->bakedFile)) {
+            if (!$this->dumping) {
+                $config = $this->format($this->generateData());
+            } else {
+                $config = $this->transmutation();
+            }
+
+            File::generate($this->bakedFile, $config);
         }
 
-        File::generate($this->bakedFile, $config);
         return $this;
     }
 
@@ -200,7 +176,7 @@ class Pinker
 
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                $k = HelperString::camelToUnderscore($k);
+                $k = $this->isCamelToUnderscore ? Str::camelToUnderscore($k) : $k;
                 if (is_callable($v)) {
                     $replaces['{_{' . $k . '}_}'] = HelperObject::closure_dump($v);
                     $printData[$k] = '{_{' . $k . '}_}';
@@ -222,6 +198,11 @@ class Pinker
         }
 
         return $printData;
+    }
+
+    public function camelToUnderscore(bool $status = true)
+    {
+        $this->isCamelToUnderscore = $status;
     }
 
     /**
@@ -294,16 +275,29 @@ class Pinker
     }
 
     /**
+     * Refresh the baked file
+     */
+    public function restore()
+    {
+        File::remove_file($this->bakedFile);
+        $this->data = is_file($this->mainFile) ? (include $this->mainFile) : null;
+        $this->bake();
+    }
+
+    /**
      * get config data file
      *
      * @return mixed
      */
-    private function getData()
+    private function getData(): mixed
     {
-        if (!is_file($this->bakedFile) && !empty($this->mainFile)) {
-            $this->data = (include $this->mainFile);
+        if (!is_file($this->bakedFile)) {
+            $this->data = is_file($this->mainFile) ? (include $this->mainFile) : null;
             $this->bake();
         }
+
+        if ($this->isOutputData)
+            return $this->data;
 
         return is_file($this->bakedFile) ? (include $this->bakedFile) : null;
     }

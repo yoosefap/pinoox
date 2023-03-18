@@ -115,11 +115,6 @@ class PortalFile extends PhpFile
             ->addBody("return '{$serviceName}';");
     }
 
-    private static function callMethodRegisterInPortal(string $path, ClassType $class, string $packageName, string $namespace, string $className): void
-    {
-        $objectName = $namespace . '\\' . $className;
-    }
-
     private static function addMethodRegisterInPortal(ClassType $class, string $body): void
     {
         // add method in class
@@ -143,7 +138,7 @@ class PortalFile extends PhpFile
         if ($return === $name) {
             $returnType = $className;
         } else if ($return === 'static') {
-            $returnType = '\\'.$serviceName;
+            $returnType = '\\' . $serviceName;
         } else if (!empty($return) && class_exists($return) || interface_exists($return) || trait_exists($return)) {
             if ($use = self::getUse($namespace, $return)) {
                 $returnType = $use;
@@ -156,7 +151,12 @@ class PortalFile extends PhpFile
         } else {
             $returnType = $return;
         }
-
+        if (Str::has($returnType, '?')) {
+            $returnType = str_replace('?', '', $returnType);
+            if (!Str::has($returnType, 'null') || !Str::has($returnType, 'NULL')) {
+                $returnType .= '|null';
+            }
+        }
         $returnType = !empty($returnType) ? $returnType . ' ' : '';
         return HelperString::replaceData('@method static {return}{name}({args})', [
             'name' => $methodName,
@@ -169,6 +169,7 @@ class PortalFile extends PhpFile
     {
         $isCallBack = true;
         $callback = [];
+        $include = [];
         $exclude = [];
         $replace = [];
 
@@ -176,6 +177,7 @@ class PortalFile extends PhpFile
             $isCallBack = call_user_func([$name, '__isCallBack']);
             $callback = call_user_func([$name, '__callback']);
             $exclude = call_user_func([$name, '__exclude']);
+            $include = call_user_func([$name, '__include']);
             $replace = call_user_func([$name, '__compileReplaces']);
         }
 
@@ -191,7 +193,7 @@ class PortalFile extends PhpFile
             $reflection = $container->getReflectionClass($className);
             $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
             foreach ($methods as $method) {
-                if (isset($replace[$method->getName()]) || HelperString::firstHas($method->getName(), '__') || in_array($method->getName(), $exclude))
+                if (isset($replace[$method->getName()]) || HelperString::firstHas($method->getName(), '__') || in_array($method->getName(), $exclude) || (!empty($include) && !in_array($method->getName(), $include)))
                     continue;
                 if ($method instanceof ReflectionMethod) {
                     $returnType = self::getReturnTypeMethod($method);

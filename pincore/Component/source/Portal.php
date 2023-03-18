@@ -90,6 +90,15 @@ abstract class Portal
     }
 
     /**
+     * Get include method names.
+     * @return string[]
+     */
+    public static function __include(): array
+    {
+        return [];
+    }
+
+    /**
      * Get replace methods.
      * @return array
      */
@@ -137,7 +146,7 @@ abstract class Portal
     {
         $instance = static::__instance();
 
-        if (empty($instance) || self::checkMethodHasExclude($method)) {
+        if (empty($instance) || self::checkMethodHasExclude($method) || !self::checkMethodHasInclude($method)) {
             throw new \RuntimeException('A Portal root has not been set.');
         }
 
@@ -311,6 +320,18 @@ abstract class Portal
     {
         $methods = static::__exclude();
         return in_array($method, $methods);
+    }
+
+    /**
+     * Check method has in callback list
+     *
+     * @param string $method
+     * @return bool
+     */
+    private static function checkMethodHasInclude(string $method): bool
+    {
+        $methods = static::__include();
+        return empty($methods) || in_array($method, $methods);
     }
 
     /**

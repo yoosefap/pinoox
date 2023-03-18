@@ -11,25 +11,22 @@
  */
 
 
-namespace pinoox\component\package\manager;
+namespace pinoox\component\package\config;
 
 
 use pinoox\component\helpers\Data;
-use pinoox\portal\Pinker;
+use pinoox\component\store\Config;
+use pinoox\component\store\Pinker;
 
-class AppManager implements ManagerInterface
+class AppConfig implements ConfigInterface
 {
-    private \pinoox\component\store\Pinker $pinker;
-    private Data $data;
 
-    public function __construct(private string $appFile, private array $defaultData = [])
+    public function __construct(private Pinker $pinker, private array $defaultData = [])
     {
-        $this->pinker = Pinker::file($this->appFile);
         $fileData = $this->pinker->pickup();
-
         $data = array_merge($this->defaultData, $fileData);
-
-        $this->data = new Data($data);
+        $this->pinker->data($data);
+        return new Config($pinker);
     }
 
 

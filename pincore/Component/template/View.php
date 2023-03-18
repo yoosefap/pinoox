@@ -37,27 +37,21 @@ class View implements ViewInterface
     /**
      * View constructor.
      *
-     * @param string|array|null $folders
-     * @param string|null $pathTheme
+     * @param string|array $folders
+     * @param string $pathTheme
      */
-    public function __construct(string|array $folders = null, string $pathTheme = null)
+    public function __construct(string|array $folders, string $pathTheme)
     {
         $this->setView($folders, $pathTheme);
     }
 
     /**
      * Set View
-     * @param string|array|null $folders
-     * @param string|null $pathTheme
+     * @param string|array $folders
+     * @param string $pathTheme
      */
-    public function setView(string|array $folders = null, string $pathTheme = null)
+    public function setView(string|array $folders, string $pathTheme)
     {
-        // theme names
-        $folders = !empty($folders) ? $folders : App::get('theme');
-
-        // base path
-        $pathTheme = !empty($pathTheme) ? $pathTheme : Dir::path(App::get('path-theme'));
-
         // template name parser
         $this->parser = new TemplateNameParser();
 

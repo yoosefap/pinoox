@@ -14,13 +14,13 @@
 namespace pinoox\component\helpers;
 
 
-use pinoox\component\package\AppReferenceInterface;
+use pinoox\component\package\PathReferenceInterface;
 use pinoox\component\package\loader\LoaderInterface;
-use pinoox\component\package\parser\AppNameParserInterface;
+use pinoox\component\package\parser\ParserInterface;
 
 class Url
 {
-    public function __construct(private AppNameParserInterface $parser, private LoaderInterface $loader, private string $packageName, private string $basePath)
+    public function __construct(private ParserInterface $parser, private LoaderInterface $loader, private string $packageName, private string $basePath)
     {
     }
 
@@ -30,9 +30,9 @@ class Url
      * @param string $path
      * @return string
      */
-    public function get(string|AppReferenceInterface $path = ''): string
+    public function get(string|PathReferenceInterface $path = ''): string
     {
-        if ($path instanceof AppReferenceInterface)
+        if ($path instanceof PathReferenceInterface)
             $parser = $path;
         else
             $parser = $this->parser->parse($path);

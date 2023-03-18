@@ -11,11 +11,12 @@
  */
 
 
-namespace pinoox\component\package;
+namespace pinoox\component\package\reference;
 
 
-interface AppReferenceInterface
+interface PathReferenceInterface
 {
     public function getPackageName(): ?string;
     public function getPath(): ?string;
+    public function get(): ?string;
 }

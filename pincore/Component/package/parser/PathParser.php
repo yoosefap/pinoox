@@ -14,17 +14,19 @@
 namespace pinoox\component\package\parser;
 
 
-use pinoox\component\helpers\HelperString;
 use pinoox\component\helpers\Str;
-use pinoox\component\package\AppReference;
-use pinoox\component\package\AppReferenceInterface;
+use pinoox\component\package\reference\PathReference;
+use pinoox\component\package\reference\PathReferenceInterface;
 
-class AppNameParser implements AppNameParserInterface
+class PathParser implements ParserInterface
 {
-
-    public function parse(AppReferenceInterface|string $name): AppReferenceInterface
+    public function __construct(private ?string $packageName = null)
     {
-        if ($name instanceof AppReferenceInterface) {
+    }
+
+    public function parse(PathReferenceInterface|string $name): PathReferenceInterface
+    {
+        if ($name instanceof PathReferenceInterface) {
             return $name;
         }
 
@@ -33,14 +35,15 @@ class AppNameParser implements AppNameParserInterface
             $app = $parts[0];
             $path = $parts[1];
         } else {
-            $app = null;
+            $app = $this->packageName;
             $path = $parts[0];
             if (Str::firstHas($path, '~')) {
                 $app = '~';
-                $path = HelperString::firstDelete($path, '~');
             }
         }
 
-        return new AppReference($app, $path);
+        $path = Str::firstDelete($path, '~');
+
+        return new PathReference($app, $path);
     }
 }

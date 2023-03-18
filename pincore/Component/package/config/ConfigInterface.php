@@ -11,10 +11,10 @@
  */
 
 
-namespace pinoox\component\package\manager;
+namespace pinoox\component\package\config;
 
 
-interface ManagerInterface
+interface ConfigInterface
 {
     /**
      *  Get data from config

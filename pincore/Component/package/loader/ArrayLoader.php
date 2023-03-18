@@ -16,17 +16,54 @@ namespace pinoox\component\package\loader;
 
 final class ArrayLoader implements LoaderInterface
 {
-    public function __construct(private array $packages)
+    /**
+     * ArrayLoader constructor.
+     *
+     * @param string $appFile
+     * @param array $packages
+     */
+    public function __construct(
+        private string $appFile,
+        private array $packages = []
+    )
     {
     }
 
+    /**
+     *  {@inheritDoc}
+     */
     public function path(string $packageName): string
     {
         return $this->packages[$packageName];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function exists(string $packageName): bool
     {
-        return isset($this->packages[$packageName]);
+        return isset($this->packages[$packageName]) && $this->checkExistsFile($packageName);
+    }
+
+    /**
+     * Check exists file
+     *
+     * @param string $packageName
+     * @return bool
+     */
+    private function checkExistsFile(string $packageName): bool
+    {
+        return is_file($this->packages[$packageName] . DIRECTORY_SEPARATOR . $this->appFile);
+    }
+
+    /**
+     * add package
+     *
+     * @param string $packageName
+     * @param string $path
+     */
+    public function add(string $packageName, string $path): void
+    {
+        $this->packages[$packageName] = $path;
     }
 }

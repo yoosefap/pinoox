@@ -14,6 +14,8 @@
 
 namespace pinoox\portal;
 
+use pinoox\component\Dir;
+use pinoox\component\package\App;
 use pinoox\component\source\Portal;
 use pinoox\component\template\View as ObjectPortal1;
 
@@ -37,7 +39,16 @@ class View extends Portal
 {
     public static function __register(): void
     {
-        self::__bind(ObjectPortal1::class);
+        // theme names
+        $folders = App::get('theme');
+
+        // base path
+        $pathTheme = Path::get(App::get('path-theme'));
+
+        self::__bind(ObjectPortal1::class)->setArguments([
+            $folders,
+            $pathTheme
+        ]);
     }
 
     /**

@@ -17,6 +17,8 @@ namespace pinoox\component\package\loader;
 interface LoaderInterface
 {
     /**
+     * get path package
+     *
      * @param string $packageName
      * @return string
      * @throws \Exception
@@ -24,6 +26,8 @@ interface LoaderInterface
     public function path(string $packageName): string;
 
     /**
+     * exists package
+     *
      * @param string $packageName
      * @return bool
      */

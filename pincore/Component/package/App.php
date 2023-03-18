@@ -19,7 +19,7 @@ use pinoox\component\kernel\Boot;
 use pinoox\component\package\loader\ArrayLoader;
 use pinoox\component\package\loader\ChainLoader;
 use pinoox\component\package\loader\PackageLoader;
-use pinoox\component\package\parser\AppNameParser;
+use pinoox\component\package\parser\PathParser;
 use pinoox\component\template\engine\DelegatingEngine;
 use pinoox\component\template\engine\PhpEngine;
 use pinoox\component\template\engine\PhpTwigEngine;
@@ -39,7 +39,7 @@ class App
             new PackageLoader('apps', PINOOX_PATH),
         ]);
 
-        $parser = new AppNameParser();
+        $parser = new PathParser();
     }
 
     /**

@@ -13,122 +13,36 @@
 
 namespace pinoox\component\store;
 
-use pinoox\component\helpers\HelperArray;
-use pinoox\component\helpers\HelperString;
-use pinoox\component\package\App;
+use pinoox\component\helpers\Data;
 
 class Config
 {
     /**
-     * key data
-     *
-     * @var string
-     */
-    private string $key;
-
-    /**
-     * name config
-     *
-     * @var string
-     */
-    private string $name;
-
-    /**
-     * app current
-     *
-     * @var ?string
-     */
-    private ?string $app = null;
-
-    /**
-     * filename data
-     *
-     * @var string
-     */
-    private string $filename;
-
-    /**
-     * Pinker instance
-     *
-     * @var Pinker
-     */
-    private Pinker $pinker;
-
-    /**
      * Data config
      *
-     * @var array
+     * @var Data
      */
-    private static array $data = [];
+    private Data $data;
 
     /**
      * Config constructor
      *
      * @param Pinker $pinker
-     * @param string|null $name
+     * @param mixed|null $merge
      */
-    public function __construct(Pinker $pinker, ?string $name = null)
+    public function __construct(private Pinker $pinker, private mixed $merge = null)
     {
-        $this->pinker = $pinker;
-        $this->initData($name);
-    }
-
-    public function name(string $name): Config
-    {
-        $this->initData($name);
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    public function getApp(): string
-    {
-        return !empty($this->app) ? $this->app : App::package();
+        $this->data($pinker->pickup(), $merge);
     }
 
     /**
-     * Set file for pinoox baker
-     *
-     * @param string $name
+     * @param Pinker $pinker
+     * @param mixed|null $merge
+     * @return static
      */
-    private function initData(string $name): void
+    public static function create(Pinker $pinker, mixed $merge = null): static
     {
-        $this->name = $name;
-        $this->app = null;
-        $parts = explode(':', $name);
-        if (count($parts) === 2) {
-            $this->app = $parts[0];
-            $name = $parts[1];
-        }
-
-        $name = str_replace(['/', '\\'], '>', $name);
-        $filename = $name;
-        if (HelperString::firstHas($name, '~')) {
-            $filename = HelperString::firstDelete($filename, '~');
-            $appDefault = '~';
-        } else {
-            $appDefault = App::package();
-        }
-
-        $this->app = !empty($app) ? $app : $appDefault;
-
-        $file = 'config/' . $filename . '.config.php';
-        $file = ($this->app === '~') ? '~' . $file : $file;
-        $this->pinker->file($file);
-
-        $this->key = $this->app . ':' . $filename;
-        if (!isset(self::$data[$this->key])) {
-            $value = $this->pinker->pickup();
-            self::$data[$this->key] = $value;
-        }
+        return new static($pinker, $merge);
     }
 
     /**
@@ -152,32 +66,12 @@ class Config
     /**
      * Get data from config
      *
-     * @param string|null $value
-     * @return mixed|null
+     * @param string|null $key
+     * @return mixed
      */
-    public function get(?string $value = null): mixed
+    public function get(?string $key = null): mixed
     {
-        $data = @self::$data[$this->key];
-
-        if (!is_null($value)) {
-            if (is_array($data)) {
-                $parts = explode('.', $value);
-                foreach ($parts as $value) {
-
-                    if (isset($data[$value])) {
-                        $data = $data[$value];
-                    } else {
-                        $data = null;
-                        break;
-                    }
-                }
-            } else {
-                $data = null;
-            }
-        }
-
-
-        return $data;
+        return $this->data->get($key);
     }
 
     /**
@@ -200,20 +94,43 @@ class Config
      */
     public function set(string $key, mixed $value): Config
     {
-        HelperArray::pushingData($key, $value, 'set', self::$data[$this->key]);
+        $this->data->set($key, $value);
         return $this;
     }
 
     /**
      * Set data in config
      *
-     * @param mixed|null $value
+     * @param mixed|null $data
+     * @param mixed|null $merge
      * @return Config
      */
-    public function data(mixed $value): Config
+    public function data(mixed $data, mixed $merge = null): Config
     {
-        self::$data[$this->key] = $value;
+        $this->data = new Data($data);
+
+        if (!empty($merge))
+            $this->data->merge($merge);
+
         return $this;
+    }
+
+    /**
+     * Get Data
+     * @return Data
+     */
+    public function getData(): Data
+    {
+        return $this->data;
+    }
+
+    /**
+     * Get Pinker
+     * @return Pinker
+     */
+    public function getPinker(): Pinker
+    {
+        return $this->pinker;
     }
 
     /**
@@ -237,7 +154,7 @@ class Config
      */
     public function delete(string $key): Config
     {
-        HelperArray::pushingData($key, null, 'del', self::$data[$this->key]);
+        $this->data->remove($key);
         return $this;
     }
 
@@ -259,15 +176,28 @@ class Config
     }
 
     /**
-     * Reset data in config with config file
+     * Reset data
      *
      * @return Config
      */
     public function reset(): Config
     {
-        $value = $this->pinker->pickup();
-        self::data($value);
+        $this->data(
+            $this->pinker->pickup(),
+            $this->merge
+        );
+        return $this;
+    }
 
+    /**
+     * refresh data in config with config file
+     *
+     * @return Config
+     */
+    public function restore(): Config
+    {
+        $this->pinker->restore();
+        $this->reset();
         return $this;
     }
 
@@ -275,12 +205,12 @@ class Config
      * Add data in config
      *
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @return Config
      */
-    public function add(string $key, string $value): Config
+    public function add(string $key, mixed $value): Config
     {
-        HelperArray::pushingData($key, $value, 'add', self::$data[$this->key]);
+        $this->data->add($key, $value);
         return $this;
     }
 
@@ -291,7 +221,7 @@ class Config
      */
     public function save(): Config
     {
-        $data = $this->get();
+        $data = $this->data->getData();
         $this->pinker->data($data)->bake();
 
         return $this;

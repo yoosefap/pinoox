@@ -15,44 +15,75 @@
 namespace pinoox\portal;
 
 use pinoox\component\package\App;
+use pinoox\component\package\reference\PathReferenceInterface;
 use pinoox\component\source\Portal;
 use pinoox\component\store\Config as ObjectPortal1;
 
 /**
- * @method static ObjectPortal1 name(string $name)
- * @method static string getName()
- * @method static string getKey()
- * @method static ObjectPortal1 setLinear(string $pointer, ?string $key, mixed $value)
- * @method static mixed get(?string $value = NULL)
- * @method static array getInfo(?string $key = NULL)
- * @method static ObjectPortal1 set(string $key, mixed $value)
- * @method static ObjectPortal1 data(mixed $value)
- * @method static mixed getLinear(?string $pointer, ?string $key)
- * @method static ObjectPortal1 delete(string $key)
- * @method static ObjectPortal1 deleteLinear(string $pointer, ?string $key)
- * @method static ObjectPortal1 reset()
- * @method static ObjectPortal1 add(string $key, string $value)
- * @method static ObjectPortal1 save()
+ * @method static \pinoox\component\store\Config create(\pinoox\component\store\Pinker $pinker, mixed $merge = NULL)
  * @method static \pinoox\component\store\Config object()
  *
  * @see \pinoox\component\store\Config
  */
 class Config extends Portal
 {
-	/**
-	 * Instance class
-	 *
-	 * @var \pinoox\component\store\Config
-	 */
-	private static ObjectPortal1 $obj;
-
-	/** @var Config[] */
-	private static array $objects;
-
+	const folder = 'config';
 
 	public static function __register(): void
 	{
-		self::__bind(ObjectPortal1::class)->setArguments([Pinker::__ref(),'~core']);
+		self::__bind(ObjectPortal1::class)->setArguments([Pinker::__ref()]);
+	}
+
+
+	/**
+	 * Set file for pinoox baker
+	 *
+	 * @param string|PathReferenceInterface $fileName
+	 * @return ObjectPortal1
+	 */
+	public static function name(string|PathReferenceInterface $fileName): ObjectPortal1
+	{
+		$fileName = $fileName . '.config.php';
+		$reference = Path::prefixReference($fileName, self::folder);
+		return static::create(Pinker::file($reference));
+	}
+
+
+	/**
+	 * Set file for pinoox baker
+	 *
+	 * @param string $name
+	 */
+	private function initData(string $name): void
+	{
+		$this->name = $name;
+		$this->app = null;
+		$parts = explode(':', $name);
+		if (count($parts) === 2) {
+		    $this->app = $parts[0];
+		    $name = $parts[1];
+		}
+
+		$name = str_replace(['/', '\\'], '>', $name);
+		$filename = $name;
+		if (HelperString::firstHas($name, '~')) {
+		    $filename = HelperString::firstDelete($filename, '~');
+		    $appDefault = '~';
+		} else {
+		    $appDefault = App::package();
+		}
+
+		$this->app = !empty($app) ? $app : $appDefault;
+
+		$file = 'config/' . $filename . '.config.php';
+		$file = ($this->app === '~') ? '~' . $file : $file;
+		$this->pinker->file($file);
+
+		$this->key = $this->app . ':' . $filename;
+		if (!isset(self::$data[$this->key])) {
+		    $value = $this->pinker->pickup();
+		    self::$data[$this->key] = $value;
+		}
 	}
 
 
@@ -67,12 +98,12 @@ class Config extends Portal
 
 
 	/**
-	 * Get exclude method names .
+	 * Get include method names .
 	 * @return string[]
 	 */
-	public static function __exclude(): array
+	public static function __include(): array
 	{
-		return [];
+		return ['name','create'];
 	}
 
 

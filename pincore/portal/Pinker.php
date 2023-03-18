@@ -14,28 +14,55 @@
 
 namespace pinoox\portal;
 
+use pinoox\component\package\reference\PathReference;
+use pinoox\component\package\reference\PathReferenceInterface;
 use pinoox\component\source\Portal;
 use pinoox\component\store\Pinker as ObjectPortal1;
 
 /**
- * @method static ObjectPortal1 data(mixed $data)
- * @method static ObjectPortal1 info(array $info)
- * @method static ?array getInfo(?string $key = NULL)
- * @method static ObjectPortal1 dumping(bool $status = true)
- * @method static ObjectPortal1 file(string $fileName)
- * @method static ObjectPortal1 bake()
- * @method static pickup()
- * @method static remove()
- * @method static array build($data, array $info = [])
+ * @method static \pinoox\component\store\Pinker create(?string $mainFile = NULL, ?string $bakedFile = NULL)
  * @method static \pinoox\component\store\Pinker object()
  *
  * @see \pinoox\component\store\Pinker
  */
 class Pinker extends Portal
 {
+	const folder = 'pinker';
+
 	public static function __register(): void
 	{
 		self::__bind(ObjectPortal1::class);
+	}
+
+
+	/**
+	 * Set file for pinoox baker
+	 *
+	 * @param string|PathReferenceInterface $fileName
+	 * @return ObjectPortal1
+	 */
+	public static function file(string|PathReferenceInterface $fileName): ObjectPortal1
+	{
+		$reference = Path::reference($fileName);
+		$pathMain = $reference->getPackageName() === '~' ? 'pincore/' . $reference->getPath() : $reference->getPath();
+		$pathBaked = $reference->getPackageName() === '~' ? 'pincore/' . self::folder . '/' . $reference->getPath() : $reference->getPath();
+
+		$reference = PathReference::create(
+		    $reference->getPackageName(),
+		    $pathMain,
+		);
+
+		$mainFile = Path::get($reference);
+		$mainFile = is_file($mainFile) ? $mainFile : '';
+
+		$reference = PathReference::create(
+		    $reference->getPackageName(),
+		    $pathBaked,
+		);
+
+		$bakedFile = Path::get($reference);
+
+		return static::create($mainFile, $bakedFile);
 	}
 
 
@@ -50,12 +77,12 @@ class Pinker extends Portal
 
 
 	/**
-	 * Get exclude method names .
+	 * Get include method names .
 	 * @return string[]
 	 */
-	public static function __exclude(): array
+	public static function __include(): array
 	{
-		return [];
+		return ['file', 'create'];
 	}
 
 

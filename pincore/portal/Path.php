@@ -15,17 +15,20 @@
 namespace pinoox\portal;
 
 use pinoox\component\helpers\Path as ObjectPortal1;
-use pinoox\component\package\loader\ArrayLoader;
-use pinoox\component\package\loader\ChainLoader;
-use pinoox\component\package\loader\PackageLoader;
-use pinoox\component\package\parser\AppNameParser;
+use pinoox\component\package\parser\PathParser;
+use pinoox\component\package\reference\PathReferenceInterface as ObjectPortal2;
 use pinoox\component\source\Portal;
 
 /**
- * @method static string get(\pinoox\component\package\AppReferenceInterface|string $path = '')
+ * @method static string get(\pinoox\component\package\reference\PathReferenceInterface|string $path = '')
  * @method static ObjectPortal1 set($key, $value)
- * @method static string getBasePath($packageName)
- * @method static ds($path)
+ * @method static string|null app(?string $packageName = NULL)
+ * @method static string ds(string $path)
+ * @method static ObjectPortal2 parse(string $name)
+ * @method static string prefix(\pinoox\component\package\reference\PathReferenceInterface|string $path, string $prefix)
+ * @method static string prefixName(\pinoox\component\package\reference\PathReferenceInterface|string $path, string $prefix)
+ * @method static reference(\pinoox\component\package\reference\PathReferenceInterface|string $path)
+ * @method static ObjectPortal2 prefixReference(\pinoox\component\package\reference\PathReferenceInterface|string $path, string $prefix)
  * @method static \pinoox\component\helpers\Path object()
  *
  * @see \pinoox\component\helpers\Path
@@ -34,18 +37,10 @@ class Path extends Portal
 {
 	public static function __register(): void
 	{
-		$loader = new ChainLoader([
-		    new ArrayLoader([
-		        'com_pinoox_welcome' => PINOOX_PATH . 'test',
-		    ]),
-		    new PackageLoader('apps', PINOOX_PATH),
-		]);
-
-		$parser = new AppNameParser();
-
+		$parser = new PathParser('com_pinoox_test');
 		parent::__bind(ObjectPortal1::class)
 		    ->setArgument('parser', $parser)
-		    ->setArgument('loader', $loader)
+		    ->setArgument('appEngine', AppEngine::object())
 		    ->setArgument('packageName', 'com_pinoox_test')
 		    ->setArgument('basePath', PINOOX_PATH);
 	}

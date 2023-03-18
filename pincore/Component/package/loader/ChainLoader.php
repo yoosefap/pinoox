@@ -39,7 +39,6 @@ final class ChainLoader implements LoaderInterface
     public function addLoader(LoaderInterface $loader): void
     {
         $this->loaders[] = $loader;
-        $this->hasSourceCache = [];
     }
 
     /**

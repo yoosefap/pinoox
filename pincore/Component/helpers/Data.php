@@ -17,6 +17,7 @@ namespace pinoox\component\helpers;
 class Data
 {
     private mixed $data;
+    private array $merge;
 
     public function __construct(mixed $data)
     {
@@ -66,9 +67,31 @@ class Data
         return $this;
     }
 
+    public function merge(mixed $data)
+    {
+        $this->merge[] = $data;
+    }
+
     public function get(?string $key = null): mixed
     {
+        return $this->pullData($key, true);
+    }
+
+    public function getData(?string $key = null): mixed
+    {
+        return $this->pullData($key, false);
+    }
+
+    private function pullData(?string $key = null, $isMerge = false): mixed
+    {
         $data = $this->data;
+
+        if (is_array($data) && $isMerge && !empty($this->merge)) {
+            $merge = $this->merge;
+            $merge[] = $data;
+            $data = array_merge(...$merge);
+        }
+
         if (is_null($key)) return $data;
 
         $parts = explode('.', $key);
