@@ -86,7 +86,7 @@ abstract class Wizard
         Zip::extractTo($this->tmpPathPackage, $files);
     }
 
-    protected abstract function getInfo(): array|null;
+    abstract public function getInfo(): array|null;
 
     /**
      * @throws Exception

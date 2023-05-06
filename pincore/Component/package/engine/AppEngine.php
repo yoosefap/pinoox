@@ -14,11 +14,13 @@
 namespace pinoox\component\package\engine;
 
 
+use pinoox\component\package\App;
 use pinoox\component\package\loader\ArrayLoader;
 use pinoox\component\package\loader\ChainLoader;
 use pinoox\component\package\loader\LoaderInterface;
 use pinoox\component\package\loader\PackageLoader;
 use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\router\Router;
 use pinoox\component\store\Config;
 use pinoox\component\store\Pinker;
 
@@ -45,6 +47,15 @@ class AppEngine implements EngineInterface
             $this->arrayLoader,
             $this->packageLoader,
         ]);
+    }
+
+    public function routes(PathReferenceInterface|string $packageName): Router
+    {
+        $routes = $this->config($packageName)->get('router.routes');
+        $path = App::path();
+        $router = new Router();
+        $router->collection('ttt/', $routes);
+        return $router;
     }
 
     /**

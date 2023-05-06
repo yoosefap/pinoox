@@ -16,7 +16,6 @@ namespace pinoox\component\router;
 use pinoox\component\Dir;
 use pinoox\component\kernel\Container;
 use pinoox\component\package\App;
-use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Closure;
 use Exception;
 
@@ -38,10 +37,11 @@ class Router
      */
     private array $actions = [];
 
-    public function __construct($path = '')
+    public function __construct(string $path = '', Router|string|array|callable|null $routes = null)
     {
         $this->collection(
-            path: $path,
+           // path: $path,
+          //  routes: $routes,
         );
     }
 

@@ -13,7 +13,6 @@
 
 namespace pinoox\app\com_pinoox_test\controller;
 
-use PhpZip\Exception\ZipEntryNotFoundException;
 use pinoox\app\com_pinoox_test\model\Product;
 
 use pinoox\component\http\Request;
@@ -21,9 +20,6 @@ use pinoox\component\kernel\controller\Controller;
 use pinoox\portal\AppWizard;
 use pinoox\portal\TemplateWizard;
 use pinoox\portal\AppEngine;
-use pinoox\portal\Config;
-use pinoox\portal\Path;
-use pinoox\portal\Pinker;
 
 class MainController extends Controller
 {
@@ -35,13 +31,13 @@ class MainController extends Controller
         $p->summary = 'best mobile around the world';
         $p->content = 'best mobile around the world......';
         $p->save();
-        dd(Path::app());
 
         return '<h2>New Product Added</h2> <br> <a href="' . $request->getBaseUrl() . '">show list</a>';
     }
 
     public function home(Request $request)
     {
+      //  dd(AppEngine::routes('com_pinoox_test')->getMainCollection());
         $products = Product::all();
         $html = '<a href="' . $request->getBaseUrl() . '/add">add new</a>';
         foreach ($products as $product) {

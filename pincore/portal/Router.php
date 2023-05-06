@@ -47,9 +47,13 @@ class Router extends Portal
 {
     public static function __register(): void
     {
-        self::__bind(\pinoox\component\router\Router::class)->addMethodCall('collection',[
-            App::path(),
-            App::get('router.routes'),
+        $routes = App::get('router.routes');
+        $path = App::path();
+
+        self::__bind(\pinoox\component\router\Router::class)
+            ->addMethodCall('collection',[
+                $path,
+                $routes
         ]);
     }
 

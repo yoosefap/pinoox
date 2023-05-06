@@ -16,8 +16,10 @@ namespace pinoox\portal;
 
 use pinoox\component\source\Portal;
 use pinoox\component\store\Config as ObjectPortal1;
+use pinoox\component\router\Router as ObjectPortal2;
 
 /**
+ * @method static ObjectPortal2 routes(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
  * @method static ObjectPortal1 config(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
  * @method static bool exists(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
  * @method static AppEngine add($packageName, $path)
@@ -35,16 +37,13 @@ class AppEngine extends Portal
 	{
 		$pathApps = PINOOX_PATH . 'apps';
 		$pathConfig = 'config' . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'source.config.php';
-		$default = Pinker::create(
-		    PINOOX_PATH . 'pincore' . DIRECTORY_SEPARATOR . $pathConfig,
-		    PINOOX_PATH . 'pincore' . DIRECTORY_SEPARATOR . Pinker::folder . DIRECTORY_SEPARATOR . $pathConfig,
-		);
+		$appConfig = Pinker::path($pathConfig,PINOOX_PATH . 'pincore');
 		self::__bind(\pinoox\component\package\engine\AppEngine::class)
 		    ->setArguments([
 		        $pathApps,
 		        self::file,
 		        Pinker::folder,
-		        $default->pickup(),
+                $appConfig->pickup(),
 		    ]);
 	}
 
