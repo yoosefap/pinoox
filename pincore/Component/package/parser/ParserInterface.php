@@ -13,14 +13,14 @@
 
 namespace pinoox\component\package\parser;
 
-use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 
 interface ParserInterface
 {
     /**
      * Convert a template name to a TemplateReferenceInterface instance.
-     * @param string|PathReferenceInterface $name
-     * @return PathReferenceInterface
+     * @param string|ReferenceInterface $name
+     * @return ReferenceInterface
      */
-    public function parse(string|PathReferenceInterface $name): PathReferenceInterface;
+    public function parse(string|ReferenceInterface $name): ReferenceInterface;
 }

@@ -16,14 +16,14 @@ namespace pinoox\component\package\reference;
 
 use pinoox\component\package\loader\LoaderInterface;
 
-class PathReference implements ReferenceInterface
+class UrlReference implements ReferenceInterface
 {
 
     /**
      * @param string|null $packageName
-     * @param string|null $path
+     * @param string|null $url
      */
-    public function __construct(private ?string $packageName, private ?string $path = null)
+    public function __construct(private ?string $packageName, private ?string $url = null)
     {
     }
 
@@ -40,19 +40,19 @@ class PathReference implements ReferenceInterface
      */
     public function getPath(): ?string
     {
-        return $this->path;
+        return $this->url;
     }
 
     /**
-     * create path reference
+     * create URL reference
      *
      * @param string|null $packageName
-     * @param string|null $path
+     * @param string|null $url
      * @return static
      */
-    public static function create(?string $packageName, ?string $path = null): static
+    public static function create(?string $packageName, ?string $url = null): static
     {
-        return new static($packageName, $path);
+        return new static($packageName, $url);
     }
 
     /**
@@ -62,6 +62,6 @@ class PathReference implements ReferenceInterface
     {
         $package = $this->getPackageName();
 
-        return !empty($package) ? $package . ':' . $this->getPath() : $this->getPath();
+        return !empty($package) ? $package . ':' . $this->getUrl() : $this->getUrl();
     }
 }

@@ -13,7 +13,7 @@
 
 namespace pinoox\component\package\engine;
 
-use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\store\Config;
 
 class DelegatingEngine implements EngineInterface
@@ -33,17 +33,17 @@ class DelegatingEngine implements EngineInterface
         }
     }
 
-    public function config(PathReferenceInterface|string $packageName): Config
+    public function config(ReferenceInterface|string $packageName): Config
     {
         return $this->getEngine($packageName)->config($packageName);
     }
 
-    public function exists(PathReferenceInterface|string $packageName): bool
+    public function exists(ReferenceInterface|string $packageName): bool
     {
         return $this->getEngine($packageName)->exists($packageName);
     }
 
-    public function supports(PathReferenceInterface|string $packageName): bool
+    public function supports(ReferenceInterface|string $packageName): bool
     {
         try {
             $this->getEngine($packageName);
@@ -57,10 +57,10 @@ class DelegatingEngine implements EngineInterface
     /**
      * Get an engine able to render the given template.
      *
-     * @param string|PathReferenceInterface $packageName
+     * @param string|ReferenceInterface $packageName
      * @return EngineInterface
      */
-    public function getEngine(string|PathReferenceInterface $packageName): EngineInterface
+    public function getEngine(string|ReferenceInterface $packageName): EngineInterface
     {
         foreach ($this->engines as $engine) {
             if ($engine->supports($packageName)) {

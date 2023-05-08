@@ -19,7 +19,7 @@ use pinoox\component\package\loader\ArrayLoader;
 use pinoox\component\package\loader\ChainLoader;
 use pinoox\component\package\loader\LoaderInterface;
 use pinoox\component\package\loader\PackageLoader;
-use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\router\Router;
 use pinoox\component\store\Config;
 use pinoox\component\store\Pinker;
@@ -49,7 +49,7 @@ class AppEngine implements EngineInterface
         ]);
     }
 
-    public function routes(PathReferenceInterface|string $packageName): Router
+    public function routes(ReferenceInterface|string $packageName): Router
     {
         $routes = $this->config($packageName)->get('router.routes');
         $path = App::path();
@@ -61,11 +61,11 @@ class AppEngine implements EngineInterface
     /**
      * Get config app.
      *
-     * @param PathReferenceInterface|string $packageName
+     * @param ReferenceInterface|string $packageName
      * @return Config
      * @throws \Exception
      */
-    public function config(PathReferenceInterface|string $packageName): Config
+    public function config(ReferenceInterface|string $packageName): Config
     {
         $path = $this->loader->path($packageName);
         $mainFile = $this->ds($path . '/' . $this->appFile);
@@ -90,10 +90,10 @@ class AppEngine implements EngineInterface
     /**
      * Exists app.
      *
-     * @param PathReferenceInterface|string $packageName
+     * @param ReferenceInterface|string $packageName
      * @return bool
      */
-    public function exists(PathReferenceInterface|string $packageName): bool
+    public function exists(ReferenceInterface|string $packageName): bool
     {
         return $this->loader->exists($packageName);
     }
@@ -112,10 +112,10 @@ class AppEngine implements EngineInterface
     /**
      * Supports app.
      *
-     * @param PathReferenceInterface|string $packageName
+     * @param ReferenceInterface|string $packageName
      * @return bool
      */
-    public function supports(PathReferenceInterface|string $packageName): bool
+    public function supports(ReferenceInterface|string $packageName): bool
     {
         return $this->checkName($packageName) && $this->exists($packageName);
     }
@@ -123,11 +123,11 @@ class AppEngine implements EngineInterface
     /**
      * Get path app.
      *
-     * @param PathReferenceInterface|string $packageName
+     * @param ReferenceInterface|string $packageName
      * @return string
      * @throws \Exception
      */
-    public function path(PathReferenceInterface|string $packageName): string
+    public function path(ReferenceInterface|string $packageName): string
     {
         return $this->loader->path($packageName);
     }

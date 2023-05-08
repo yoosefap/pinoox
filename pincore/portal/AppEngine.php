@@ -19,12 +19,12 @@ use pinoox\component\store\Config as ObjectPortal1;
 use pinoox\component\router\Router as ObjectPortal2;
 
 /**
- * @method static ObjectPortal2 routes(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
- * @method static ObjectPortal1 config(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
- * @method static bool exists(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
+ * @method static ObjectPortal2 routes(\pinoox\component\package\reference\ReferenceInterface|string $packageName)
+ * @method static ObjectPortal1 config(\pinoox\component\package\reference\ReferenceInterface|string $packageName)
+ * @method static bool exists(\pinoox\component\package\reference\ReferenceInterface|string $packageName)
  * @method static AppEngine add($packageName, $path)
- * @method static bool supports(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
- * @method static string path(\pinoox\component\package\reference\PathReferenceInterface|string $packageName)
+ * @method static bool supports(\pinoox\component\package\reference\ReferenceInterface|string $packageName)
+ * @method static string path(\pinoox\component\package\reference\ReferenceInterface|string $packageName)
  * @method static \pinoox\component\package\engine\AppEngine object()
  *
  * @see \pinoox\component\package\engine\AppEngine

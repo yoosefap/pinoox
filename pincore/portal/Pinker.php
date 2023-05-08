@@ -15,7 +15,7 @@
 namespace pinoox\portal;
 
 use pinoox\component\package\reference\PathReference;
-use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\source\Portal;
 use pinoox\component\store\Pinker as ObjectPortal1;
 
@@ -38,10 +38,10 @@ class Pinker extends Portal
     /**
      * get pinker by file
      *
-     * @param string|PathReferenceInterface $fileName
+     * @param string|ReferenceInterface $fileName
      * @return ObjectPortal1
      */
-    public static function file(string|PathReferenceInterface $fileName): ObjectPortal1
+    public static function file(string|ReferenceInterface $fileName): ObjectPortal1
     {
         $reference = Path::reference($fileName);
         $pathMain = $reference->getPackageName() === '~' ? 'pincore/' . $reference->getPath() : $reference->getPath();

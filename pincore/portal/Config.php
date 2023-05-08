@@ -15,7 +15,7 @@
 namespace pinoox\portal;
 
 use pinoox\component\package\App;
-use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\source\Portal;
 use pinoox\component\store\Config as ObjectPortal1;
 
@@ -38,10 +38,10 @@ class Config extends Portal
 	/**
 	 * Set file for pinoox baker
 	 *
-	 * @param string|PathReferenceInterface $fileName
+	 * @param string|ReferenceInterface $fileName
 	 * @return ObjectPortal1
 	 */
-	public static function name(string|PathReferenceInterface $fileName): ObjectPortal1
+	public static function name(string|ReferenceInterface $fileName): ObjectPortal1
 	{
 		$fileName = $fileName . '.config.php';
 		$reference = Path::prefixReference($fileName, self::folder);

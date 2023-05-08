@@ -16,10 +16,19 @@ namespace pinoox\app\com_pinoox_test\controller;
 use pinoox\app\com_pinoox_test\model\Product;
 
 use pinoox\component\http\Request;
+use pinoox\component\kernel\Container;
 use pinoox\component\kernel\controller\Controller;
 use pinoox\portal\AppWizard;
+use pinoox\portal\Path;
 use pinoox\portal\TemplateWizard;
 use pinoox\portal\AppEngine;
+use Symfony\Component\Asset\Context\RequestStackContext;
+use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\Asset\PathPackage;
+use Symfony\Component\Asset\UrlPackage;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class MainController extends Controller
 {
@@ -37,6 +46,25 @@ class MainController extends Controller
 
     public function home(Request $request)
     {
+
+        dd(Path::get());
+        return;
+        $versionStrategy = new StaticVersionStrategy('v1');
+
+        $defaultPackage = new Package($versionStrategy);
+
+        $namedPackages = [
+            'img' => new UrlPackage('https://img.example.com/', $versionStrategy),
+            'doc' => new PathPackage('/somewhere/deep/for/documents', $versionStrategy,new RequestStackContext( Container::pincore()->get('request_stack'))),
+        ];
+
+        $packages = new Packages($defaultPackage, $namedPackages);
+
+
+       echo $packages->getUrl('test') . "</br>";
+       echo $packages->getUrl('test.png','img') . "</br>";
+       echo $packages->getUrl('test.css','doc') . "</br>";
+        exit;
       //  dd(AppEngine::routes('com_pinoox_test')->getMainCollection());
         $products = Product::all();
         $html = '<a href="' . $request->getBaseUrl() . '/add">add new</a>';

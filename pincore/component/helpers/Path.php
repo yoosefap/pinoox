@@ -17,8 +17,7 @@ namespace pinoox\component\helpers;
 use pinoox\component\package\engine\EngineInterface;
 use pinoox\component\package\parser\PathParser;
 use pinoox\component\package\reference\PathReference;
-use pinoox\component\package\reference\PathReferenceInterface;
-use pinoox\component\package\parser\ParserInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 
 class Path
 {
@@ -44,11 +43,11 @@ class Path
     /**
      * Get path
      *
-     * @param string|PathReferenceInterface $path
+     * @param string|ReferenceInterface $path
      * @return string
      * @throws \Exception
      */
-    public function get(string|PathReferenceInterface $path = ''): string
+    public function get(string|ReferenceInterface $path = ''): string
     {
         $parser = $this->reference($path);
         $key = $parser->get();
@@ -123,32 +122,32 @@ class Path
         return str_replace(['/', '\\', '>'], DIRECTORY_SEPARATOR, $path);
     }
 
-    public function parse(string $name): PathReferenceInterface
+    public function parse(string $name): ReferenceInterface
     {
         return $this->parser->parse($name);
     }
 
-    public function prefix(string|PathReferenceInterface $path, string $prefix): string
+    public function prefix(string|ReferenceInterface $path, string $prefix): string
     {
         $reference = $this->prefixReference($path, $prefix);
         return $this->get($reference);
     }
 
-    public function prefixName(string|PathReferenceInterface $path, string $prefix): string
+    public function prefixName(string|ReferenceInterface $path, string $prefix): string
     {
         $reference = $this->prefixReference($path, $prefix);
         return $reference->get();
     }
 
-    public function reference(string|PathReferenceInterface $path)
+    public function reference(string|ReferenceInterface $path)
     {
-        if (!($path instanceof PathReferenceInterface))
+        if (!($path instanceof ReferenceInterface))
             $path = $this->parser->parse($path);
 
         return $path;
     }
 
-    public function prefixReference(string|PathReferenceInterface $path, string $prefix): PathReferenceInterface
+    public function prefixReference(string|ReferenceInterface $path, string $prefix): ReferenceInterface
     {
         $ref = $this->reference($path);
 

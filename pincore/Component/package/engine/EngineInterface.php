@@ -14,7 +14,7 @@
 namespace pinoox\component\package\engine;
 
 
-use pinoox\component\package\reference\PathReferenceInterface;
+use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\store\Config;
 use RuntimeException;
 
@@ -23,33 +23,33 @@ interface EngineInterface
     /**
      * Renders an App.
      *
-     * @param string|PathReferenceInterface $packageName
+     * @param string|ReferenceInterface $packageName
      * @return Config
      * @throws RuntimeException if the template cannot be rendered
      */
-    public function config(string|PathReferenceInterface $packageName): Config;
+    public function config(string|ReferenceInterface $packageName): Config;
 
     /**
      * Returns true if the App exists.
      *
-     * @param string|PathReferenceInterface $packageName
+     * @param string|ReferenceInterface $packageName
      * @return bool
      * @throws RuntimeException if the engine cannot handle the App name
      */
-    public function exists(string|PathReferenceInterface $packageName): bool;
+    public function exists(string|ReferenceInterface $packageName): bool;
 
     /**
      * Returns true if this class is able to render the given App.
-     * @param string|PathReferenceInterface $packageName
+     * @param string|ReferenceInterface $packageName
      * @return bool
      */
-    public function supports(string|PathReferenceInterface $packageName): bool;
+    public function supports(string|ReferenceInterface $packageName): bool;
 
     /**
      * get path app
      *
-     * @param string|PathReferenceInterface $packageName
+     * @param string|ReferenceInterface $packageName
      * @return string
      */
-    public function path(string|PathReferenceInterface $packageName): string;
+    public function path(string|ReferenceInterface $packageName): string;
 }
