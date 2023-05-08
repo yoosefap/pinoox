@@ -35,43 +35,44 @@ use pinoox\component\source\Portal;
  */
 class Path extends Portal
 {
-	public static function __register(): void
-	{
-		$parser = new PathParser('com_pinoox_test');
-		parent::__bind(ObjectPortal1::class)
-		    ->setArgument('parser', $parser)
-		    ->setArgument('appEngine', AppEngine::object())
-		    ->setArgument('packageName', 'com_pinoox_test')
-		    ->setArgument('basePath', PINOOX_PATH);
-	}
+    public static function __register(): void
+    {
+        parent::__bind(PathParser::class, 'parser')
+            ->setArguments(['com_pinoox_test']);
+
+        parent::__bind(ObjectPortal1::class)
+            ->setArgument('parser', self::__ref('parser'))
+            ->setArgument('appEngine', AppEngine::object())
+            ->setArgument('basePath', PINOOX_PATH);
+    }
 
 
-	/**
-	 * Get the registered name of the component.
-	 * @return string
-	 */
-	public static function __name(): string
-	{
-		return 'path';
-	}
+    /**
+     * Get the registered name of the component.
+     * @return string
+     */
+    public static function __name(): string
+    {
+        return 'path';
+    }
 
 
-	/**
-	 * Get exclude method names .
-	 * @return string[]
-	 */
-	public static function __exclude(): array
-	{
-		return [];
-	}
+    /**
+     * Get exclude method names .
+     * @return string[]
+     */
+    public static function __exclude(): array
+    {
+        return [];
+    }
 
 
-	/**
-	 * Get method names for callback object.
-	 * @return string[]
-	 */
-	public static function __callback(): array
-	{
-		return [];
-	}
+    /**
+     * Get method names for callback object.
+     * @return string[]
+     */
+    public static function __callback(): array
+    {
+        return [];
+    }
 }

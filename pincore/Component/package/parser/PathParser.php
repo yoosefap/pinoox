@@ -24,6 +24,11 @@ class PathParser implements ParserInterface
     {
     }
 
+    public function getPackageName(): ?string
+    {
+        return $this->packageName;
+    }
+
     public function parse(PathReferenceInterface|string $name): PathReferenceInterface
     {
         if ($name instanceof PathReferenceInterface) {

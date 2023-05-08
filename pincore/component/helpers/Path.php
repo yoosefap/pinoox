@@ -15,6 +15,7 @@ namespace pinoox\component\helpers;
 
 
 use pinoox\component\package\engine\EngineInterface;
+use pinoox\component\package\parser\PathParser;
 use pinoox\component\package\reference\PathReference;
 use pinoox\component\package\reference\PathReferenceInterface;
 use pinoox\component\package\parser\ParserInterface;
@@ -26,13 +27,18 @@ class Path
      */
     private array $paths = [];
 
+    /**
+     * @var string|null
+     */
+    private ?string $packageName;
+
     public function __construct(
-        private ParserInterface $parser,
+        private PathParser $parser,
         private EngineInterface $appEngine,
-        private string $packageName,
         private string $basePath
     )
     {
+        $this->packageName = $this->parser->getPackageName();
     }
 
     /**

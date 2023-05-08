@@ -245,11 +245,12 @@ abstract class Portal
     /**
      * instance object in container
      *
+     * @param string|null $name
      * @return object|null
      */
-    final public static function __instance(): ?object
+    final public static function __instance(?string $name = null): ?object
     {
-        $name = static::__name();
+        $name = static::__id($name);
         $container = self::__container();
         if (!empty($name) && $container->has($name)) {
             try {
@@ -264,11 +265,12 @@ abstract class Portal
     /**
      * instance object in container
      *
+     * @param string|null $name
      * @return bool
      */
-    final public static function __has(): bool
+    final public static function __has(?string $name = null): bool
     {
-        $name = static::__name();
+        $name = static::__id($name);
         $container = self::__container();
         return !empty($name) && $container->has($name);
     }
@@ -276,11 +278,12 @@ abstract class Portal
     /**
      * instance object in container
      *
+     * @param string|null $name
      * @return Definition|null
      */
-    final public static function __definition(): ?Definition
+    final public static function __definition(?string $name = null): ?Definition
     {
-        $name = static::__name();
+        $name = static::__id($name);
         $container = self::__container();
         if (!empty($name) && $container->hasDefinition($name)) {
             try {
@@ -292,9 +295,14 @@ abstract class Portal
         return null;
     }
 
-    final public static function __ref(): Reference
+    /**
+     * get reference class
+     * @param string|null $name
+     * @return Reference
+     */
+    final public static function __ref(?string $name = null): Reference
     {
-        $name = static::__name();
+        $name = static::__id($name);
         return Container::ref($name);
     }
 
@@ -370,16 +378,16 @@ abstract class Portal
      * bind service
      *
      * @param string|object|null $class class object or class name
-     * @param string|null $id
+     * @param string|null $name
      * @return Definition|null
      */
-    final public static function __bind(string|object|null $class = null, string $id = null): ?Definition
+    final public static function __bind(string|object|null $class = null, string $name = null): ?Definition
     {
-        $name = !empty($id) ? $id : static::__name();
+        $id = self::__id($name);
         if (is_object($class)) {
-            self::__container()->set($name, $class);
+            self::__container()->set($id, $class);
         } else {
-            return self::__container()->register($name, $class);
+            return self::__container()->register($id, $class);
         }
         return null;
     }
@@ -394,5 +402,16 @@ abstract class Portal
     final public static function __param(string $name, array|bool|string|int|float|null $value): void
     {
         self::__container()->setParameter($name, $value);
+    }
+
+    /**
+     * get id
+     *
+     * @param string|null $name
+     * @return string
+     */
+    final public static function __id(?string $name = null): string
+    {
+        return !empty($name) ? static::__name() . '.' . $name : static::__name();
     }
 }
