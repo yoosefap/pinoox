@@ -13,6 +13,7 @@
 
 namespace pinoox\terminal\portal;
 
+
 use pinoox\component\helpers\PhpFile\PortalFile;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
@@ -21,7 +22,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdatePortalCommand extends Terminal
+class PortalUpdateCommand extends Terminal
 {
 
     protected static $defaultName = 'portal:update';

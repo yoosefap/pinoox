@@ -56,8 +56,8 @@ class Terminal
 
         foreach ($finder as $f) {
             $path = $f->getPath();
-            $namespace = DS . "pinoox" . DS . str_replace(PINOOX_CORE_PATH, '', $path) . DS;
-
+            $namespace = "pinoox" . '\\' . str_replace(PINOOX_CORE_PATH, '', $path) . '\\';
+            $namespace = str_replace('/', '\\', $namespace);
             $this->commands[] = [
                 'path' => $path,
                 'fileName' => $f->getFilename(),

@@ -87,6 +87,7 @@ class CreateMigrationCommand extends Terminal
                 return $file->isDir() || \preg_match('/\.(php)$/', $file->getPathname());
             });
 
+
         foreach ($finder as $f) {
             $name = $f->getBasename('.php');
 

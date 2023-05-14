@@ -28,3 +28,4 @@ package-lock.json
 .phpunit.result.cache
 
 # Migrations
+.DS_Store
