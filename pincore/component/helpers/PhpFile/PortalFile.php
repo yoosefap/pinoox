@@ -35,7 +35,7 @@ class PortalFile extends PhpFile
 
         $namespace = $source->addNamespace($namespace);
         $namespace->addUse(Portal::class);
-
+        
         $class = $namespace->addClass($portalName);
         $class->setExtends(Portal::class);
         self::addMethodName($class, $service);

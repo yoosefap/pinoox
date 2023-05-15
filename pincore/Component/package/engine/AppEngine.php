@@ -71,8 +71,7 @@ class AppEngine implements EngineInterface
         $mainFile = $this->ds($path . '/' . $this->appFile);
         $bakedFile = $this->ds($path . '/' . $this->folderPinker . '/' . $this->appFile);
         $pinker = new Pinker($mainFile, $bakedFile);
-        $pinker
-            ->dumping(true);
+        $pinker->dumping(true);
         return new Config($pinker, $this->defaultData);
     }
 

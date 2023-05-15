@@ -14,6 +14,7 @@
 
 namespace pinoox\portal;
 
+use pinoox\component\helpers\HelperString;
 use pinoox\component\package\App;
 use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\source\Portal;

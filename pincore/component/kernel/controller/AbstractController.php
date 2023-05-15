@@ -355,7 +355,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Get a user from the Security Token Storage.
+     * Get a user from the Security Token Data.
      *
      * @throws \LogicException If SecurityBundle is not available
      *

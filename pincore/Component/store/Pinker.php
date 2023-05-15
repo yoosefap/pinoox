@@ -16,7 +16,6 @@ namespace pinoox\component\store;
 use pinoox\component\helpers\HelperAnnotations;
 use pinoox\component\File;
 use pinoox\component\helpers\HelperObject;
-use pinoox\component\helpers\HelperString;
 use pinoox\component\helpers\Str;
 
 /**
@@ -65,6 +64,11 @@ class Pinker
      */
     private string $mainFile = '';
 
+    public function __construct(string $mainFile = '', string $bakedFile = '')
+    {
+        $this->mainFile = $mainFile;
+        $this->bakedFile = $bakedFile;
+    }
 
     /**
      * Set data for pinoox baker
@@ -115,12 +119,6 @@ class Pinker
         $this->dumping = $status;
 
         return $this;
-    }
-
-    public function __construct(string $mainFile = '', string $bakedFile = '')
-    {
-        $this->mainFile = $mainFile;
-        $this->bakedFile = $bakedFile;
     }
 
     /**
@@ -320,5 +318,15 @@ class Pinker
             'info' => $info,
             '__pinker__' => true,
         ];
+    }
+
+    public function getBakedFile()
+    {
+        return $this->bakedFile;
+    }
+
+    public function getMainFile()
+    {
+        return $this->mainFile;
     }
 }

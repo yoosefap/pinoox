@@ -79,7 +79,7 @@ class CreatePortalCommand extends Terminal
             portalName: $this->portalName,
             service: $this->service,
             package: $this->app['package'],
-            namespace: $this->app['namespace'] . DS . 'portal'
+            namespace: $this->app['namespace'] . '\portal'
         );
 
         if ($isCreated) {

@@ -70,7 +70,7 @@ class Session
     private static $encryption = false;
 
     /**
-     * Store session in file or database.
+     * Data session in file or database.
      *
      * default state is false means store in file, For store in database use true state.
      *

@@ -32,6 +32,16 @@ route(
     action: 'MainController:template',
     methods: 'GET'
 );
+route(
+    path: '/config',
+    action: 'MainController:config',
+    methods: 'GET'
+);
+route(
+    path: '/configPortal',
+    action: 'MainController:configPortal',
+    methods: 'GET'
+);
 
 //get(
 //    path: '/test',

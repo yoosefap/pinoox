@@ -24,43 +24,39 @@ class Data
         $this->data = $data;
     }
 
-    private function dataPreparationByInput(string $key)
+    private function prepareDataByKey(string $key)
     {
-        $temp = &$this->data;
         $parts = explode('.', $key);
-        $countKeys = count($parts) - 1;
-        $key = null;
-        for ($i = 0; $i <= $countKeys; $i++) {
-            $key = $parts[$i];
-            if (($i != $countKeys)) {
-                if (!isset($temp[$key]))
-                    $temp[$key] = [];
-                else if (!is_array($temp[$key]))
-                    $temp[$key] = [$temp[$key]];
+        $temp = &$this->data;
 
-                $temp = &$temp[$key];
+        foreach ($parts as $part) {
+            if (!isset($temp[$part])) {
+                $temp[$part] = [];
+            } elseif (!is_array($temp[$part])) {
+                $temp[$part] = [$temp[$part]];
             }
+            $temp = &$temp[$part];
         }
     }
 
     public function add(string $key, mixed $value): static
     {
-        $this->dataPreparationByInput($key);
+        $this->prepareDataByKey($key);
 
-        if (!isset($this->data[$key])) {
-            $this->data[$key] = [$value];
-        } else {
-            if (!is_array($this->data[$key]))
-                $this->data[$key] = [$this->data[$key]];
-            $this->data[$key][] = $value;
+        $dataForKey = &$this->data[$key];
+        if (!is_array($dataForKey)) {
+            $dataForKey = [$dataForKey];
         }
+
+        $dataForKey[] = $value;
+        $this->data[$key] = $dataForKey;
 
         return $this;
     }
 
     public function set(string $key, mixed $value): static
     {
-        $this->dataPreparationByInput($key);
+        $this->prepareDataByKey($key);
 
         $this->data[$key] = $value;
 
@@ -113,7 +109,7 @@ class Data
 
     public function remove(string $key): static
     {
-        $this->dataPreparationByInput($key);
+        $this->prepareDataByKey($key);
 
         unset($this->data[$key]);
 

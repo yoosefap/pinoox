@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'development' => [
+    'test' => [
         'driver' => 'mysql',
         'host' => 'localhost',
         'database' => 'pinoox',

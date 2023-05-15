@@ -33,7 +33,7 @@ class Cache
     private static $app = null;
 
     /**
-     * Store data from cache init
+     * Data data from cache init
      *
      * @var array|null
      */
