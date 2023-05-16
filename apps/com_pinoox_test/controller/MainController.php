@@ -18,13 +18,8 @@ use pinoox\app\com_pinoox_test\model\Product;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\Container;
 use pinoox\component\kernel\controller\Controller;
-use pinoox\component\store\ConfigManager;
-use pinoox\component\store\data\DataArray;
-use pinoox\component\store\strategy\FileConfigStrategy;
 use pinoox\portal\AppWizard;
-use pinoox\portal\Path;
-use pinoox\portal\ConfigManager as config;
-use pinoox\portal\Pinker;
+use pinoox\portal\Config as config;
 use pinoox\portal\TemplateWizard;
 use Symfony\Component\Asset\Context\RequestStackContext;
 use Symfony\Component\Asset\Package;
@@ -100,39 +95,11 @@ class MainController extends Controller
         return dd($wizard->getInfo(), $wizard->install());
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public function configPortal()
+    public function config()
     {
         $cm = config::name('~test');
-        $cm->merge(['tester' => ['user'=>'ali']]);
-        $cm->set('tester.user' ,'reza');
-        $cm->save();
-        dd($cm->get());
-
+        $cm->add('developers' ,['ali','ahmad']);
+        dd($cm->get(),$cm->reset(),$cm->get(),$cm->restore());
     }
 }
     

@@ -31,5 +31,7 @@ interface DataInterface
 
     public function reset(): void;
 
+    public function restore(): void;
+
     public function fromArray(array $arr): mixed;
 }

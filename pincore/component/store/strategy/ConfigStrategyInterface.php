@@ -51,7 +51,7 @@ interface ConfigStrategyInterface
      *
      * @return array
      */
-    public function get(string $key = null): array;
+    public function get(string $key = null): mixed;
 
     /**
      * Removes a configuration key.

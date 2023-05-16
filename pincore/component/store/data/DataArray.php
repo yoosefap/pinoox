@@ -33,7 +33,7 @@ class DataArray implements DataInterface
 
     public function get(?string $key = null, mixed $default = null): mixed
     {
-        $value = $this->pullData($key, true);
+        $value = $this->fetchData($key, true);
 
         return $value !== null ? $value : $default;
     }
@@ -43,7 +43,7 @@ class DataArray implements DataInterface
         return $this->data;
     }
 
-    private function pullData(?string $key = null, bool $isMerge = false)
+    private function fetchData(?string $key = null, bool $isMerge = false)
     {
         $data = $this->data;
 
@@ -65,6 +65,10 @@ class DataArray implements DataInterface
         $this->data = [];
     }
 
+    public function restore(): void
+    {
+        $this->reset();;
+    }
 
     public function add(string $key, mixed $value): void
     {

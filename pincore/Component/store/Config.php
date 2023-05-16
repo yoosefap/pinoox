@@ -15,7 +15,7 @@ namespace pinoox\component\store;
 
 use pinoox\component\store\strategy\ConfigStrategyInterface;
 
-class ConfigManager
+class Config
 {
     private ConfigStrategyInterface $strategy;
 
@@ -30,39 +30,45 @@ class ConfigManager
         $this->strategy->save();
     }
 
-    public function get(string $key = null): mixed
+    public function get(string $key = null, $default = null): mixed
     {
-        return $this->strategy->get($key);
+        return $this->strategy->get($key,$default);
     }
 
-    public function add(string $key, mixed $value): ConfigManager
+    public function add(string $key, mixed $value): Config
     {
         $this->strategy->add($key, $value);
         return $this;
     }
 
-    public function set(string $key, mixed $value): ConfigManager
+    public function set(string $key, mixed $value): Config
     {
         $this->strategy->set($key, $value);
         return $this;
     }
 
 
-    public function remove(string $key): ConfigManager
+    public function remove(string $key): Config
     {
         $this->strategy->remove($key);
         return $this;
     }
 
-    public function merge(array $array): ConfigManager
+    public function merge(array $array): Config
     {
         $this->strategy->merge($array);
         return $this;
     }
 
-    public function reset(): ConfigManager
+    public function reset(): Config
     {
         $this->strategy->reset();
+        return $this;
+    }
+
+    public function restore(): Config
+    {
+        $this->strategy->restore();
         return $this;
     }
 

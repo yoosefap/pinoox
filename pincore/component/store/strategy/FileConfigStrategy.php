@@ -19,9 +19,12 @@ use pinoox\component\store\Pinker;
 class FileConfigStrategy implements ConfigStrategyInterface
 {
 
+    private $dataFirstState;
+
     public function __construct(private readonly Pinker $pinker, private DataInterface $data)
     {
         $this->load();
+        $this->dataFirstState = $this->data;
     }
 
     public function load(): void
@@ -39,9 +42,9 @@ class FileConfigStrategy implements ConfigStrategyInterface
         $this->data->set($key, $value);
     }
 
-    public function get($key = null): array
+    public function get($key = null, $default = null): mixed
     {
-        return $this->data->get($key);
+        return $this->data->get($key, $default);
     }
 
     public function remove($key): void
@@ -55,6 +58,11 @@ class FileConfigStrategy implements ConfigStrategyInterface
     }
 
     public function reset(): void
+    {
+        $this->data = $this->dataFirstState;
+    }
+
+    public function restore(): void
     {
         $this->pinker->restore();
         $this->load();

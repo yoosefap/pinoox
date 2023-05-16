@@ -45,7 +45,7 @@ class DatabaseManager extends Portal
     {
         //get configs
         $mode = Config::name('~pinoox')->get('mode');
-        if (!($config = Config::name('~database')->getLinear(null, $mode)))
+        if (!($config = Config::name('~database')->get($mode)))
             throw new Exception('Database config "' . $mode . '" not defined');
 
         return $config[$key] ?? $config;
