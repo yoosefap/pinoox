@@ -38,13 +38,11 @@ use pinoox\component\store\strategy\FileConfigStrategy;
 class Config extends Portal
 {
     const folder = 'config';
-    private $strategy;
 
     public static function __register(): void
     {
         self::__bind(ObjectPortal1::class)->setArguments([Pinker::__ref()]);
     }
-
 
     /**
      * Get the registered name of the component.

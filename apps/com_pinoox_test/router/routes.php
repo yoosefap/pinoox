@@ -42,6 +42,11 @@ route(
     action: 'MainController:configPortal',
     methods: 'GET'
 );
+route(
+    path: '/lang',
+    action: 'MainController:lang',
+    methods: 'GET'
+);
 
 //get(
 //    path: '/test',

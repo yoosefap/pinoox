@@ -8,4 +8,6 @@ return [
     'email' => 'Email',
     'username' => 'Username',
     'password' => 'Password',
+    'welcome' => 'hello {0}, welcome to dashboard. today is {1}',
+    'apples' => 'there are not any apples | there is one apple | there are :count apples',
 ];

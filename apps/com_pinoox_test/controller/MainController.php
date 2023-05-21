@@ -18,8 +18,12 @@ use pinoox\app\com_pinoox_test\model\Product;
 use pinoox\component\http\Request;
 use pinoox\component\kernel\Container;
 use pinoox\component\kernel\controller\Controller;
+use pinoox\component\kernel\Exception;
+use pinoox\component\lang\Lang;
+use pinoox\component\lang\source\FileLangSource;
 use pinoox\portal\AppWizard;
 use pinoox\portal\Config as config;
+use pinoox\portal\Path;
 use pinoox\portal\TemplateWizard;
 use Symfony\Component\Asset\Context\RequestStackContext;
 use Symfony\Component\Asset\Package;
@@ -98,8 +102,19 @@ class MainController extends Controller
     public function config()
     {
         $cm = config::name('~test');
-        $cm->add('developers' ,['ali','ahmad']);
-        dd($cm->get(),$cm->reset(),$cm->get(),$cm->restore());
+        $cm->add('developers', ['ali', 'ahmad']);
+        dd($cm->get(), $cm->reset(), $cm->get(), $cm->restore());
+    }
+
+    public function lang()
+    {
+        try {
+            $path = Path::get('com_pinoox_test:lang');
+            $lang = new Lang(new FileLangSource($path, 'fa'));
+            $lang->setFallback('en');
+            dd($lang->getChoice('user.apples', 2));
+        } catch (Exception $e) {
+        }
     }
 }
     

@@ -569,4 +569,21 @@ class HelperArray
         return $data;
     }
 
+    public static function getNestedValue(array $array, string $key)
+    {
+        $keys = explode('.', $key);
+        $value = $array;
+ 
+        foreach ($keys as $nestedKey) {
+
+            if (isset($value[$nestedKey])) {
+                $value = $value[$nestedKey];
+            } else {
+                return null;
+            }
+        }
+
+        return $value;
+    }
+
 }
