@@ -18,18 +18,21 @@ use pinoox\component\migration\MigrationQuery;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+
+// the "name" and "description" arguments of AsCommand replace the
+// static $defaultName and $defaultDescription properties
+#[AsCommand(
+    name: 'migrate',
+    description: 'Migrate schemas.',
+)]
 class MigrateCommand extends Terminal
 {
-
-    protected static $defaultName = 'migrate';
-
-    protected static $defaultDescription = 'Migrate schemas';
-
     private string $package;
 
     private array $app;

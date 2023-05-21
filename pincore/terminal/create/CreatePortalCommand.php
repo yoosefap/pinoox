@@ -17,18 +17,18 @@ use pinoox\component\helpers\PhpFile\PortalFile;
 use pinoox\component\helpers\Str;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'create:portal',
+    description: 'Create a new Portal class.',
+)]
 class CreatePortalCommand extends Terminal
 {
-
-    protected static $defaultName = 'create:portal';
-
-    protected static $defaultDescription = 'Create a new Portal class';
-
     private string $portalName;
     private string $service;
     private string $package;

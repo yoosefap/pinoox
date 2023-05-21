@@ -16,20 +16,19 @@ namespace pinoox\terminal\migrate;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function pinoox\router\action;
 
-
+#[AsCommand(
+    name: 'migrate:status',
+    description: 'Show the status of each migration.',
+)]
 class MigrateStatusCommand extends Terminal
 {
-
-    protected static $defaultName = 'migrate:status';
-
-    protected static $defaultDescription = 'Show the status of each migration';
-
     private string $package;
 
     private array $app;

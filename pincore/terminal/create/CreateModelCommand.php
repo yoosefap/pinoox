@@ -6,18 +6,18 @@ use pinoox\component\helpers\PhpFile\ModelFile;
 use pinoox\component\helpers\Str;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
+#[AsCommand(
+    name: 'create:model',
+    description: 'Create a new model class.',
+)]
 class CreateModelCommand extends Terminal
 {
-    protected static $defaultName = 'create:model';
-
-    protected static $defaultDescription = 'Create a new model class';
-
     private string $package;
 
     private array $app;

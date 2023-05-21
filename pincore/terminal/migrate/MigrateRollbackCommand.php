@@ -17,19 +17,18 @@ use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\component\migration\MigrationQuery;
 use pinoox\portal\MigrationToolkit;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
+#[AsCommand(
+    name: 'migrate:rollback',
+    description: 'Rollback the database migrations.',
+)]
 class MigrateRollbackCommand extends Terminal
 {
-
-    protected static $defaultName = "migrate:rollback";
-
-    protected static $defaultDescription = 'Rollback the database migrations';
-
     private string $package;
 
     private array $app;

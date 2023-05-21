@@ -16,17 +16,17 @@ namespace pinoox\terminal\migrate;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'migrate:init',
+    description: 'Initialize migration repository and create tables.',
+)]
 class MigrateInitCommand extends Terminal
 {
-
-    protected static $defaultName = 'migrate:init';
-
-    protected static $defaultDescription = 'Initialize migration repository and create tables';
-
 
     /**
      * @var MigrationToolkit

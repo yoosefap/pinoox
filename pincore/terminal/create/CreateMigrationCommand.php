@@ -6,6 +6,7 @@ use pinoox\component\helpers\PhpFile\MigrationFile;
 use pinoox\component\helpers\Str;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,13 +15,12 @@ use pinoox\portal\MigrationToolkit;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-
+#[AsCommand(
+    name: 'create:migration',
+    description: 'Create a new Migration Schema.',
+)]
 class CreateMigrationCommand extends Terminal
 {
-    protected static $defaultName = 'create:migration';
-
-    protected static $defaultDescription = "Create a new Migration Schema";
-
     private string $package;
 
     private array $app;
@@ -107,7 +107,7 @@ class CreateMigrationCommand extends Terminal
                 exportPath: $exportPath,
                 className: $this->className,
                 package: $this->app['package'],
-                namespace: $this->app['namespace'] .DS. $this->app['migration_relative_path']
+                namespace: $this->app['namespace'] . DS . $this->app['migration_relative_path']
             );
 
             if ($isCreated) {
