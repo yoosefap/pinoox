@@ -11,7 +11,7 @@
  */
 
 
-namespace pinoox\component\store\strategy;
+namespace pinoox\component\store\config\strategy;
 
 interface ConfigStrategyInterface
 {

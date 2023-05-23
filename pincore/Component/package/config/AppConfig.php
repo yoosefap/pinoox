@@ -14,9 +14,7 @@
 namespace pinoox\component\package\config;
 
 
-use pinoox\component\helpers\Data;
-use pinoox\component\store\Config;
-use pinoox\component\store\Pinker;
+use pinoox\component\store\config\Config;
 
 class AppConfig implements ConfigInterface
 {

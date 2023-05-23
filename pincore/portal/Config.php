@@ -14,11 +14,12 @@
 
 namespace pinoox\portal;
 
+use pinoox\component\package\App;
 use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\source\Portal;
-use pinoox\component\store\Config as ObjectPortal1;
-use pinoox\component\store\data\DataArray;
-use pinoox\component\store\strategy\FileConfigStrategy;
+use pinoox\component\store\config\Config as ObjectPortal1;
+use pinoox\component\store\config\data\DataArray;
+use pinoox\component\store\config\strategy\FileConfigStrategy;
 
 /**
  * @method static Config save()
@@ -31,9 +32,9 @@ use pinoox\component\store\strategy\FileConfigStrategy;
  * @method static ObjectPortal1 restore()
  * @method static setLinear(string $key, string $target, mixed $value)
  * @method static getLinear(string $key, string $target)
- * @method static \pinoox\component\store\Config  object()
+ * @method static \pinoox\component\store\config\Config  object()
  *
- * @see \pinoox\component\store\Config
+ * @see \pinoox\component\store\config\Config
  */
 class Config extends Portal
 {

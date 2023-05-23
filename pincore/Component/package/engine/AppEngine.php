@@ -21,8 +21,7 @@ use pinoox\component\package\loader\LoaderInterface;
 use pinoox\component\package\loader\PackageLoader;
 use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\router\Router;
-use pinoox\component\store\Config;
-use pinoox\component\store\Pinker;
+use pinoox\component\store\config\Config;
 
 class AppEngine implements EngineInterface
 {

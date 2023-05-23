@@ -24,6 +24,7 @@ use pinoox\component\lang\source\FileLangSource;
 use pinoox\portal\AppWizard;
 use pinoox\portal\Config as config;
 use pinoox\portal\Path;
+use pinoox\portal\Pinker;
 use pinoox\portal\TemplateWizard;
 use Symfony\Component\Asset\Context\RequestStackContext;
 use Symfony\Component\Asset\Package;
@@ -115,6 +116,13 @@ class MainController extends Controller
             dd($lang->getChoice('user.apples', 2));
         } catch (Exception $e) {
         }
+    }
+
+    public function pinker()
+    {
+        $p1 = Pinker::path('app.php');
+        $p2 = Pinker::file('app.php');
+        dd($p1, $p2);
     }
 }
     

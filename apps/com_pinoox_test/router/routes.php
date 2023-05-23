@@ -47,6 +47,11 @@ route(
     action: 'MainController:lang',
     methods: 'GET'
 );
+route(
+    path: '/pinker',
+    action: 'MainController:pinker',
+    methods: 'GET'
+);
 
 //get(
 //    path: '/test',

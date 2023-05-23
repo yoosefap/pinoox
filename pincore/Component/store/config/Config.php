@@ -11,9 +11,9 @@
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 
-namespace pinoox\component\store;
+namespace pinoox\component\store\config;
 
-use pinoox\component\store\strategy\ConfigStrategyInterface;
+use pinoox\component\store\config\strategy\ConfigStrategyInterface;
 
 class Config
 {

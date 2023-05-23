@@ -11,7 +11,7 @@
  */
 
 
-namespace pinoox\component\store\data;
+namespace pinoox\component\store\config\data;
 
 interface DataInterface
 {

@@ -14,7 +14,7 @@
 namespace pinoox\component\package\engine;
 
 use pinoox\component\package\reference\ReferenceInterface;
-use pinoox\component\store\Config;
+use pinoox\component\store\config\Config;
 
 class DelegatingEngine implements EngineInterface
 {

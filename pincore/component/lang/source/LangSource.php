@@ -21,7 +21,7 @@ namespace pinoox\component\lang\source;
 abstract class LangSource
 {
     private string $locale = 'en';
-    protected string $fallback;
+    protected string $fallback = 'en';
     private string $filename;
     private string $key;
     private string $path;
