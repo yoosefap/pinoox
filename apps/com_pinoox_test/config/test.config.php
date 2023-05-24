@@ -1,7 +1,8 @@
 <?php
-/**
- * Pinoox Baker
- * @time 1684152663
- */
 
-return NULL;
+return [
+    'user_id' => 1,
+    'username' => 'esmaeil',
+    'role' => 'developer',
+];
+
