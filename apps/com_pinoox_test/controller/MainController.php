@@ -103,8 +103,7 @@ class MainController extends Controller
     public function config()
     {
         $cm = config::name('test');
-        $cm->add('developers', ['ali', 'ahmad']);
-        dd($cm->get(), $cm->reset(), $cm->get(), $cm->restore());
+        dd($cm->get());
     }
 
     public function lang()

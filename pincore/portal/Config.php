@@ -14,7 +14,6 @@
 
 namespace pinoox\portal;
 
-use pinoox\component\package\App;
 use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\source\Portal;
 use pinoox\component\store\config\Config as ObjectPortal1;

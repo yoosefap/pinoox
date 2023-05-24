@@ -55,7 +55,7 @@ class Pinker extends Portal
     {
         $ref = Path::reference($fileName);
         $pathMain = $ref->getPackageName() === '~' ? 'pincore/' . $ref->getPath() : $ref->getPath();
-        $pathBaked = $ref->getPackageName() === '~' ? 'pincore/' . self::folder . '/' . $ref->getPath() : $ref->getPath();
+        $pathBaked = $ref->getPackageName() === '~' ? 'pincore/' . self::folder . '/' . $ref->getPath() : self::folder.'/'. $ref->getPath();
 
         $ref = PathReference::create(
             $ref->getPackageName(),
