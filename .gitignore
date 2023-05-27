@@ -1,16 +1,6 @@
 # Pinoox
-../pinoox/apps
-!apps/com_pinoox_manager/*
-!apps/com_pinoox_welcome/*
-!apps/com_pinoox_test/*
-!apps/com_pinoox_market/*
-upload
-uploads
-cache
-temp
-downloads
+/apps/
 pinker
-*.pin
 
 # IntelliJ IDEA
 .idea
@@ -20,12 +10,13 @@ pinker
 node_modules
 package-lock.json
 
-# composer 
+# Composer
 /vendor
 /composer.lock
 
 # PHPUnit
 .phpunit.result.cache
 
-# Migrations
+# MacOS
 .DS_Store
+
