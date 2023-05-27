@@ -32,6 +32,7 @@ class TestCreateCommand extends Terminal
     protected function configure(): void
     {
         $this->addArgument('TestName', InputArgument::REQUIRED, 'Name of the test class')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite existing test case file')
             ->addOption('unit', null, InputOption::VALUE_NONE, 'Create a unit test in the Unit path');
     }
 
@@ -42,7 +43,7 @@ class TestCreateCommand extends Terminal
         $testName = $input->getArgument('TestName');
         $subFolder = $input->getOption('unit') ? 'Unit' : 'Feature';
 
-        $exportPath = 'tests' . DS . $subFolder . DS . $testName . 'Test.php';
+        $exportPath = 'tests' . DS . $subFolder . DS . $testName . '.php';
 
         if (file_exists($exportPath)) {
             $this->error($testName . "Test file already exists");

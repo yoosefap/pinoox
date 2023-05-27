@@ -32,7 +32,7 @@ class AppWizard extends Wizard implements WizardInterface
      * @throws ZipException
      */
     public function install(): array
-    {
+    { 
         $zip = $this->extract($this->packagePath);
         return [
             'message' => 'Package was installed successfully',

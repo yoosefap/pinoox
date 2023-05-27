@@ -17,6 +17,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Terminal extends Command
 {
@@ -80,5 +82,13 @@ class Terminal extends Command
         $table->render();
     }
 
+    protected function confirm(string $message,InputInterface $input, OutputInterface $output): bool
+    {
+        $io = new SymfonyStyle($input, $output);
+
+        $question = new ConfirmationQuestion($message, false);
+
+        return $io->askQuestion($question);
+    }
 
 }

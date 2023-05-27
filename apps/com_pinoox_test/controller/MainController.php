@@ -13,6 +13,7 @@
 
 namespace pinoox\app\com_pinoox_test\controller;
 
+use PhpZip\Exception\ZipEntryNotFoundException;
 use pinoox\app\com_pinoox_test\model\Product;
 
 use pinoox\component\http\Request;

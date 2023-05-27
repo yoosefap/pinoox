@@ -136,7 +136,7 @@ class AppEngine implements EngineInterface
      * @param $packageName
      * @return bool
      */
-    private function checkName($packageName): bool
+    public function checkName($packageName): bool
     {
         return !!preg_match('/^[a-zA-Z]+[a-zA-Z0-9]*+[_]\s{0,1}[a-zA-Z0-9]+[_]\s{0,1}[a-zA-Z0-9]+[_]{0,1}[a-zA-Z0-9]+$/m', $packageName);
     }
