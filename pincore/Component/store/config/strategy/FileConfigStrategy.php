@@ -14,7 +14,7 @@
 namespace pinoox\component\store\config\strategy;
 
 use pinoox\component\store\config\data\DataInterface;
-use pinoox\component\store\Pinker\Pinker;
+use pinoox\component\store\baker\Pinker;
 
 class FileConfigStrategy implements ConfigStrategyInterface
 {

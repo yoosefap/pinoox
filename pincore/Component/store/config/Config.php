@@ -14,7 +14,7 @@
 namespace pinoox\component\store\config;
 
 use pinoox\component\store\config\strategy\ConfigStrategyInterface;
-use pinoox\component\store\Pinker;
+use pinoox\component\store\baker;
 
 class Config
 {
@@ -85,7 +85,7 @@ class Config
         return $this;
     }
 
-    public function getPinker(): Pinker\Pinker
+    public function getPinker(): baker\Pinker
     {
         return $this->strategy->getPinker();
     }

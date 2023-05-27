@@ -17,14 +17,14 @@ namespace pinoox\portal;
 use pinoox\component\package\reference\PathReference;
 use pinoox\component\package\reference\ReferenceInterface;
 use pinoox\component\source\Portal;
-use pinoox\component\store\pinker\FileHandler;
-use pinoox\component\store\pinker\Pinker as ObjectPortal1;
+use pinoox\component\store\baker\FileHandler;
+use pinoox\component\store\baker\Pinker as ObjectPortal1;
 
 /**
  * @method static array build($data, array $info = [])
- * @method static \pinoox\component\store\pinker\Pinker object()
+ * @method static \pinoox\component\store\baker\Pinker object()
  *
- * @see \pinoox\component\store\pinker\Pinker
+ * @see \pinoox\component\store\baker\Pinker
  */
 class Pinker extends Portal
 {
