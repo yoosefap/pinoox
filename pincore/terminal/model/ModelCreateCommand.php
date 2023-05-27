@@ -1,6 +1,6 @@
 <?php
 
-namespace pinoox\terminal\create;
+namespace pinoox\terminal\model;
 
 use pinoox\component\helpers\PhpFile\ModelFile;
 use pinoox\component\helpers\Str;
@@ -13,10 +13,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'create:model',
+    name: 'model:create',
     description: 'Create a new model class.',
 )]
-class CreateModelCommand extends Terminal
+class ModelCreateCommand extends Terminal
 {
     private string $package;
 

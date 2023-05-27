@@ -22,9 +22,8 @@ use pinoox\component\kernel\Exception;
 use pinoox\component\lang\Lang;
 use pinoox\component\lang\source\FileLangSource;
 use pinoox\portal\AppWizard;
-use pinoox\portal\Config as config;
+use pinoox\portal\Config;
 use pinoox\portal\Path;
-use pinoox\portal\Pinker;
 use pinoox\portal\TemplateWizard;
 use Symfony\Component\Asset\Context\RequestStackContext;
 use Symfony\Component\Asset\Package;
@@ -119,9 +118,13 @@ class MainController extends Controller
 
     public function pinker()
     {
-        $p1 = Pinker::path('app.php');
-        $p2 = Pinker::file('app.php');
-        dd($p1, $p2);
+        $p2 = Config::name('test')->get();
+        dd($p2);
+    }
+
+    public function wizard()
+    {
+        dd('wizard');
     }
 }
     

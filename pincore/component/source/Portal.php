@@ -145,7 +145,7 @@ abstract class Portal
     private static function callMethod(string $method, array $args): mixed
     {
         $instance = static::__instance();
-
+        
         if (empty($instance) || self::checkMethodHasExclude($method) || !self::checkMethodHasInclude($method)) {
             throw new \RuntimeException('A Portal root has not been set.');
         }

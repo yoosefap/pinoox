@@ -14,6 +14,7 @@
 namespace pinoox\component\store\config;
 
 use pinoox\component\store\config\strategy\ConfigStrategyInterface;
+use pinoox\component\store\Pinker;
 
 class Config
 {
@@ -32,7 +33,7 @@ class Config
 
     public function get(string $key = null, $default = null): mixed
     {
-        return $this->strategy->get($key,$default);
+        return $this->strategy->get($key, $default);
     }
 
     public function add(string $key, mixed $value): Config
@@ -82,6 +83,11 @@ class Config
     {
         $this->strategy->get($key . '.' . $target);
         return $this;
+    }
+
+    public function getPinker(): Pinker\Pinker
+    {
+        return $this->strategy->getPinker();
     }
 
 

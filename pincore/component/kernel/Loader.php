@@ -20,7 +20,7 @@ class Loader
 {
     public static function boot(ClassLoader $loader)
     {
-        $manager = new LoaderManager($loader);
+        new LoaderManager($loader);
         self::loadServices();
     }
 

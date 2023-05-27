@@ -52,8 +52,8 @@ route(
     action: 'MainController:pinker',
     methods: 'GET'
 );
-
-//get(
-//    path: '/test',
-//    action: fn() => view('test test terst'),
-//);
+route(
+    path: '/wizard',
+    action: 'MainController:wizard',
+    methods: 'GET'
+);

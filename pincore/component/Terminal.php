@@ -31,30 +31,35 @@ class Terminal extends Command
         return Command::SUCCESS;
     }
 
-    protected function info($message)
+    protected function info($message, $newLine = true)
     {
         $this->output->write($message);
+        if ($newLine) $this->newline();
     }
 
-    #[NoReturn] protected function error($message): void
+    #[NoReturn] protected function error($message, $newLine = true): void
     {
         $this->output->write("<error>$message</error>");
+        if ($newLine) $this->newline();
         exit;
     }
 
-    #[NoReturn] protected function success($message): void
+    #[NoReturn] protected function success($message, $newLine = true): void
     {
         $this->output->write("<info>$message</info>");
+        if ($newLine) $this->newline();
     }
 
-    #[NoReturn] protected function question($message): void
+    #[NoReturn] protected function question($message, $newLine = true): void
     {
         $this->output->write("<question>$message</question>");
+        if ($newLine) $this->newline();
     }
 
-    #[NoReturn] protected function warning($message): void
+    #[NoReturn] protected function warning($message, $newLine = true): void
     {
         $this->output->write("<comment>$message</comment>");
+        if ($newLine) $this->newline();
     }
 
     #[NoReturn] protected function newline(): void

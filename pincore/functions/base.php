@@ -19,9 +19,8 @@ use pinoox\component\Lang;
 use pinoox\component\Service;
 use pinoox\component\Url;
 use pinoox\component\helpers\HelperString;
-use pinoox\component\worker\Pinker;
 use pinoox\component\kernel\Container;
-use pinoox\component\template\ViewInterface;
+use pinoox\portal\Pinker;
 use pinoox\portal\View;
 
 if (!function_exists('url')) {

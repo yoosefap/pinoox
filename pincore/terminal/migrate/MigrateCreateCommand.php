@@ -1,6 +1,6 @@
 <?php
 
-namespace pinoox\terminal\create;
+namespace pinoox\terminal\migrate;
 
 use pinoox\component\helpers\PhpFile\MigrationFile;
 use pinoox\component\helpers\Str;
@@ -16,10 +16,10 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[AsCommand(
-    name: 'create:migration',
+    name: 'migrate:create',
     description: 'Create a new Migration Schema.',
 )]
-class CreateMigrationCommand extends Terminal
+class MigrateCreateCommand extends Terminal
 {
     private string $package;
 

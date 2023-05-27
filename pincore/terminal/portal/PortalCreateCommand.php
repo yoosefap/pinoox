@@ -11,7 +11,7 @@
  */
 
 
-namespace pinoox\terminal\create;
+namespace pinoox\terminal\portal;
 
 use pinoox\component\helpers\PhpFile\PortalFile;
 use pinoox\component\helpers\Str;
@@ -24,10 +24,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'create:portal',
+    name: 'portal:create',
     description: 'Create a new Portal class.',
 )]
-class CreatePortalCommand extends Terminal
+class PortalCreateCommand extends Terminal
 {
     private string $portalName;
     private string $service;

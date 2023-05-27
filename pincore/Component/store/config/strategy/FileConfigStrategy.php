@@ -37,6 +37,11 @@ class FileConfigStrategy implements ConfigStrategyInterface
         $this->pinker->data($this->data->getData())->bake();
     }
 
+    public function getPinker(): Pinker
+    {
+        return $this->pinker;
+    }
+
     public function set($key, $value): void
     {
         $this->data->set($key, $value);
