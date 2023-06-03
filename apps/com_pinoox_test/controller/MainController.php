@@ -22,6 +22,7 @@ use pinoox\component\kernel\controller\Controller;
 use pinoox\component\kernel\Exception;
 use pinoox\component\lang\Lang;
 use pinoox\component\lang\source\FileLangSource;
+use pinoox\component\wizard\Wizard;
 use pinoox\portal\AppWizard;
 use pinoox\portal\Config;
 use pinoox\portal\Path;

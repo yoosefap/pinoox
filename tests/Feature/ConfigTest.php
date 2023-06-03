@@ -4,7 +4,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use pinoox\component\store\config\Config;
 use pinoox\component\store\config\strategy\ConfigStrategyInterface;
 
-it('adds, saves, and retrieves a configuration key-value pair', function () {
+it('should adds, saves, and retrieves a configuration key-value pair', function () {
     // Arrange
     /** @var ConfigStrategyInterface|MockObject $strategy */
     $strategy = $this->createMock(ConfigStrategyInterface::class);
