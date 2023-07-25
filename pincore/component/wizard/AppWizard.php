@@ -30,15 +30,22 @@ class AppWizard extends Wizard implements WizardInterface
 
     /**
      * @throws ZipException
+     * @throws Exception
      */
-    public function install(): array
-    { 
+    public function install(): array|bool
+    {
+        if ($this->isInstalled() && !$this->force) {
+            $this->setError('The package is already installed');
+            return false;
+        }
+
         $zip = $this->extract($this->packagePath);
         return [
             'message' => 'Package was installed successfully',
             'listFiles' => $zip->getListFiles(),
         ];
     }
+
 
     public function open(string $path): Wizard
     {
@@ -76,6 +83,17 @@ class AppWizard extends Wizard implements WizardInterface
         $existsInfo = $this->getExistsPackageInfo();
         return $existsInfo['version-code'] <= $this->getInfo()['version-code'];
     }
+
+    /**
+     * Check if the package is installed.
+     *
+     * @return bool Returns true if the package is installed, false otherwise.
+     */
+    public function isInstalled(): bool
+    {
+        return is_dir(PINOOX_APP_PATH . $this->package);
+    }
+
 
     public function getInfo(): array|null
     {

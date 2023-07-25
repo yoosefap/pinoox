@@ -13,11 +13,8 @@
 
 namespace pinoox\terminal\wizard;
 
-use pinoox\component\kernel\Exception;
 use pinoox\component\Terminal;
-use pinoox\portal\AppEngine;
 use pinoox\portal\AppWizard;
-use pinoox\portal\Path;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,8 +32,9 @@ class WizardCommand extends Terminal
 
     protected function configure(): void
     {
-        $this->addArgument('app', InputArgument::OPTIONAL, 'Enter app package name')
-            ->addArgument('path', InputArgument::OPTIONAL, 'Enter path pin package');
+        $this
+            ->addArgument('package', InputArgument::REQUIRED, 'Enter package name')
+            ->addOption('force', 'f', null, 'force install if it is already exists. example:[wizard [package_name] -f]');
 
     }
 
@@ -44,37 +42,34 @@ class WizardCommand extends Terminal
     {
         parent::execute($input, $output);
 
-        $app = $input->getArgument('app');
-        $path = $input->getArgument('path');
+      
+        $package = $input->getArgument('package');
+        $force = $input->getOption('force')  ?? null;
 
-        if (empty($app) && empty($path)) {
-            $this->error('Enter app or path option to install pin');
-        }
+        $package = str_replace('.pin', '', $package);
+        $pin = self::PATH . $package . '.pin';
 
-        if (!empty($app) && !file_exists(self::PATH . $app . '.pin')) {
-            $this->error('App not found: "' . self::PATH . $app . '.pin"');
-        }
-
-        if (!empty($path) && !file_exists($path)) {
-            $this->error('Pin not found in path: "' . $path);
-        }
-
-        if (!empty($app)) {
-            $pin = self::PATH . $app . '.pin';
-            if (!file_exists($pin)) {
-                $this->error('App not found: "' . $pin . '"');
-            }
-        } elseif (!empty($path)) {
-            if (!file_exists($path)) {
-                $this->error('Pin not found at path: "' . $path . '"');
-            }
-            $pin = $path;
+        if (!file_exists($pin)) {
+            $this->error('package file not found: "' . $pin . '"');
         }
 
         $wizard = AppWizard::open($pin);
-        $wizard->install();
 
-        $this->success('App installed successfully: '. $pin);
+        $wizard->force($force);
+
+        if ($wizard->isInstalled() && !$force) {
+            // Continue installation
+            $confirm = $this->confirm('The package already exists, Do you want to continue installation? (yes/no) ', $input, $output);
+            if ($confirm) {
+                $wizard->force();
+            } else {
+                $this->error('Installation canceled.');
+            }
+
+        }
+
+        $result = $wizard->install();
+        $this->success($result['message'] . ': "' . $package.'"');
 
         return Command::SUCCESS;
     }

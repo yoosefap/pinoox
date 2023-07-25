@@ -76,6 +76,11 @@ abstract class Wizard
     protected bool $isUpdate = false;
 
     /**
+     * @var bool Install the package even if it is already installed
+     */
+    protected bool $force = false;
+
+    /**
      * @var ZipFile The ZipFile instance for the package
      */
     protected ZipFile $zip;
@@ -305,5 +310,14 @@ abstract class Wizard
         $this->setPackage();
 
         $this->checkUpdate();
+    }
+
+    /**
+     * Enable force mode for installing packages.
+     */
+    public function force(bool $val = true): Wizard
+    {
+        $this->force = $val;
+        return $this;
     }
 }

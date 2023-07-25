@@ -80,18 +80,15 @@ class MainController extends Controller
 
     public function app()
     {
-        $wizard = AppWizard::open(PINOOX_PATH . 'installs\com_pinoox_welcome.pin');
+        $wizard = AppWizard::open(PINOOX_PATH . 'pins/dev_armin_comingsoon.pin');
 
-        try {
-            return dd(
-                $wizard->isUpdateAvailable(),
-                $wizard->install(),
-                $wizard->getMeta(),
-                $wizard->getInfo()
-            );
-        } catch (ZipEntryNotFoundException $e) {
-            return $e->getMessage();
-        }
+        //dd($wizard->getMeta());
+        //dd($wizard->getInfo());
+        //dd($wizard->isUpdateAvailable());
+        //dd($wizard->install());
+        //dd($wizard->force()->install());
+
+        return '<h2> Test "AppWizard" component to install apps</h2>';
     }
 
     public function template()
@@ -124,9 +121,5 @@ class MainController extends Controller
         dd($p2);
     }
 
-    public function wizard()
-    {
-        dd('wizard');
-    }
 }
     
