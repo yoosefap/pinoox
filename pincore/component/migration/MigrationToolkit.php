@@ -131,11 +131,12 @@ class MigrationToolkit
         if (!$this->checkPaths()) return $this;
 
         $migrations = $this->readyFromPath();
+        if (empty($migrations)) return $this;
 
         if ($this->action != 'init' && $this->isExistsMigrationTable()) {
             $migrations = $this->syncWithDB($migrations);
         }
-        
+
         if (!empty($migrations)) {
             foreach ($migrations as $m) {
                 list($fileName, $className, $classObject, $isLoad) = $this->extract($m);
@@ -157,6 +158,11 @@ class MigrationToolkit
 
     private function readyFromPath(): array
     {
+        if (!is_dir($this->migrationPath)) {
+            $this->setError('migration path not defined, use `migrate:init` command to prepare path and table');
+            return [];
+        }
+
         $files = [];
         $finder = new Finder();
         $finder->in($this->migrationPath)->files();
@@ -174,7 +180,7 @@ class MigrationToolkit
     {
         $path = $this->package == 'pincore' ? PINOOX_CORE_PATH : PINOOX_APP_PATH;
         $filename = $item['migration'] . '.php';
-        $namespace  = trim($this->namespace . DS . str_replace([$filename, $path, $this->package . DS], '', $item['path']));
+        $namespace = trim($this->namespace . DS . str_replace([$filename, $path, $this->package . DS], '', $item['path']));
         $fileName = $this->getFileName($item);
         $className = $this->getClassName($fileName);
         $isLoad = $this->loadMigrationClass($this->migrationPath . DS . $fileName . '.php');
@@ -261,7 +267,7 @@ class MigrationToolkit
     private function loadMigrationClass($classFile): bool
     {
         if (!file_exists($classFile)) return false;
-
+ 
         spl_autoload_register(function ($className) use ($classFile) {
             include_once $classFile;
         });

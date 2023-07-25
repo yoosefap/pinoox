@@ -74,7 +74,12 @@ class MigrateCreateCommand extends Terminal
     }
 
     private function create()
-    {
+    { 
+        // Check if directory doesn't exist
+        if (!is_dir($this->app['migration'])) {
+            mkdir($this->app['migration'], 0777, true);
+        }
+
         //get input
         $this->className = Str::toCamelCase($this->className);
         $fileName = Str::toUnderScore($this->className);
