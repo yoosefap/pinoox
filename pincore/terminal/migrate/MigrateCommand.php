@@ -44,7 +44,7 @@ class MigrateCommand extends Terminal
 
     protected function configure(): void
     {
-        $this->addArgument('package', InputArgument::REQUIRED, 'Enter the package name of app you want to migrate schemas');
+        $this->addArgument('package', InputArgument::REQUIRED, 'Enter the package name that you want to migrate schemas');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -72,7 +72,7 @@ class MigrateCommand extends Terminal
             ->package($this->app['package'])
             ->namespace($this->app['namespace'])
             ->load();
-
+ 
         if (!$this->toolkit->isSuccess()) {
             $this->error($this->toolkit->getErrors());
         }
@@ -81,7 +81,7 @@ class MigrateCommand extends Terminal
     private function migrate()
     {
         $migrations = $this->toolkit->getMigrations();
-
+ 
         if (empty($migrations)) {
             $this->success('Nothing to migrate.');
         }
@@ -93,7 +93,7 @@ class MigrateCommand extends Terminal
             $this->warning('Migrating: ');
             $this->warning($m['fileName']);
             $this->newline();
-
+ 
             $obj = new $m['classObject']();
             $obj->up();
 

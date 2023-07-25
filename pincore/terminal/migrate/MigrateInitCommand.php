@@ -54,7 +54,7 @@ class MigrateInitCommand extends Terminal
             ->namespace($this->pincore['namespace'])
             ->action('init')
             ->load();
-
+        
         if (!$this->toolkit->isSuccess()) {
             $this->error($this->toolkit->getErrors());
         }
@@ -73,7 +73,6 @@ class MigrateInitCommand extends Terminal
             $this->success('Migrating: ');
             $this->success($m['fileName']);
             $this->newline();
-
             $obj = new $m['classObject']();
             $obj->up();
 

@@ -26,12 +26,14 @@ class MigrationFile extends PhpFile
     {
         $source = self::source();
 
+        $namespace = str_replace(DS, '\\', $namespace);
         $namespace = $source->addNamespace($namespace);
         $namespace->addUse(Blueprint::class);
         $namespace->addUse(MigrationBase::class);
 
         $class = $namespace->addClass($className);
         $class->setExtends(MigrationBase::class);
+
         self::addRunMethod($class, $className, $package);
         self::addDownMethod($class, $className, $package);
 

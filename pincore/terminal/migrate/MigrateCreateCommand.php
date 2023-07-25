@@ -74,12 +74,7 @@ class MigrateCreateCommand extends Terminal
     }
 
     private function create()
-    { 
-        // Check if directory doesn't exist
-        if (!is_dir($this->app['migration'])) {
-            mkdir($this->app['migration'], 0777, true);
-        }
-
+    {
         //get input
         $this->className = Str::toCamelCase($this->className);
         $fileName = Str::toUnderScore($this->className);
@@ -92,21 +87,21 @@ class MigrateCreateCommand extends Terminal
                 return $file->isDir() || \preg_match('/\.(php)$/', $file->getPathname());
             });
 
-
-        foreach ($finder as $f) {
-            $name = $f->getBasename('.php');
-
-            //eliminate timestamp
-            $name_no_timestamp = substr($name, 15);
-            if ($name_no_timestamp == $fileName) {
-                $this->error('☓  The migration class name "' . $this->className . '" already exists ');
+        if (count($finder) > 0) {
+            foreach ($finder as $f) {
+                $name = $f->getBasename('.php');
+                //eliminate timestamp
+                $name_no_timestamp = substr($name, 15);
+                if ($name_no_timestamp == $fileName) {
+                    $this->error('☓  The migration class name "' . $this->className . '" already exists ');
+                }
             }
         }
-
+        
         //create timestamp filename
         $exportFile = date('Ymdhis') . '_' . $fileName . '.php';
         $exportPath = $this->app['migration'] . DS . $exportFile;
-
+ 
         try {
             $isCreated = MigrationFile::create(
                 exportPath: $exportPath,
