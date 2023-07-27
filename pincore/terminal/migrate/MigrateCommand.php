@@ -13,10 +13,8 @@
 
 namespace pinoox\terminal\migrate;
 
-use pinoox\component\kernel\Exception;
-use pinoox\component\migration\MigrationQuery;
+use pinoox\component\migration\Migrator;
 use pinoox\component\Terminal;
-use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -33,14 +31,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class MigrateCommand extends Terminal
 {
-    private string $package;
-
-    private array $app;
-
-    /**
-     * @var MigrationToolkit
-     */
-    private $toolkit = null;
 
     protected function configure(): void
     {
@@ -51,18 +41,24 @@ class MigrateCommand extends Terminal
     {
         parent::execute($input, $output);
 
-        $this->package = $input->getArgument('package');
+        $package = $input->getArgument('package');
 
-        $this->init();
-        $this->migrate();
+        $migrator = new Migrator($package);
+
+        try {
+            $result = $migrator->run();
+            $this->success($result);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
 
         return Command::SUCCESS;
     }
 
-    private function init()
+    /*public function init($package)
     {
         try {
-            $this->app = AppManager::getApp($this->package);
+            $this->app = AppManager::getApp($package);
         } catch (Exception $e) {
             $this->error($e->getMessage());
         }
@@ -72,41 +68,42 @@ class MigrateCommand extends Terminal
             ->package($this->app['package'])
             ->namespace($this->app['namespace'])
             ->load();
- 
+
         if (!$this->toolkit->isSuccess()) {
             $this->error($this->toolkit->getErrors());
         }
-    }
 
-    private function migrate()
-    {
-        $migrations = $this->toolkit->getMigrations();
- 
-        if (empty($migrations)) {
-            $this->success('Nothing to migrate.');
-        }
+        $this->migrate();
+    }*/
 
-        $batch = MigrationQuery::fetchLatestBatch($this->app['package']) ?? 0;
+    /* private function migrate()
+     {
+         $migrations = $this->toolkit->getMigrations();
+         if (empty($migrations)) {
+             $this->success('Nothing to migrate.');
+         }
 
-        foreach ($migrations as $m) {
-            $start_time = microtime(true);
-            $this->warning('Migrating: ');
-            $this->warning($m['fileName']);
-            $this->newline();
- 
-            $obj = new $m['classObject']();
-            $obj->up();
+         $batch = MigrationQuery::fetchLatestBatch($this->app['package']) ?? 0;
 
-            MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
+         foreach ($migrations as $m) {
+             $start_time = microtime(true);
+             $this->warning('Migrating: ');
+             $this->warning($m['fileName']);
+             $this->newline();
 
-            $end_time = microtime(true);
-            $exec_time = $end_time - $start_time;
+             $obj = new $m['classObject']();
+             $obj->up();
 
-            //end migrating
-            $this->success('Migrated: ' . $m['fileName']);
-            $this->info(' (' . substr($exec_time, 0, 5) . 'ms)');
-            $this->newline();
-        }
+             MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
 
-    }
+             $end_time = microtime(true);
+             $exec_time = $end_time - $start_time;
+
+             //end migrating
+             $this->success('Migrated: ' . $m['fileName']);
+             $this->info(' (' . substr($exec_time, 0, 5) . 'ms)');
+             $this->newline();
+         }
+
+     }*/
 }

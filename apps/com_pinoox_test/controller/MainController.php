@@ -22,7 +22,6 @@ use pinoox\component\kernel\controller\Controller;
 use pinoox\component\kernel\Exception;
 use pinoox\component\lang\Lang;
 use pinoox\component\lang\source\FileLangSource;
-use pinoox\component\wizard\Wizard;
 use pinoox\portal\AppWizard;
 use pinoox\portal\Config;
 use pinoox\portal\Path;
@@ -82,21 +81,22 @@ class MainController extends Controller
     {
         $wizard = AppWizard::open(PINOOX_PATH . 'pins/dev_armin_comingsoon.pin');
 
-        //dd($wizard->getMeta());
-        //dd($wizard->getInfo());
-        //dd($wizard->isUpdateAvailable());
-        //dd($wizard->install());
-        //dd($wizard->force()->install());
+        $wizard->getMeta();
+        $wizard->getInfo();
+        $wizard->isUpdateAvailable();
+        $wizard->install();
+        $wizard->migration()->force()->install();
 
-        return '<h2> Test "AppWizard" component to install apps</h2>';
+        return '<h2> uncomment codes for testing "AppWizard" component</h2>';
     }
 
-    public function template()
-    {
-        $wizard = TemplateWizard::open(PINOOX_PATH . 'installs\welcome.pin');
+    /*
+        public function template()
+        {
+            $wizard = TemplateWizard::open(PINOOX_PATH . 'installs\welcome.pin');
 
-        return dd($wizard->getInfo(), $wizard->install());
-    }
+            return dd($wizard->getInfo(), $wizard->install());
+        }*/
 
     public function config()
     {
@@ -120,6 +120,8 @@ class MainController extends Controller
         $p2 = Config::name('test')->get();
         dd($p2);
     }
+
+    public 
 
 }
     

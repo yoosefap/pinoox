@@ -19,14 +19,13 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'wizard',
+    name: 'wizard:install',
     description: 'Install apps or templates',
 )]
-class WizardCommand extends Terminal
+class WizardInstallCommand extends Terminal
 {
     const PATH = PINOOX_PATH . 'pins' . DS;
 
@@ -34,7 +33,8 @@ class WizardCommand extends Terminal
     {
         $this
             ->addArgument('package', InputArgument::REQUIRED, 'Enter package name')
-            ->addOption('force', 'f', null, 'force install if it is already exists. example:[wizard [package_name] -f]');
+            ->addOption('force', 'f', null, 'if the package is already installed, you can force the installation. example:[wizard [package_name] -f]')
+            ->addOption('migration', 'm', null, 'migrate database tables. example:[wizard [package_name] -m]');
 
     }
 
@@ -45,6 +45,7 @@ class WizardCommand extends Terminal
       
         $package = $input->getArgument('package');
         $force = $input->getOption('force')  ?? null;
+        $migration = $input->getOption('migration')  ?? null;
 
         $package = str_replace('.pin', '', $package);
         $pin = self::PATH . $package . '.pin';
@@ -56,16 +57,16 @@ class WizardCommand extends Terminal
         $wizard = AppWizard::open($pin);
 
         $wizard->force($force);
+        $wizard->migration($migration);
 
         if ($wizard->isInstalled() && !$force) {
             // Continue installation
-            $confirm = $this->confirm('The package already exists, Do you want to continue installation? (yes/no) ', $input, $output);
+            $confirm = $this->confirm('The package already installed, Do you want to continue installation? (yes/no) ', $input, $output);
             if ($confirm) {
                 $wizard->force();
             } else {
                 $this->error('Installation canceled.');
             }
-
         }
 
         $result = $wizard->install();

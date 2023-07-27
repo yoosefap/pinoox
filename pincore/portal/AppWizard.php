@@ -23,6 +23,7 @@ use pinoox\component\wizard\Wizard as ObjectPortal1;
  * @method static ObjectPortal1 open(string $path)
  * @method static bool isUpdateAvailable()
  * @method static bool isInstalled()
+ * @method static ObjectPortal1 migration($val = true)
  * @method static array|null getInfo()
  * @method static mixed getErrors(bool $last = false)
  * @method static array getMeta()
