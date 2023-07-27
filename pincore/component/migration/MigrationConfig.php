@@ -14,7 +14,7 @@
 namespace pinoox\component\migration;
 
 use pinoox\component\kernel\Exception;
-use pinoox\portal\DatabaseManager;
+use pinoox\portal\DB;
 
 class MigrationConfig
 {
@@ -44,7 +44,7 @@ class MigrationConfig
         //check database
         if ($this->isPrepareDB()) {
             try {
-                $this->config = DatabaseManager::getConfig();
+                $this->config = DB::getConfig();
             } catch (Exception $e) {
                 $this->setError($e);
             }
@@ -55,7 +55,7 @@ class MigrationConfig
 
     public function isPrepareDB(): bool
     {
-        $db = DatabaseManager::getCapsule();
+        $db = DB::getCapsule();
         if (empty($db->getConnection())) {
             $this->setError('Database not connected');
             return false;

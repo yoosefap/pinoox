@@ -6,7 +6,7 @@ namespace pinoox\command\migrate;
 use pinoox\component\console;
 use pinoox\component\interfaces\CommandInterface;
 use pinoox\component\package\App;
-use pinoox\portal\DatabaseManager;
+use pinoox\portal\DB;
 use pinoox\portal\MigrationConfig;
 use \pinoox\component\migration\MigrationConfig as MigConf;
 use pinoox\component\migration\MigrationQuery;

@@ -15,6 +15,7 @@
 namespace pinoox\portal;
 
 use Illuminate\Database\Capsule\Manager as ObjectPortal2;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Schema\Builder as ObjectPortal1;
 use pinoox\component\kernel\Exception;
 use pinoox\component\source\Portal;
@@ -28,7 +29,7 @@ use Illuminate\Database\Connection;
  *
  * @see \pinoox\component\database\DatabaseManager
  */
-class DatabaseManager extends Portal
+class DB extends Portal
 {
     /**
      * @throws Exception
@@ -58,5 +59,10 @@ class DatabaseManager extends Portal
     public static function __name(): string
     {
         return 'database';
+    }
+
+    public static function table(string $table): \Illuminate\Database\Query\Builder
+    {
+        return self::getCapsule()::table($table);
     }
 }

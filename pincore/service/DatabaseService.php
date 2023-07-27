@@ -13,14 +13,14 @@
 namespace pinoox\service;
 
 use pinoox\component\interfaces\ServiceInterface;
-use pinoox\portal\DatabaseManager;
+use pinoox\portal\DB;
 
 class DatabaseService implements ServiceInterface
 {
 
     public function _run()
     {
-        DatabaseManager::run();
+        DB::run();
     }
 
     public function _stop()

@@ -13,7 +13,6 @@
 
 namespace pinoox\app\com_pinoox_test\controller;
 
-use PhpZip\Exception\ZipEntryNotFoundException;
 use pinoox\app\com_pinoox_test\model\Product;
 
 use pinoox\component\http\Request;
@@ -24,8 +23,8 @@ use pinoox\component\lang\Lang;
 use pinoox\component\lang\source\FileLangSource;
 use pinoox\portal\AppWizard;
 use pinoox\portal\Config;
+use pinoox\portal\DB;
 use pinoox\portal\Path;
-use pinoox\portal\TemplateWizard;
 use Symfony\Component\Asset\Context\RequestStackContext;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
@@ -121,6 +120,11 @@ class MainController extends Controller
         dd($p2);
     }
 
+    public function query()
+    {
+        $result = DB::table('table_name')->get();
+        dd($result);
+    }
 
 }
     

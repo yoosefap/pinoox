@@ -57,3 +57,8 @@ route(
     action: 'MainController:wizard',
     methods: 'GET'
 );
+route(
+    path: '/query',
+    action: 'MainController:query',
+    methods: 'GET'
+);

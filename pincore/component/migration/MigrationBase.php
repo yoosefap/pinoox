@@ -13,7 +13,7 @@
 namespace pinoox\component\migration;
 
 use Illuminate\Database\Migrations\Migration;
-use pinoox\portal\DatabaseManager;
+use pinoox\portal\DB;
 use \Illuminate\Database\Schema\Builder;
 
 class MigrationBase extends Migration
@@ -22,7 +22,7 @@ class MigrationBase extends Migration
 
     public function __construct()
     {
-        $this->schema = DatabaseManager::getSchema();
+        $this->schema = DB::getSchema();
     }
 
 }

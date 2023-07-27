@@ -15,7 +15,7 @@ namespace pinoox\component\migration;
 use Illuminate\Database\Capsule\Manager;
 use pinoox\component\helpers\Str;
 use pinoox\component\kernel\Exception;
-use pinoox\portal\DatabaseManager;
+use pinoox\portal\DB;
 use Symfony\Component\Finder\Finder;
 
 class MigrationToolkit
@@ -70,8 +70,8 @@ class MigrationToolkit
 
     public function __construct()
     {
-        $this->schema = DatabaseManager::getSchema();
-        $this->cp = DatabaseManager::getCapsule();
+        $this->schema = DB::getSchema();
+        $this->cp = DB::getCapsule();
     }
 
     public function appPath($val): self
