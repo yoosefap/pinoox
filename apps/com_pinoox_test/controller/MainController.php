@@ -121,7 +121,6 @@ class MainController extends Controller
         dd($p2);
     }
 
-    public 
 
 }
     
