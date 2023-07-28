@@ -13,7 +13,6 @@
 namespace pinoox\component\migration;
 
 use Illuminate\Database\Capsule\Manager;
-use pinoox\component\helpers\Str;
 use pinoox\component\kernel\Exception;
 use pinoox\portal\DB;
 use Symfony\Component\Finder\Finder;
@@ -93,7 +92,7 @@ class MigrationToolkit
     }
 
     /**
-     * actions: init, run, rollback
+     * actions: init, run, rollback, create
      * @return $this
      */
     public function action($action): self
@@ -133,19 +132,24 @@ class MigrationToolkit
         $migrations = $this->readyFromPath();
         if (empty($migrations)) return $this;
 
-        if ($this->action != 'init' && $this->isExistsMigrationTable()) {
+        if ($this->action != 'create' && $this->action != 'init' && $this->isExistsMigrationTable()) {
             $migrations = $this->syncWithDB($migrations);
         }
 
         if (!empty($migrations)) {
             foreach ($migrations as $m) {
-                list($fileName, $className, $classObject, $isLoad) = $this->extract($m);
+                list($fileName, $migrationFile) = $this->extract($m);
 
                 if ($this->action === 'rollback' && empty($m['sync'])) continue;
                 if ($this->action === 'run' && !empty($m['sync'])) continue;
 
                 try {
-                    $this->migrations[] = $this->build($m['sync'], $className, $fileName, $classObject, $isLoad);
+                    $this->migrations[] = [
+                        'sync' => $m['sync'],
+                        'packageName' => $this->package,
+                        'migrationFile' => $migrationFile,
+                        'fileName' => $fileName,
+                    ];
                 } catch (Exception $e) {
                     $this->setError($e);
                 }
@@ -177,56 +181,39 @@ class MigrationToolkit
 
     private function extract($item): array
     {
-        $path = $this->package == 'pincore' ? PINOOX_CORE_PATH : PINOOX_APP_PATH;
-        $filename = $item['migration'] . '.php';
-        $namespace = str_replace(DS, '\\', trim($this->namespace . DS . str_replace([$filename, $path, $this->package . DS], '', $item['path'])));
-
         $fileName = $this->getFileName($item);
-        $className = $this->getClassName($fileName);
-        $isLoad = $this->loadMigrationClass($this->migrationPath . DS . $fileName . '.php');
-        $classObject = $namespace . $className;
+        $migrationFile = $this->migrationPath . DS . $fileName . '.php';
 
-        return [$fileName, $className, $classObject, $isLoad];
+        return [$fileName, $migrationFile];
     }
 
-    /**
-     * @throws Exception
-     */
-    private function build($sync, $className, $fileName, $classObject, $isLoad): array
-    {
-        return [
-            'sync' => $sync,
-            'isLoad' => $isLoad,
-            'packageName' => $this->package,
-            'className' => $className,
-            'fileName' => $fileName,
-            'classObject' => $classObject,
-            // 'dbPrefix' => Database::getConfig('prefix') . ($this->package != 'pincore' ? $this->package . '_' : ''),
-        ];
-    }
 
     public function getMigrations(): array
     {
         return $this->migrations;
     }
 
-
-    private function convertToTimestampPrefix($fileName)
+    public function generateMigrationFileName($modelName): string
     {
-        $timestamp = date('Ymdhis');
-        $newFileName = $timestamp . '_' . $fileName;
-        rename($this->migrationPath . $fileName . '.php', $this->migrationPath . $newFileName . '.php');
-        return $fileName;
+        // Get the current timestamp in the required format
+        $timestamp = date('Y_m_d_His');
+
+        // Convert the model name to snake_case and add "create_" prefix
+        $tableName = 'create_' . $this->snakeCase($modelName) . '_table';
+
+        // Combine the timestamp and table name to form the migration file name
+        return $timestamp . '_' . $tableName . '.php';
     }
 
-    private function getClassName($fileName): string
+    private function snakeCase($string): string
     {
-        $justFilename = substr($fileName, 15);
-        if (!$justFilename) {
-            $justFilename = $this->convertToTimestampPrefix($fileName);
-        }
-        return Str::toCamelCase($justFilename);
+        // Replace spaces and underscores with dashes
+        $string = str_replace([' ', '_'], '-', $string);
+
+        // Convert the string to lowercase
+        return strtolower($string);
     }
+
 
     private function getFileName($file): string
     {

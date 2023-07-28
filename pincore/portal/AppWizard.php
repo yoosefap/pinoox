@@ -50,12 +50,4 @@ class AppWizard extends Portal
 	}
 
 
-	/**
-	 * Get method names for callback object.
-	 * @return string[]
-	 */
-	public static function __callback(): array
-	{
-		return [];
-	}
 }

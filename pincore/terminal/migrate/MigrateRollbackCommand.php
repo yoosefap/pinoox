@@ -88,18 +88,13 @@ class MigrateRollbackCommand extends Terminal
 
         foreach ($migrations as $m) {
 
-            if (!$m['isLoad']) {
-                $this->error('Migration not found: '.$m['fileName']);
-                $this->newLine();
-                continue;
-            }
-
             $start_time = microtime(true);
             $this->warning('Rolling back: ');
             $this->info($m['fileName']);
             $this->newLine();
-            $obj = new $m['classObject']();
-            $obj->down();
+
+            $class = require_once $m['migrationFile'];
+            $class->down();
 
             MigrationQuery::delete($batch, $m['packageName']);
 

@@ -13,9 +13,11 @@
 
 
 namespace pinoox\component\migration;
+
 use pinoox\component\kernel\Exception;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
+use ReflectionClass;
 
 /**
  * Class Migrator
@@ -69,7 +71,7 @@ class Migrator
             throw new \Exception($this->toolkit->getErrors());
         }
 
-       return $this->migrate();
+        return $this->migrate();
     }
 
     /**
@@ -85,9 +87,10 @@ class Migrator
 
         $batch = MigrationQuery::fetchLatestBatch($this->app['package']) ?? 0;
 
+
         foreach ($migrations as $m) {
-            $obj = new $m['classObject']();
-            $obj->up();
+            $class = require_once $m['migrationFile'];
+            $class->up();
 
             MigrationQuery::insert($m['fileName'], $m['packageName'], $batch);
         }

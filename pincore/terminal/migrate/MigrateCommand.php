@@ -15,7 +15,6 @@ namespace pinoox\terminal\migrate;
 
 use pinoox\component\migration\Migrator;
 use pinoox\component\Terminal;
-use pinoox\portal\MigrationToolkit;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

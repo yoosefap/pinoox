@@ -2,10 +2,10 @@
 
 namespace pinoox\terminal\migrate;
 
-use pinoox\component\helpers\PhpFile\MigrationFile;
 use pinoox\component\helpers\Str;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
+use pinoox\portal\StubGenerator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -66,6 +66,7 @@ class MigrateCreateCommand extends Terminal
             ->migrationPath($this->app['migration'])
             ->package($this->app['package'])
             ->namespace($this->app['namespace'])
+            ->action('create')
             ->load();
 
         if (!$this->toolkit->isSuccess()) {
@@ -87,34 +88,29 @@ class MigrateCreateCommand extends Terminal
                 return $file->isDir() || \preg_match('/\.(php)$/', $file->getPathname());
             });
 
-        if (count($finder) > 0) {
-            foreach ($finder as $f) {
-                $name = $f->getBasename('.php');
-                //eliminate timestamp
-                $name_no_timestamp = substr($name, 15);
-                if ($name_no_timestamp == $fileName) {
-                    $this->error('☓  The migration class name "' . $this->className . '" already exists ');
-                }
-            }
-        }
-        
-        //create timestamp filename
-        $exportFile = date('Ymdhis') . '_' . $fileName . '.php';
-        $exportPath = $this->app['migration'] . DS . $exportFile;
- 
+
+        //create filename
+        $migrationFilename = $this->toolkit->generateMigrationFileName($fileName);
+        $exportPath = $this->app['migration'] . DS . $migrationFilename;
+
         try {
-            $isCreated = MigrationFile::create(
-                exportPath: $exportPath,
-                className: $this->className,
-                package: $this->app['package'],
-                namespace: $this->app['namespace'] . DS . $this->app['migration_relative_path']
-            );
+            /* $isCreated = MigrationFile::create(
+                 exportPath: $exportPath,
+                 className: $this->className,
+                 package: $this->app['package'],
+                 namespace: $this->app['namespace'] . DS . $this->app['migration_relative_path']
+             );*/
+
+            $isCreated = StubGenerator::generate('migration.create.stub', $exportPath, [
+                'copyright' => StubGenerator::get('copyright.stub'),
+                'table' => $migrationFilename,
+            ]);
 
             if ($isCreated) {
                 //print success messages
                 $this->success('✓ Created Class ' . $this->className);
                 $this->success(' in path: ' . $this->app['migration']);
-                $this->warning(DS . $exportFile);
+                $this->warning(DS . $migrationFilename);
                 $this->newLine();
             } else {
                 $this->error('Can\'t generate a new migration class!');
