@@ -54,7 +54,7 @@ class MigrateCreateCommand extends Terminal
     }
 
 
-    private function init()
+    private function init(): void
     {
         try {
             $this->app = AppManager::getApp($this->package);
@@ -74,7 +74,7 @@ class MigrateCreateCommand extends Terminal
         }
     }
 
-    private function create()
+    private function create(): void
     {
         //get input
         $this->className = Str::toCamelCase($this->className);
@@ -94,13 +94,6 @@ class MigrateCreateCommand extends Terminal
         $exportPath = $this->app['migration'] . DS . $migrationFilename;
 
         try {
-            /* $isCreated = MigrationFile::create(
-                 exportPath: $exportPath,
-                 className: $this->className,
-                 package: $this->app['package'],
-                 namespace: $this->app['namespace'] . DS . $this->app['migration_relative_path']
-             );*/
-
             $isCreated = StubGenerator::generate('migration.create.stub', $exportPath, [
                 'copyright' => StubGenerator::get('copyright.stub'),
                 'table' => $migrationFilename,
