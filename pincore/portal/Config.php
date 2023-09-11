@@ -14,34 +14,20 @@
 
 namespace pinoox\portal;
 
+
 use pinoox\component\package\reference\ReferenceInterface;
-use pinoox\component\source\Portal;
-use pinoox\component\store\config\Config as ObjectPortal1;
 use pinoox\component\store\config\data\DataArray;
 use pinoox\component\store\config\strategy\FileConfigStrategy;
+use pinoox\component\store\config\Config as ObjectPortal1;
+use pinoox\component\source\Portal;
 
-/**
- * @method static Config save()
- * @method static mixed get(?string $key = NULL)
- * @method static ObjectPortal1 add(string $key, mixed $value)
- * @method static ObjectPortal1 set(string $key, mixed $value)
- * @method static ObjectPortal1 remove(string $key)
- * @method static ObjectPortal1 merge(array $array)
- * @method static ObjectPortal1 reset()
- * @method static ObjectPortal1 restore()
- * @method static setLinear(string $key, string $target, mixed $value)
- * @method static getLinear(string $key, string $target)
- * @method static \pinoox\component\store\config\Config  object()
- *
- * @see \pinoox\component\store\config\Config
- */
 class Config extends Portal
 {
     const folder = 'config';
 
     public static function __register(): void
     {
-        self::__bind(ObjectPortal1::class)->setArguments([Pinker::__ref()]);
+        self::__bind(ObjectPortal1::class);
     }
 
     /**
@@ -50,7 +36,7 @@ class Config extends Portal
      */
     public static function __name(): string
     {
-        return 'config.manager';
+        return 'config';
     }
 
 

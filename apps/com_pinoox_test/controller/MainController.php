@@ -99,7 +99,7 @@ class MainController extends Controller
 
     public function config()
     {
-        $cm = config::name('test');
+        $cm = Config::name('test');
         dd($cm->get());
     }
 

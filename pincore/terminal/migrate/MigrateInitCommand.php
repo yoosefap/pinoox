@@ -13,6 +13,7 @@
 
 namespace pinoox\terminal\migrate;
 
+use pinoox\component\migration\Migrator;
 use pinoox\component\Terminal;
 use pinoox\portal\AppManager;
 use pinoox\portal\MigrationToolkit;
@@ -39,8 +40,16 @@ class MigrateInitCommand extends Terminal
     {
         parent::execute($input, $output);
 
-        $this->init();
-        $this->migrate();
+        $this->pincore = AppManager::getApp('pincore');
+
+        $migrator = new Migrator($this->pincore['package'], 'init');
+
+        try {
+            $result = $migrator->run();
+            $this->success($result);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
 
         return Command::SUCCESS;
     }
@@ -54,7 +63,7 @@ class MigrateInitCommand extends Terminal
             ->namespace($this->pincore['namespace'])
             ->action('init')
             ->load();
-        
+
         if (!$this->toolkit->isSuccess()) {
             $this->error($this->toolkit->getErrors());
         }
