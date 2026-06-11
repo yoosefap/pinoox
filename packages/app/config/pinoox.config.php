@@ -1,0 +1,6 @@
+<?php
+
+return [
+    'version_code' => 1,
+    'version_name' => '1.0.0-dev',
+];

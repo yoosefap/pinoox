@@ -1,0 +1,26 @@
+{
+  "name": "pinoox/app",
+  "description": "Single-app Pinoox project — root app layout with pinx CLI",
+  "type": "project",
+  "license": "MIT",
+  "keywords": ["pinoox", "hmvc", "skeleton", "pinx"],
+  "require": {
+    "php": "^8.1",
+    "ext-mysqli": "*",
+    "ext-zip": "*",
+    "pinoox/pincore": "^3.0"
+  },
+  "require-dev": {
+    "pinoox/pinx-cli": "^1.0"
+  },
+  "scripts": {
+    "post-root-package-install": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ],
+    "dev": "@php bin/pinx dev",
+    "build": "@php bin/pinx build --yes",
+    "setup": "@php bin/pinx setup --yes"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

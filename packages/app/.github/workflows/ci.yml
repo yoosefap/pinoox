@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - '**'
+  pull_request:
+    paths:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, zip, mbstring
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Environment
+        run: cp .env.example .env
+
+      - name: Doctor
+        run: php bin/pinx doctor
+
+      - name: Build pinx package
+        run: php bin/pinx build --yes
+
+      - name: Verify export artifact
+        run: test -n "$(find export -maxdepth 1 -name '*.pinx' -print -quit)"

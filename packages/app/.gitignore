@@ -1,0 +1,14 @@
+/vendor/
+/.pinx-build/
+/node_modules/
+/storage/*
+!/storage/.gitkeep
+/pinker/state/
+/pinker/wizard_tmp/
+/export/
+.env
+.env.local
+composer.lock
+.idea/
+.vscode/
+*.log
