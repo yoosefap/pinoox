@@ -121,3 +121,4 @@ tests/Fixtures/**/*
 
 # Themes
 /themes/*/.pinoox/
+.pinoox/

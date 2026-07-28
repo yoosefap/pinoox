@@ -15,6 +15,17 @@ $documentRoot = rtrim(str_replace('\\', '/', (string) getcwd()), '/');
 
 require_once $documentRoot . '/vendor/autoload.php';
 
+use Pinoox\Component\Server\Share\SharePinggyScreeningBypass;
+use Pinoox\Component\Server\Share\ShareTunnelRequest;
+
+ShareTunnelRequest::applyToGlobals($documentRoot);
+
+$pinggyBypass = SharePinggyScreeningBypass::isActive($documentRoot);
+
+if ($pinggyBypass && SharePinggyScreeningBypass::tryServe($uri)) {
+    return;
+}
+
 $inspectorEnabled = (string) getenv('PINX_INSPECTOR_ENABLED') === '1';
 $inspectorRoute = rtrim((string) (getenv('PINX_INSPECTOR_ROUTE') ?: '/~inspector'), '/');
 $inspectorRouter = (string) getenv('PINX_INSPECTOR_ROUTER');
@@ -38,12 +49,12 @@ if (getenv('PINOOX_SERVER_LOG') !== '0') {
 
 if (FrontController::shouldRoute($uri, $documentRoot)) {
     FrontController::applyServerGlobals($uri);
-    if ($inspectorEnabled) {
+    if ($inspectorEnabled || $pinggyBypass) {
         ob_start();
     }
     require $documentRoot . '/index.php';
-    if ($inspectorEnabled) {
-        echo pinx_inspector_inject_widget((string) ob_get_clean(), $inspectorRoute);
+    if ($inspectorEnabled || $pinggyBypass) {
+        echo pinx_dev_server_finish_html((string) ob_get_clean(), $inspectorEnabled, $inspectorRoute, $pinggyBypass);
     }
 
     return;
@@ -53,14 +64,27 @@ if ($uri !== '/' && $uri !== '' && is_file($target)) {
     return false;
 }
 
-if ($inspectorEnabled) {
+if ($inspectorEnabled || $pinggyBypass) {
     ob_start();
 }
 
 require $documentRoot . '/index.php';
 
-if ($inspectorEnabled) {
-    echo pinx_inspector_inject_widget((string) ob_get_clean(), $inspectorRoute);
+if ($inspectorEnabled || $pinggyBypass) {
+    echo pinx_dev_server_finish_html((string) ob_get_clean(), $inspectorEnabled, $inspectorRoute, $pinggyBypass);
+}
+
+function pinx_dev_server_finish_html(string $html, bool $inspectorEnabled, string $inspectorRoute, bool $pinggyBypass): string
+{
+    if ($pinggyBypass) {
+        $html = SharePinggyScreeningBypass::injectHtml($html);
+    }
+
+    if ($inspectorEnabled) {
+        $html = pinx_inspector_inject_widget($html, $inspectorRoute);
+    }
+
+    return $html;
 }
 
 function pinx_inspector_inject_widget(string $html, string $inspectorRoute): string
