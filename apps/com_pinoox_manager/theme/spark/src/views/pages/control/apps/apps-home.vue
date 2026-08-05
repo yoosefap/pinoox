@@ -1,13 +1,13 @@
 <template>
   <Page title="اپلیکیشن‌ها" class="pageApps">
     <template #toolbar>
-      <Menu @click="openModalInstallApp" :icon="saxIcon.add" label="نصب اپلکیشن"/>
-      <Menu @click="openMarket()" :icon="saxIcon.market" label="مارکت"/>
+      <Menu @click="openModalInstallApp" :icon="icons.add" label="نصب اپلکیشن"/>
+      <Menu @click="openMarket()" :icon="icons.market" label="مارکت"/>
     </template>
 
     <div v-if="stagedCount" class="pageApps__stagedEntry">
       <button type="button" class="pageApps__stagedBtn" @click="openStagedModal">
-        <Icon :is="saxIcon.upload" size="sm"/>
+        <Icon :is="icons.upload" size="sm"/>
         <span>بسته‌های آپلود شده</span>
         <span class="pageApps__stagedBadge">{{ stagedCount }}</span>
       </button>
@@ -33,13 +33,13 @@
         v-else-if="!stagedCount"
         title="هیچ اپلیکیشنی نصب نشده"
         description="برای افزودن اپلیکیشن جدید، روی دکمه نصب کلیک کنید."
-        :icon="saxIcon.apps"
+        :icon="icons.apps"
     />
   </Page>
 </template>
 
 <script setup>
-import {computed, onMounted, ref, watch} from 'vue';
+import {computed, markRaw, onMounted, ref, watch} from 'vue';
 import {openModal} from '@kolirt/vue-modal';
 import {saxIcon} from '@/const/icons.js';
 import {appAPI} from '@api/app.js';
@@ -57,6 +57,13 @@ const packageInstallerStore = usePackageInstallerStore();
 const {pushAppManager} = useControlPanelNavigation();
 const {openMarket} = useMarket();
 const stagedFiles = ref([]);
+
+const icons = markRaw({
+    add: saxIcon.add,
+    market: saxIcon.market,
+    upload: saxIcon.upload,
+    apps: saxIcon.apps,
+});
 
 const stagedCount = computed(() => stagedFiles.value.length);
 

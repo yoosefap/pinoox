@@ -1,4 +1,4 @@
-import {lucideSidebar} from '@/const/icons.js';
+import { lucideSidebar } from '@/const/icons.js';
 
 export const controlMenuItems = [
     {
@@ -47,30 +47,18 @@ export const controlMenuItems = [
     },
 ];
 
-export function menuIconComponent(LucideIcon, name) {
-    return {
-        element: LucideIcon,
-        attributes: {name},
-    };
-}
-
-export function toSidebarMenuItems(LucideIcon) {
+export function toSidebarMenuItems() {
     return controlMenuItems.map((item) => {
+        const base = {
+            title: item.title,
+            attributes: { 'aria-label': item.title },
+        };
+
         if (item.children) {
-            return {
-                title: item.title,
-                icon: menuIconComponent(LucideIcon, item.iconName),
-                attributes: {'aria-label': item.title},
-                child: item.children.map((child) => ({...child})),
-            };
+            return { ...base, child: item.children.map((child) => ({ ...child })) };
         }
 
-        return {
-            href: item.href,
-            title: item.title,
-            icon: menuIconComponent(LucideIcon, item.iconName),
-            attributes: {'aria-label': item.title},
-        };
+        return { ...base, href: item.href };
     });
 }
 

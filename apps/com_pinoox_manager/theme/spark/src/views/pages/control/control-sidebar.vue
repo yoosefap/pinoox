@@ -24,8 +24,8 @@
       <LucideIcon :name="isMenuCollapsed ? lucideSidebar.chevronLeft : lucideSidebar.chevronRight" size="sm"/>
     </template>
 
-    <template #icon>
-      <LucideIcon :name="lucideSidebar.chevronLeft" size="sm"/>
+    <template #icon="{ iconClass, item }">
+      <LucideIcon :name="resolveIconName(item)" size="sm"/>
     </template>
   </sidebar-menu>
 </template>
@@ -38,7 +38,7 @@ import {lucideSidebar} from '../../../const/icons.js';
 import LucideIcon from '../../components/widgets/LucideIcon.vue';
 import {useSidebarStore} from '../../composables/useSidebar.js';
 import {useControlPanelLayoutStore} from '@/stores/modules/controlPanelLayout.js';
-import {toSidebarMenuItems} from '@/views/pages/control/controlMenuItems.js';
+import {controlMenuItems, toSidebarMenuItems} from '@/views/pages/control/controlMenuItems.js';
 import ControlPanelSidebarLink from '@/views/pages/control/ControlPanelSidebarLink.vue';
 import {isControlPanelMemoryPath} from '@/router/controlPanelMemoryRouter.js';
 import {useControlPanelNavigation} from '@/views/composables/useControlPanelNavigation.js';
@@ -54,7 +54,26 @@ const sidebar = useSidebarStore();
 const layout = useControlPanelLayoutStore();
 const {pushControlPath} = useControlPanelNavigation();
 
-const menuItems = ref(toSidebarMenuItems(LucideIcon));
+const iconNameMap = new Map(controlMenuItems.map((item) => [item.title, item.iconName]));
+
+const resolveIconName = (item) => {
+    if (!item) {
+        return lucideSidebar.menu;
+    }
+
+    const byTitle = iconNameMap.get(item.title);
+    if (byTitle) {
+        return byTitle;
+    }
+
+    if (item.title === 'کنترل پنل' || item.iconClass?.includes('toggle')) {
+        return isMenuCollapsed.value ? lucideSidebar.chevronLeft : lucideSidebar.chevronRight;
+    }
+
+    return lucideSidebar.menu;
+};
+
+const menuItems = ref(toSidebarMenuItems());
 
 const isMenuCollapsed = computed(() => sidebar.isCollapsed && !layout.isCompact);
 const showSidebar = computed(() => !layout.isCompact || layout.mobileSidebarOpen);
