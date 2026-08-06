@@ -40,7 +40,7 @@ if ($loader instanceof Composer\Autoload\ClassLoader) {
 
 \Pinoox\Component\Helpers\EnvBootstrap::load(PINOOX_BASE_PATH);
 
-\Pinoox\Component\File::ensureStorageRootHtaccess(\Pinoox\Support\SystemConfig::path('storage'));
+\Pinoox\Component\Storage\StorageSetup::ensure();
 \Pinoox\Support\SystemConfig::ensureProjectConfigFiles();
 
 AppProvider::boot();

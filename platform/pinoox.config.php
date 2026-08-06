@@ -11,6 +11,6 @@ return [
     | Kernel version: pincore/config/pincore.config.php
     |
     */
-    'version_code' => 54,
-    'version_name' => '3.3.13',
+    'version_code' => 55,
+    'version_name' => '3.3.14',
 ];
