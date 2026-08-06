@@ -13,8 +13,8 @@ return [
     'title' => 'Manager',
     'description' => 'Pinoox control panel',
     'icon' => '@layout-dashboard',
-    'version-name' => '2.4.69',
-    'version-code' => 92,
+    'version-name' => '2.4.74',
+    'version-code' => 97,
     'developer' => 'Pinoox Team',
     'minpin' => 2,
     'lang' => 'fa',
@@ -23,8 +23,15 @@ return [
         'user' => 'platform',
     ],
     'filesystem' => [
-        'disk' => 'local',
-        'default_access' => 'public',
+        'disk' => 'local', // public disk ⇒ public uploads; anything else ⇒ private
+        'hash_length' => 8, // hash_id length (4–50); shorter URLs, still unique-checked
+        'file_policy' => 'owner',
+        'groups' => [
+            // 'avatar' => 'public',
+            // 'docs' => 'login',
+            // 'admin' => 'role:admin',
+            // 'reports' => 'permission:reports.view',
+        ],
         'thumb_width' => 512,
         'thumb_height' => 512,
     ],
