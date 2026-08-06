@@ -2,9 +2,9 @@
 
 /**
  *      ****  *  *     *  ****  ****  *    *
- *      *  *  *  * *   *  *  *  *  *   *  *
- *      ****  *  *  *  *  *  *  *  *    *
- *      *     *  *   * *  *  *  *  *   *  *
+ *      *  *  * *   *  *  *  *   *  *
+ *      ****  *  *  *  *  *  *  *    *
+ *      *     *  *   * *  *  *  *   *  *
  *      *     *  *    **  ****  ****  *    *
  * @author   Pinoox
  * @link https://www.pinoox.com/
@@ -33,7 +33,8 @@ class AppViewController
 
         $managerToken = $request->queryOne('__manager_token');
         if (is_string($managerToken) && $managerToken !== '') {
-            Auth::setRequestToken($managerToken);
+            $tokenKey = $this->resolveTokenKeyFromJwt($managerToken);
+            Auth::setRequestToken($tokenKey ?? $managerToken);
         }
 
         if (!Auth::check()) {
@@ -83,6 +84,34 @@ class AppViewController
         return Auth::check();
     }
 
+    /**
+     * Decode a manager JWT and return the inner token_key.
+     * The JWT payload is keyed by the active auth.cookie name (e.g. manager_pinoox).
+     */
+    private function resolveTokenKeyFromJwt(string $jwt): ?string
+    {
+        if (!class_exists('Firebase\\JWT\\JWT')) {
+            return null;
+        }
+
+        try {
+            $config = \Pinoox\Component\User\AuthConfig::resolve(refresh: false);
+            $secret = (string) ($config['jwt_secret'] ?? '');
+            $keyName = (string) ($config['key'] ?? '');
+
+            if ($secret === '' || $keyName === '') {
+                return null;
+            }
+
+            $payload = (array) \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($secret, 'HS256'));
+            $value = $payload[$keyName] ?? reset($payload);
+
+            return is_string($value) && $value !== '' ? $value : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     private function canPreview(string $packageName): bool
     {
         if (!AppEngine::exists($packageName))
@@ -117,4 +146,3 @@ class AppViewController
         ]);
     }
 }
-
