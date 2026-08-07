@@ -990,8 +990,8 @@ body.ltr {
   position: fixed;
   bottom: 0;
   left: 0;
-  background: url('@/assets/images/cloud.png') repeat-x bottom center;
-  background-size: auto 100%;
+  background: url('@/assets/images/cloud.png') no-repeat bottom center;
+  background-size: 100% auto;
   z-index: 0;
   pointer-events: none;
 }
