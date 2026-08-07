@@ -1,24 +1,28 @@
 <template>
     <div class="art-cloud">
-        <div class="moving-clouds"></div>
-        <div class="steps" v-if="$route.name !== 'lang' && $route.name !== 'setup' && $route.name !== 'bootstrap'">
-            <ul>
-                <li class="done" v-show="false"></li>
-                <li :class="stepClass(0)"><span>{{ install.agreement }}</span></li>
-                <li :class="stepClass(1)"><span>{{ install.prerequisites }}</span></li>
-                <li :class="stepClass(2)"><span>{{ install.db_info }}</span></li>
-                <li :class="stepClass(3)"><span>{{ user.info_admin }}</span></li>
-            </ul>
+        <div class="art-sky" aria-hidden="true">
+            <div class="moving-clouds"></div>
         </div>
-        <router-view v-slot="{ Component, route: activeRoute }">
-            <transition name="route-fade" mode="out-in">
-                <component
-                    :is="Component"
-                    :key="activeRoute.fullPath"
-                    v-model:steps="steps"
-                />
-            </transition>
-        </router-view>
+        <div class="art-cloud__content">
+            <div class="steps" v-if="$route.name !== 'lang' && $route.name !== 'setup' && $route.name !== 'bootstrap'">
+                <ul>
+                    <li class="done" v-show="false"></li>
+                    <li :class="stepClass(0)"><span>{{ install.agreement }}</span></li>
+                    <li :class="stepClass(1)"><span>{{ install.prerequisites }}</span></li>
+                    <li :class="stepClass(2)"><span>{{ install.db_info }}</span></li>
+                    <li :class="stepClass(3)"><span>{{ user.info_admin }}</span></li>
+                </ul>
+            </div>
+            <router-view v-slot="{ Component, route: activeRoute }">
+                <transition name="route-fade" mode="out-in">
+                    <component
+                        :is="Component"
+                        :key="activeRoute.fullPath"
+                        v-model:steps="steps"
+                    />
+                </transition>
+            </router-view>
+        </div>
 
         <div class="loading" v-if="isLoading || preflightLoading">
             <div class="lds-roller">
