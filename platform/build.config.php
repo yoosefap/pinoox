@@ -71,6 +71,6 @@ return [
     // Output directory for .zip files (default: ~/pinx/export/platform)
     // 'output_dir' => '~/pinx/export/platform',
 
-    // Write BUILD.json metadata into the archive root
+    // Write BUILD.json metadata into the archive storage directory
     'manifest' => true,
 ];
