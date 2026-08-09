@@ -352,6 +352,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    margin-top: 0.55rem;
   }
 
   &__quickBtn {
@@ -424,6 +425,29 @@
       line-height: 1.35;
       word-break: break-word;
     }
+
+    &.is-version {
+      cursor: pointer;
+      user-select: none;
+
+      &:hover,
+      &.is-open {
+        border-color: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      &:hover .appDetails__versionCode,
+      &.is-open .appDetails__versionCode {
+        display: inline;
+      }
+    }
+  }
+
+  &__versionCode {
+    display: none;
+    margin-inline-start: 0.2rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
   }
 
   &__metaHint {
@@ -664,6 +688,11 @@
       font-size: 0.78rem;
       line-height: 1.6;
       color: rgba(255, 255, 255, 0.52);
+    }
+
+    .appDetails__quick {
+      justify-content: center;
+      margin-top: 0.15rem;
     }
   }
 
