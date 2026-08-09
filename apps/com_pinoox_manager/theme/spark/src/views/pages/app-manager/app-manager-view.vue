@@ -14,6 +14,7 @@
             @click="pushControlPath('/control/apps')"
         >
           <Icon :is="saxIcon.back" size="sm"/>
+          <span>{{ translate('app_back') }}</span>
         </button>
 
         <AppIcon v-bind="appIconProps(app)" size="md"/>
@@ -84,6 +85,7 @@
             @click="pushControlPath('/control/apps')"
         >
           <Icon :is="saxIcon.back" size="sm"/>
+          <span>{{ translate('app_back') }}</span>
         </button>
         <div class="appManagerHero__text">
           <h1 class="appManagerHero__title">{{ translate('app_not_found_title') }}</h1>

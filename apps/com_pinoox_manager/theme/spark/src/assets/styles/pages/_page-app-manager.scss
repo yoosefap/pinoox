@@ -129,14 +129,17 @@
   &__back {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 2.15rem;
-    height: 2.15rem;
-    padding: 0;
+    gap: 0.28rem;
+    min-height: 2.15rem;
+    padding-block: 0.35rem;
+    padding-inline: 0.5rem 0.75rem;
     border-radius: 0.7rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1;
     cursor: pointer;
     flex-shrink: 0;
     transition:
@@ -146,8 +149,8 @@
 
     &:hover {
       color: #fff;
-      border-color: rgba(255, 255, 255, 0.22);
-      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.12);
     }
   }
 
