@@ -2,11 +2,12 @@
   <SimpleModal :title="title" size="md" class="modalAppUser">
     <form class="appUserForm" @submit.prevent="save">
       <div class="appUserForm__row">
-        <Input v-model="form.fname" :label="translate('app_users_form_fname')"/>
-        <Input v-model="form.lname" :label="translate('app_users_form_lname')"/>
+        <Input v-model="form.fname" variant="glass" :label="translate('app_users_form_fname')"/>
+        <Input v-model="form.lname" variant="glass" :label="translate('app_users_form_lname')"/>
       </div>
       <Input
           v-model="form.username"
+          variant="glass"
           :label="translate('app_users_form_username')"
           direction="ltr"
           autocomplete="off"
@@ -14,18 +15,21 @@
       <Input
           v-model="form.email"
           type="email"
+          variant="glass"
           :label="translate('app_users_form_email')"
           direction="ltr"
           autocomplete="off"
       />
       <Input
           v-model="form.mobile"
+          variant="glass"
           :label="translate('app_users_form_mobile')"
           direction="ltr"
       />
       <Input
           v-model="form.password"
           type="password"
+          variant="glass"
           :label="translate('app_users_form_password')"
           direction="ltr"
           autocomplete="new-password"

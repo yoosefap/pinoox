@@ -1,6 +1,15 @@
 <template>
   <PageSection :title="translate('app_users_title')">
     <template #actions>
+      <button
+          v-if="hasAccessLists"
+          type="button"
+          class="appUsers__access"
+          @click="openAccess"
+      >
+        <Icon :is="saxIcon.lock" size="xs"/>
+        <span>{{ translate('app_users_access_button') }}</span>
+      </button>
       <button type="button" class="appUsers__add" @click="openCreate">
         <Icon :is="saxIcon.add" size="xs"/>
         <span>{{ translate('app_users_add') }}</span>
@@ -140,67 +149,6 @@
           />
         </div>
       </section>
-
-      <section v-if="meta.has_roles" class="appUsersBlock">
-        <header class="appUsersBlock__head">
-          <h3>{{ translate('app_users_roles_title') }}</h3>
-        </header>
-        <div class="appUsersTableWrap">
-          <table class="appUsersTable appUsersTable--compact">
-            <thead>
-            <tr>
-              <th>{{ translate('app_users_col_name') }}</th>
-              <th>{{ translate('app_users_col_key') }}</th>
-              <th>{{ translate('app_users_permissions_title') }}</th>
-              <th v-if="meta.has_permissions" class="appUsersTable__actions">{{ translate('app_users_col_actions') }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="role in meta.roles" :key="role.role_id">
-              <td :data-label="translate('app_users_col_name')"><strong>{{ role.name }}</strong></td>
-              <td class="ltr" :data-label="translate('app_users_col_key')">{{ role.key }}</td>
-              <td :data-label="translate('app_users_permissions_title')">
-                <span v-if="role.permissions?.length" class="appUsersChips">
-                  <span v-for="permission in role.permissions" :key="permission.permission_id" class="appUsersChip">
-                    {{ permission.name }}
-                  </span>
-                </span>
-                <span v-else class="appUsersMuted">{{ translate('app_users_no_permissions') }}</span>
-              </td>
-              <td v-if="meta.has_permissions" class="appUsersTable__actions">
-                <button type="button" class="appUsersTable__action" :title="translate('app_users_edit_role')" @click="openRoleAccess(role)">
-                  <Icon :is="saxIcon.setting" size="xs"/>
-                </button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="appUsersBlock__caption">{{ translate('app_users_roles_caption') }}</p>
-      </section>
-
-      <section v-if="meta.has_permissions" class="appUsersBlock">
-        <header class="appUsersBlock__head">
-          <h3>{{ translate('app_users_permissions_title') }}</h3>
-        </header>
-        <div class="appUsersTableWrap">
-          <table class="appUsersTable appUsersTable--compact">
-            <thead>
-            <tr>
-              <th>{{ translate('app_users_col_name') }}</th>
-              <th>{{ translate('app_users_col_key') }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="permission in meta.permissions" :key="permission.permission_id">
-              <td :data-label="translate('app_users_col_name')"><strong>{{ permission.name }}</strong></td>
-              <td class="ltr" :data-label="translate('app_users_col_key')">{{ permission.key }}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="appUsersBlock__caption">{{ translate('app_users_permissions_caption') }}</p>
-      </section>
       </div>
     </div>
   </PageSection>
@@ -218,7 +166,7 @@ import {unwrapResponse} from '@utils/helpers/apiHelper.js';
 import {translate} from '@utils/helpers/managerLang.js';
 import ModalAppUser from './modal-app-user.vue';
 import ModalDeleteAppUser from './modal-delete-app-user.vue';
-import ModalAppRoleAccess from './modal-app-role-access.vue';
+import ModalAppAccess from './modal-app-access.vue';
 
 const props = defineProps({packageName: String});
 
@@ -263,6 +211,7 @@ const perPageOptions = [
 ];
 
 const hasActiveFilters = computed(() => Boolean(query.value || statusFilter.value || groupFilter.value || roleFilter.value));
+const hasAccessLists = computed(() => Boolean(meta.value.has_groups || meta.value.has_roles || meta.value.has_permissions));
 
 const statusFilterOptions = computed(() => [
   {value: '', label: translate('app_users_filter_all')},
@@ -424,14 +373,14 @@ function openDelete(user) {
   }).then(() => loadUsers()).catch(() => {});
 }
 
-function openRoleAccess(role) {
-  openModal(ModalAppRoleAccess, {
+function openAccess() {
+  openModal(ModalAppAccess, {
     props: {
       packageName: packageName.value,
-      role,
-      permissions: meta.value.permissions || [],
+      meta: meta.value,
+      onUpdated: loadUsers,
     },
-  }).then(() => loadUsers()).catch(() => {});
+  }).catch(() => {});
 }
 
 onMounted(loadUsers);
