@@ -8,6 +8,7 @@ export const appAPI = {
     iconPack: () => http.get(BASE_URL + '/iconPack', {alert: false}),
     get: (filter) => http.get(BASE_URL + '/get' + (filter ? `/${filter}` : ''), {alert: false}),
     getConfig: (packageName) => http.get(`${BASE_URL}/getConfig/${packageName}`, {alert: false}),
+    usage: (packageName) => http.get(`${BASE_URL}/usage/${packageName}`, {alert: false}),
     setConfig: (packageName, key, config) => http.post(`${BASE_URL}/setConfig/${packageName}/${key}`, {config}),
     installPackage: (filename) => http.get(`${BASE_URL}/installPackage/${encodeURIComponent(filename)}`),
     installPackageStart: (payload) => http.post(`${BASE_URL}/installPackage/start`, payload, {alert: false}),

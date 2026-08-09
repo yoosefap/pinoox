@@ -201,6 +201,99 @@
   }
 }
 
+.appData {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+
+  &__storage {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.1rem 1.15rem 1.15rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(var(--color-primary-rgb), 0.18), transparent 55%),
+      rgba(0, 0, 0, 0.22);
+  }
+
+  &__storageHead {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  &__storageIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 0.65rem;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(var(--color-primary-rgb), 0.18);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.28);
+    flex-shrink: 0;
+  }
+
+  &__storageTitle {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: $color-title;
+  }
+
+  &__storageHint {
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  &__storageValue {
+    font-size: 1.85rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+
+    @media (min-width: 840px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+    padding: 0.8rem 0.9rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  &__statLabel {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.48);
+  }
+
+  &__statValue {
+    font-size: 1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
+    word-break: break-word;
+  }
+}
+
 .appDetails {
   display: flex;
   flex-direction: column;

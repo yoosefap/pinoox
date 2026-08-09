@@ -1,6 +1,6 @@
 import * as sax from '@placetopay/iconsax-vue/outline';
 import * as m from '@mdi/js';
-import { Copy, ExternalLink, Eye, EyeOff, Home, LogOut } from 'lucide-vue-next';
+import { Copy, Database, ExternalLink, Eye, EyeOff, Home, LogOut } from 'lucide-vue-next';
 
 // Define an object of icons
 export const saxIcon = {
@@ -38,6 +38,7 @@ export const saxIcon = {
     notifyWarn: sax.Warning2Icon,
     notifyInfo: sax.InfoCircleIcon,
     notifyClose: sax.CloseSquareIcon,
+    data: Database,
     eye: Eye,
     eyeOff: EyeOff,
 };

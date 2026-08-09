@@ -79,6 +79,7 @@ const navItems = computed(() => [
   {to: appManagerPath(packageName.value, 'config'), label: 'تنظیمات', icon: saxIcon.setting},
   {to: appManagerPath(packageName.value, 'users'), label: 'کاربران', icon: saxIcon.user},
   {to: appManagerPath(packageName.value, 'templates'), label: 'قالب‌ها', icon: saxIcon.appearance},
+  {to: appManagerPath(packageName.value, 'data'), label: 'داده‌ها', icon: saxIcon.data},
 ]);
 
 onMounted(async () => {

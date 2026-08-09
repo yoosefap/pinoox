@@ -93,66 +93,19 @@
         </button>
       </div>
     </section>
-
-    <section v-if="isSystemApp" class="appDetails__notice appDetails__notice--info">
-      <Icon :is="saxIcon.notifyInfo" size="sm"/>
-      <p>{{ translate('app_system_notice') }}</p>
-    </section>
-
-    <section v-else class="appDetails__dangerZone">
-      <h3 class="appDetails__dangerZoneTitle">{{ translate('app_details_danger_zone') }}</h3>
-      <div class="appDetails__dangerGrid">
-        <article class="appDetails__warn">
-          <div class="appDetails__warnHead">
-            <span class="appDetails__warnIcon">
-              <Icon :is="saxIcon.refresh" size="sm"/>
-            </span>
-            <h4>{{ translate('app_reset_title') }}</h4>
-          </div>
-          <p>{{ translate('app_reset_intro') }}</p>
-          <Button
-              :label="translate('app_reset_button')"
-              variant="warning"
-              outline
-              @click="openResetModal"
-          />
-        </article>
-
-        <article class="appDetails__danger">
-          <div class="appDetails__dangerHead">
-            <span class="appDetails__dangerIcon">
-              <Icon :is="saxIcon.remove" size="sm"/>
-            </span>
-            <h4>{{ translate('app_uninstall_title') }}</h4>
-          </div>
-          <p>{{ translate('app_uninstall_intro') }}</p>
-          <Button
-              :label="translate('app_uninstall_button')"
-              variant="danger"
-              outline
-              @click="openUninstallModal"
-          />
-        </article>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup>
 import {computed, onUnmounted, ref} from 'vue';
-import {openModal} from '@kolirt/vue-modal';
 import {getUrl} from '@/boot.js';
 import {saxIcon} from '@/const/icons.js';
 import Icon from '@/views/components/widgets/Icon.vue';
-import Button from '@/views/components/widgets/Button.vue';
 import {resolveRouterMode} from '@utils/helpers/appRoutePolicy.js';
 import {useControlPanelNavigation} from '@/views/composables/useControlPanelNavigation.js';
 import {translate} from '@utils/helpers/managerLang.js';
 import {normalizeAppRoutes} from '@utils/appRoutes.js';
 import {formatSiteOriginForDisplay} from '@utils/helpers/siteUrlHelper.js';
-import {toastSuccess} from '@utils/helpers/toastHelper.js';
-import ModalUninstallApp from '@/views/pages/app-manager/modal-uninstall-app.vue';
-import ModalResetApp from '@/views/pages/app-manager/modal-reset-app.vue';
 
 const props = defineProps({
   app: {
@@ -273,33 +226,6 @@ function markCopied(route) {
 
 function goRoutes() {
   pushControlPath('/control/routes');
-}
-
-function openResetModal() {
-  openModal(ModalResetApp, {
-    props: {
-      app: props.app,
-      packageName: props.packageName,
-    },
-  }).then((result) => {
-    if (result?.reset) {
-      toastSuccess(translate('reset_successfully'));
-    }
-  }).catch(() => {});
-}
-
-function openUninstallModal() {
-  openModal(ModalUninstallApp, {
-    props: {
-      app: props.app,
-      packageName: props.packageName,
-    },
-  }).then((result) => {
-    if (result?.uninstalled) {
-      toastSuccess(translate('delete_successfully'));
-      pushControlPath('/control/apps');
-    }
-  }).catch(() => {});
 }
 
 onUnmounted(() => {

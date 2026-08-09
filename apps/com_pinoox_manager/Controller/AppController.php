@@ -19,11 +19,18 @@ use App\com_pinoox_manager\Component\AppLifecycle;
 use App\com_pinoox_manager\Component\InstallSession;
 use App\com_pinoox_manager\Component\PackageDatabase;
 use App\com_pinoox_manager\Component\PackagePaths;
+use App\com_pinoox_manager\Component\StorageHelper;
 use App\com_pinoox_manager\Component\Wizard;
 use Pinoox\Component\Http\Request;
 use Pinoox\Component\Http\JsonResponse;
 use Pinoox\Component\Kernel\Controller\ApiController;
+use Pinoox\Component\Migration\MigrationQuery;
+use Pinoox\Model\FileModel;
+use Pinoox\Model\HistoryModel;
 use Pinoox\Portal\App\AppEngine;
+use Pinoox\Portal\App\AppRouter;
+use Pinoox\Portal\Auth;
+use Pinoox\Portal\Storage;
 
 class AppController extends ApiController
 {
@@ -382,6 +389,84 @@ class AppController extends ApiController
         );
     }
 
+    public function usage($packageName)
+    {
+        if (empty($packageName) || !AppEngine::exists($packageName)) {
+            return $this->deny('manager.request_not_valid');
+        }
+
+        $fileCount = 0;
+        $fileBytes = 0;
+
+        try {
+            $fileCount = (int) FileModel::withoutGlobalScopes()->where('app', $packageName)->count();
+            $fileBytes = (int) FileModel::withoutGlobalScopes()->where('app', $packageName)->sum('file_size');
+        } catch (\Throwable) {
+        }
+
+        $private = $this->directoryUsage($this->resolveStoragePath('app', $packageName));
+        $public = $this->directoryUsage($this->resolveStoragePath('public', $packageName));
+        $diskBytes = $private['bytes'] + $public['bytes'];
+        $diskComplete = $private['complete'] && $public['complete'];
+        $storageBytes = $diskComplete ? $diskBytes : max($diskBytes, $fileBytes);
+
+        $packagePath = null;
+
+        try {
+            $packagePath = AppEngine::path($packageName);
+        } catch (\Throwable) {
+        }
+
+        $package = $this->directoryUsage(is_string($packagePath) ? $packagePath : null);
+
+        $userCount = 0;
+
+        try {
+            $users = Auth::listForApp($packageName);
+            $userCount = is_array($users) ? count($users) : 0;
+        } catch (\Throwable) {
+        }
+
+        $routeCount = 0;
+
+        try {
+            $routes = AppRouter::getByPackage($packageName);
+            $routeCount = is_array($routes) ? count($routes) : 0;
+        } catch (\Throwable) {
+        }
+
+        $migrations = 0;
+        $patches = 0;
+
+        try {
+            $migrations = (int) HistoryModel::where('app', $packageName)
+                ->where('type', MigrationQuery::TYPE_MIGRATION)
+                ->count();
+            $patches = (int) HistoryModel::where('app', $packageName)
+                ->where('type', MigrationQuery::TYPE_PATCH)
+                ->count();
+        } catch (\Throwable) {
+        }
+
+        return [
+            'storage_bytes' => $storageBytes,
+            'storage_label' => $this->formatBytes($storageBytes),
+            'storage_complete' => $diskComplete || $fileBytes > 0 || $storageBytes === 0,
+            'storage_private_bytes' => $private['bytes'],
+            'storage_public_bytes' => $public['bytes'],
+            'files' => $fileCount,
+            'file_bytes' => $fileBytes,
+            'file_label' => $this->formatBytes($fileBytes),
+            'package_bytes' => $package['bytes'],
+            'package_label' => $this->formatBytes($package['bytes']),
+            'package_complete' => $package['complete'],
+            'users' => $userCount,
+            'routes' => $routeCount,
+            'migrations' => $migrations,
+            'patches' => $patches,
+        ];
+    }
+
     public function remove(Request $request, $packageName)
     {
         if (empty($packageName))
@@ -443,6 +528,58 @@ class AppController extends ApiController
         }
 
         return $this->message('manager.reset_successfully', $result);
+    }
+
+    private function resolveStoragePath(string $kind, string $package): ?string
+    {
+        try {
+            $path = $kind === 'public'
+                ? Storage::publicPath($package)
+                : Storage::appPath($package);
+
+            return is_string($path) && $path !== '' ? $path : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @return array{bytes: int, complete: bool}
+     */
+    private function directoryUsage(?string $path): array
+    {
+        if (!is_string($path) || $path === '' || !is_dir($path)) {
+            return ['bytes' => 0, 'complete' => true];
+        }
+
+        $scan = StorageHelper::directorySizeBytes($path, 12, true);
+
+        return [
+            'bytes' => (int) ($scan['bytes'] ?? 0),
+            'complete' => !empty($scan['complete']),
+        ];
+    }
+
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes < 1024) {
+            return $bytes . ' B';
+        }
+
+        $units = ['KB', 'MB', 'GB', 'TB'];
+        $value = (float) $bytes;
+
+        foreach ($units as $unit) {
+            $value /= 1024;
+
+            if ($value < 1024) {
+                $decimals = $value < 10 ? 2 : ($value < 100 ? 1 : 0);
+
+                return rtrim(rtrim(number_format($value, $decimals, '.', ''), '0'), '.') . ' ' . $unit;
+            }
+        }
+
+        return number_format($value / 1024, 1, '.', '') . ' PB';
     }
 
     private function boolPayload(Request $request, string $key, bool $default = false): bool

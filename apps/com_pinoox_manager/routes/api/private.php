@@ -102,6 +102,7 @@ return collect(['flow' => ['manager.auth']], function () {
                     post('/abort/{uploadId}', 'abort')->name('abort');
                 });
 
+            get('/usage/{packageName}', 'usage')->name('usage.packageName');
             post('/remove/{packageName}', 'remove')->name('remove.packageName');
             post('/reset/{packageName}', 'reset')->name('reset.packageName');
         });
