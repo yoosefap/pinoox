@@ -38,6 +38,14 @@
         </div>
       </div>
 
+      <label class="modalAppUninstall__option">
+        <input v-model="purgeData" type="checkbox" :disabled="isDeleting || isDone"/>
+        <span>
+          <strong>{{ translate('app_uninstall_purge_title') }}</strong>
+          <small>{{ translate('app_uninstall_purge_hint') }}</small>
+        </span>
+      </label>
+
       <p v-if="isDeleting" class="modalAppUninstall__status" role="status" aria-live="polite">
         <span class="modalAppUninstall__statusDot"/>
         {{ translate('app_uninstall_progress') }}
@@ -101,6 +109,7 @@ const routeStore = useRouteStore();
 
 const isDeleting = ref(false);
 const isDone = ref(false);
+const purgeData = ref(true);
 
 const assignedRoutes = computed(() => {
     if (routeStore.isLoaded) {
@@ -131,7 +140,9 @@ const confirmUninstall = async () => {
   await nextTick();
 
   try {
-    const response = await appAPI.remove(props.packageName, HTTP_ALERT_SILENT);
+    const response = await appAPI.remove(props.packageName, {
+      purge_data: purgeData.value,
+    }, HTTP_ALERT_SILENT);
     unwrapResponse(response);
     appStore.deleteAppByPackage(props.packageName);
     routeStore.deleteRoutesByPackage(props.packageName);

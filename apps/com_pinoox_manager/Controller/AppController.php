@@ -15,6 +15,7 @@ namespace App\com_pinoox_manager\Controller;
 
 use App\com_pinoox_manager\Component\AppHelper;
 use App\com_pinoox_manager\Component\AppIconPack;
+use App\com_pinoox_manager\Component\AppLifecycle;
 use App\com_pinoox_manager\Component\InstallSession;
 use App\com_pinoox_manager\Component\PackageDatabase;
 use App\com_pinoox_manager\Component\PackagePaths;
@@ -381,7 +382,7 @@ class AppController extends ApiController
         );
     }
 
-    public function remove($packageName)
+    public function remove(Request $request, $packageName)
     {
         if (empty($packageName))
             return $this->deny('manager.request_not_valid');
@@ -395,7 +396,12 @@ class AppController extends ApiController
             return $this->deny('manager.cannot_delete_system_app');
         }
 
-        if (!Wizard::deleteApp($packageName)) {
+        $purgeData = $this->boolPayload($request, 'purge_data', true);
+
+        if (!Wizard::deleteApp($packageName, [
+            'purge_data' => $purgeData,
+            'purge_storage' => $purgeData,
+        ])) {
             $message = Wizard::getMessage();
 
             if (empty($message)) {
@@ -406,5 +412,63 @@ class AppController extends ApiController
         }
 
         return $this->message('manager.delete_successfully');
+    }
+
+    public function reset(Request $request, $packageName)
+    {
+        if (empty($packageName))
+            return $this->deny('manager.request_not_valid');
+
+        if (!AppEngine::exists($packageName))
+            return $this->deny('manager.request_not_valid');
+
+        $config = AppEngine::config($packageName);
+
+        if ($config->get('sys-app')) {
+            return $this->deny('manager.cannot_reset_system_app');
+        }
+
+        $result = AppLifecycle::reset($packageName, [
+            'purge_storage' => $this->boolPayload($request, 'purge_storage', true),
+        ]);
+
+        if ($result === false) {
+            $message = AppLifecycle::getMessage();
+
+            if (empty($message)) {
+                return $this->deny('manager.error_happened');
+            }
+
+            return $this->deny($message);
+        }
+
+        return $this->message('manager.reset_successfully', $result);
+    }
+
+    private function boolPayload(Request $request, string $key, bool $default = false): bool
+    {
+        $value = $request->payload($key, $default);
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (bool) $value;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+
+            if (in_array($normalized, ['1', 'true', 'yes', 'on'], true)) {
+                return true;
+            }
+
+            if (in_array($normalized, ['0', 'false', 'no', 'off', ''], true)) {
+                return false;
+            }
+        }
+
+        return (bool) $value;
     }
 }

@@ -103,6 +103,7 @@ return collect(['flow' => ['manager.auth']], function () {
                 });
 
             post('/remove/{packageName}', 'remove')->name('remove.packageName');
+            post('/reset/{packageName}', 'reset')->name('reset.packageName');
         });
 
     group('/router')

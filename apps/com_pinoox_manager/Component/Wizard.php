@@ -153,11 +153,36 @@ class Wizard
         return $message;
     }
 
-    public static function deleteApp($packageName)
+    /**
+     * @param array{
+     *     purge_data?: bool,
+     *     purge_storage?: bool,
+     *     force?: bool,
+     *     skip_routes?: bool,
+     *     keep_files?: bool
+     * } $options
+     */
+    public static function deleteApp($packageName, array $options = [])
     {
+        $purgeData = array_key_exists('purge_data', $options)
+            ? (bool) $options['purge_data']
+            : true;
+        $purgeStorage = array_key_exists('purge_storage', $options)
+            ? (bool) $options['purge_storage']
+            : $purgeData;
+
+        if ($purgeStorage) {
+            AppLifecycle::purgeStorage($packageName);
+        }
+
         AppRouteCleanup::deleteForPackage($packageName);
 
-        $result = Pinx::uninstallApp($packageName);
+        $result = Pinx::uninstallApp($packageName, [
+            'force' => (bool) ($options['force'] ?? false),
+            'skip_migrate' => !$purgeData || (bool) ($options['skip_migrate'] ?? false),
+            'skip_routes' => (bool) ($options['skip_routes'] ?? false),
+            'keep_files' => (bool) ($options['keep_files'] ?? false),
+        ]);
 
         if (!$result->success) {
             self::$message = $result->message;
