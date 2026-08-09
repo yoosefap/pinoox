@@ -77,10 +77,7 @@ return collect(['flow' => ['manager.auth']], function () {
             get('/getConfig/{packageName}', 'getConfig')->name('getConfig.packageName');
             post('/setConfig/{packageName}/{key}', 'setConfig')->name('setConfig.packageName.key');
             post('/install', 'install')->name('install');
-            get('/packageMeta', 'packageMeta')->name('packageMeta');
-            get('/packageMeta/{filename}', 'packageMeta')
-                ->name('packageMeta.filename')
-                ->filters(['filename' => '[^/]+']);
+            post('/packageMeta', 'packageMeta')->name('packageMeta');
             get('/installPackage/{filename}', 'installPackage')
                 ->name('installPackage.filename')
                 ->filters(['filename' => '[^/]+']);

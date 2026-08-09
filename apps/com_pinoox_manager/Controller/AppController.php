@@ -299,13 +299,9 @@ class AppController extends ApiController
         }
     }
 
-    public function packageMeta(Request $request, $filename = null)
+    public function packageMeta(Request $request)
     {
-        $filename = basename((string) (
-            $filename
-            ?: $request->queryOne('filename', '')
-            ?: $request->payload('filename', '')
-        ));
+        $filename = basename((string) $request->payload('filename', ''));
 
         if ($filename === '') {
             return $this->deny('manager.error_happened');
