@@ -10,5 +10,16 @@ export const userAPI = {
     changeAvatar: (formData) => http.postForm(`${BASE_URL}/changeAvatar`, formData, HTTP_ALERT_SUCCESS),
     changeInfo: (params) => http.post(`${BASE_URL}/changeInfo`, params, HTTP_ALERT_SUCCESS),
     changePassword: (params) => http.post(`${BASE_URL}/changePassword`, params, HTTP_ALERT_SUCCESS),
-    getUsers: (packageName) => http.get(`${BASE_URL}/getUsers/${packageName}`, {alert: false}),
+    getUsers: (packageName, params = {}) => http.get(`${BASE_URL}/getUsers/${packageName}`, {
+        params,
+        alert: false,
+    }),
+    createUser: (packageName, data) => http.post(`${BASE_URL}/create/${packageName}`, data, {alert: false}),
+    updateUser: (packageName, userId, data) => http.post(`${BASE_URL}/update/${packageName}/${userId}`, data, {alert: false}),
+    deleteUser: (packageName, userId) => http.post(`${BASE_URL}/delete/${packageName}/${userId}`, {}, {alert: false}),
+    saveRolePermissions: (packageName, roleId, permissionIds) => http.post(
+        `${BASE_URL}/rolePermissions/${packageName}/${roleId}`,
+        {permission_ids: permissionIds},
+        {alert: false},
+    ),
 };

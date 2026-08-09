@@ -172,5 +172,10 @@ return [
     'database_error_host_invalid' => 'The database host address is invalid.',
     'database_error_sqlite_path' => 'The SQLite database file could not be opened.',
     'unlocked_successfully' => 'unlocked successfully',
+    'user_not_found' => 'User not found',
+    'cannot_delete_self' => 'You cannot delete your own account',
+    'user_delete_failed' => 'Could not delete the user',
+    'role_not_found' => 'Role not found',
+    'role_permission_failed' => 'Could not save role permissions',
 
 ];

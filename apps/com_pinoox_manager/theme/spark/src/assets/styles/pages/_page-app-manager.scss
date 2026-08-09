@@ -13,6 +13,7 @@
 
   &.is-refreshing {
     .appManagerUsers,
+    .appUsers,
     .appTemplates {
       opacity: 0.72;
       pointer-events: none;
@@ -157,6 +158,7 @@
   &__text {
     display: flex;
     flex-direction: column;
+    align-items: start;
     gap: 0.15rem;
     min-width: 0;
     flex: 1 1 10rem;
@@ -174,6 +176,7 @@
     font-size: 0.74rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     color: rgba(255, 255, 255, 0.55);
+    unicode-bidi: isolate;
   }
 
   &__aside {
@@ -1392,5 +1395,425 @@
     background: #fbbf24;
     box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55);
     animation: routeDeleteStatusDot 1.2s ease-in-out infinite;
+  }
+}
+
+.appUsers {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+
+  &__intro {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  &__add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.4);
+    background: rgba(var(--color-primary-rgb), 0.18);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 650;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(var(--color-primary-rgb), 0.28);
+    }
+  }
+
+  &__toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 0.7rem;
+    align-items: end;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.45rem;
+    padding: 0 0.75rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.22);
+    color: rgba(255, 255, 255, 0.72);
+
+    input {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 0.84rem;
+      outline: none;
+    }
+  }
+}
+
+.appUsersBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+
+  &__head h3 {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: $color-title;
+  }
+
+  &__caption {
+    margin: 0;
+    font-size: 0.74rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.appUsersTableWrap {
+  overflow-x: auto;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.appUsersTable {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+
+  &--compact {
+    min-width: 28rem;
+  }
+
+  th,
+  td {
+    padding: 0.7rem 0.85rem;
+    text-align: start;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  th {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.03);
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  &__id {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  &__person {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    strong {
+      font-weight: 650;
+    }
+
+    small {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  &__sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  &__sortMark {
+    font-size: 0.7rem;
+    opacity: 0.55;
+  }
+
+  th.is-active .appUsersTable__sortMark {
+    opacity: 1;
+    color: rgb(var(--color-primary-rgb));
+  }
+
+  &__actions {
+    white-space: nowrap;
+  }
+
+  &__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin-inline-start: 0.2rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.82);
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    &.is-danger:hover:not(:disabled) {
+      border-color: rgba(252, 165, 165, 0.35);
+      background: rgba(211, 47, 47, 0.18);
+      color: #fecaca;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 760px) {
+    min-width: 0;
+
+    thead {
+      display: none;
+    }
+
+    tbody tr {
+      display: grid;
+      gap: 0.45rem;
+      padding: 0.85rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      display: grid;
+      grid-template-columns: 7.5rem minmax(0, 1fr);
+      gap: 0.5rem;
+      padding: 0;
+      border: 0;
+      align-items: start;
+
+      &::before {
+        content: attr(data-label);
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.48);
+      }
+    }
+
+    &__actions {
+      grid-template-columns: 7.5rem auto;
+    }
+  }
+}
+
+.appUsersStatus {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.78);
+
+  &.is-active {
+    background: rgba(74, 222, 128, 0.14);
+    color: #86efac;
+  }
+
+  &.is-inactive,
+  &.is-suspend {
+    background: rgba(252, 165, 165, 0.12);
+    color: #fecaca;
+  }
+
+  &.is-pending {
+    background: rgba(251, 191, 36, 0.14);
+    color: #fde68a;
+  }
+}
+
+.appUsersChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.appUsersChip {
+  display: inline-flex;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.appUsersMuted {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.appUsersPager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.6rem;
+
+  button,
+  span {
+    font-size: 0.78rem;
+  }
+
+  button {
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    color: rgba(255, 255, 255, 0.62);
+    padding-bottom: 0.45rem;
+  }
+
+  .darkSelect {
+    min-width: 7.5rem;
+  }
+}
+
+.appUserForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__hint {
+    margin: -0.4rem 0 0;
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &__checks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  &__checksLabel {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  &__check,
+  .appRoleAccess__check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+
+    input {
+      margin-top: 0.15rem;
+      accent-color: rgb(var(--color-primary-rgb));
+    }
+  }
+}
+
+.modalAppUserDelete__body,
+.appRoleAccess__hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.modalAppUserDelete__lead {
+  margin: 0;
+  font-weight: 650;
+  color: #fff;
+}
+
+.modalAppUserDelete__hint,
+.appRoleAccess__empty {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.modalAppUserDelete__preview,
+.appRoleAccess__role {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.85rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.appRoleAccess__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.appRoleAccess__check span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+
+  small {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.45);
   }
 }

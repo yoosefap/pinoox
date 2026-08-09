@@ -194,4 +194,9 @@ return [
     'assign_route' => 'تخصیص آدرس',
     'skip_route' => 'بعداً',
     'unlocked_successfully' => 'قفل با موفقیت باز شد',
+    'user_not_found' => 'کاربر پیدا نشد',
+    'cannot_delete_self' => 'نمی‌توانید حساب خودتان را حذف کنید',
+    'user_delete_failed' => 'حذف کاربر انجام نشد',
+    'role_not_found' => 'نقش پیدا نشد',
+    'role_permission_failed' => 'ذخیره دسترسی‌های نقش انجام نشد',
 ];

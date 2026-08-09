@@ -38,6 +38,10 @@ return collect(['flow' => ['manager.auth']], function () {
             post('/changeInfo', 'changeInfo')->name('changeInfo');
             post('/changePassword', 'changePassword')->name('changePassword');
             get('/getUsers/{packageName}', 'getUsers')->name('getUsers.packageName');
+            post('/create/{packageName}', 'createUser')->name('create.packageName');
+            post('/update/{packageName}/{userId}', 'updateUser')->name('update.packageName.userId');
+            post('/delete/{packageName}/{userId}', 'deleteUser')->name('delete.packageName.userId');
+            post('/rolePermissions/{packageName}/{roleId}', 'saveRolePermissions')->name('rolePermissions.packageName.roleId');
         });
 
     group('/options')
