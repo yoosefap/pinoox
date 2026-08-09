@@ -13,26 +13,6 @@
         <p v-if="app?.description" class="appDetails__description">{{ app.description }}</p>
         <p v-else class="appDetails__muted">{{ translate('app_details_no_description') }}</p>
       </div>
-
-      <div class="appDetails__quick">
-        <button
-            v-if="primaryRoute"
-            type="button"
-            class="appDetails__quickBtn appDetails__quickBtn--primary"
-            @click="openRouteUrl(primaryRoute)"
-        >
-          <Icon :is="saxIcon.externalLink" size="xs"/>
-          <span>{{ translate('app_run') }}</span>
-        </button>
-        <button type="button" class="appDetails__quickBtn" @click="goConfig">
-          <Icon :is="saxIcon.setting" size="xs"/>
-          <span>{{ translate('app_settings') }}</span>
-        </button>
-        <button v-if="hasTemplates" type="button" class="appDetails__quickBtn" @click="goTemplates">
-          <Icon :is="saxIcon.appearance" size="xs"/>
-          <span>{{ translate('app_templates') }}</span>
-        </button>
-      </div>
     </section>
 
     <section class="appDetails__stats" :aria-label="translate('app_details_about')">
@@ -183,7 +163,7 @@ const props = defineProps({
   },
 });
 
-const {pushAppManager, pushControlPath} = useControlPanelNavigation();
+const {pushControlPath} = useControlPanelNavigation();
 
 const siteUrl = String(getUrl().SITE ?? '').replace(/\/+$/, '');
 const currentSite = formatSiteOriginForDisplay(siteUrl);
@@ -191,16 +171,7 @@ const copiedPath = ref(null);
 let copiedTimer = null;
 
 const isSystemApp = computed(() => !!(props.app?.sys_app ?? props.app?.['sys-app']));
-const hasTemplates = computed(() => !isSystemApp.value);
 const routes = computed(() => normalizeAppRoutes(props.app?.routes));
-
-const primaryRoute = computed(() => {
-  if (routes.value.length === 0) {
-    return null;
-  }
-
-  return routes.value.find((route) => route.path === '/') ?? routes.value[0];
-});
 
 const routerModeLabel = computed(() => {
   const mode = resolveRouterMode(props.app);
@@ -293,18 +264,6 @@ function markCopied(route) {
   copiedTimer = setTimeout(() => {
     copiedPath.value = null;
   }, 1800);
-}
-
-function openRouteUrl(route) {
-  window.open(buildRouteUrl(route), '_blank', 'noopener,noreferrer');
-}
-
-function goConfig() {
-  pushAppManager(props.packageName, 'config');
-}
-
-function goTemplates() {
-  pushAppManager(props.packageName, 'templates');
 }
 
 function goRoutes() {
