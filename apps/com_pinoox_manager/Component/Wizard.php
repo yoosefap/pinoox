@@ -17,6 +17,8 @@ use App\com_pinoox_manager\Component\PackagePaths;
 use Pinoox\Component\Cache\AppCacheManager;
 use Pinoox\Component\Database\Patch\PatchToolkit;
 use Pinoox\Component\Migration\Migrator;
+use Pinoox\Component\Package\Lifecycle\AppLifecycle;
+use Pinoox\Component\Package\Lifecycle\AppLifecycleRunner;
 use Pinoox\Component\Package\Pinx\PinxInstallResult;
 use Pinoox\Component\Package\Pinx\PinxManifest;
 use Pinoox\Component\Package\PackageName;
@@ -421,6 +423,7 @@ class Wizard
             if ($needsDatabasePass) {
                 $installOptions['skip_migrate'] = true;
                 $installOptions['skip_patch'] = true;
+                $installOptions['skip_lifecycle'] = true;
                 $installOptions['skip_cache'] = true;
             }
 
@@ -499,6 +502,20 @@ class Wizard
                 self::appendStep($steps, 'migrate', 'skipped', 'مایگریشنی در بسته تعریف نشده است.', $sessionId);
                 self::appendStep($steps, 'patch', 'skipped', 'پچی برای اجرا نبود.', $sessionId);
             }
+
+            $life = (new AppLifecycleRunner(AppEngine::___()))->run(
+                $package,
+                $result->mode === 'update' ? AppLifecycle::UPDATE : AppLifecycle::INSTALL,
+                [
+                    'toVersionCode' => $result->manifest->versionCode(),
+                    'toVersionName' => $result->manifest->versionName(),
+                ],
+                [
+                    'once' => $result->mode !== 'update',
+                    'record' => $result->mode !== 'update',
+                ],
+            );
+            self::appendStep($steps, 'lifecycle', $life['status'], $life['message'], $sessionId);
 
             AppCacheManager::build($package, null, true);
             self::appendStep($steps, 'cache', 'ok', 'کش اپلیکیشن بازسازی شد.', $sessionId);
