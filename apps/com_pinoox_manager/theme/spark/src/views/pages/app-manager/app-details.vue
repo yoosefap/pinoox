@@ -1,85 +1,173 @@
 <template>
   <div class="appDetails">
-    <section class="appDetails__stats">
+    <section class="appDetails__overview">
+      <div class="appDetails__about">
+        <div class="appDetails__aboutHead">
+          <h3 class="appDetails__cardTitle">{{ translate('app_details_about') }}</h3>
+          <div v-if="badges.length" class="appDetails__badges">
+            <span v-for="badge in badges" :key="badge.label" class="appDetails__badge" :class="badge.class">
+              {{ badge.label }}
+            </span>
+          </div>
+        </div>
+        <p v-if="app?.description" class="appDetails__description">{{ app.description }}</p>
+        <p v-else class="appDetails__muted">{{ translate('app_details_no_description') }}</p>
+      </div>
+
+      <div class="appDetails__quick">
+        <button
+            v-if="primaryRoute"
+            type="button"
+            class="appDetails__quickBtn appDetails__quickBtn--primary"
+            @click="openRouteUrl(primaryRoute)"
+        >
+          <Icon :is="saxIcon.externalLink" size="xs"/>
+          <span>{{ translate('app_run') }}</span>
+        </button>
+        <button type="button" class="appDetails__quickBtn" @click="goConfig">
+          <Icon :is="saxIcon.setting" size="xs"/>
+          <span>{{ translate('app_settings') }}</span>
+        </button>
+        <button v-if="hasTemplates" type="button" class="appDetails__quickBtn" @click="goTemplates">
+          <Icon :is="saxIcon.appearance" size="xs"/>
+          <span>{{ translate('app_templates') }}</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="appDetails__stats" :aria-label="translate('app_details_about')">
       <article v-for="item in statItems" :key="item.label" class="appDetails__stat">
         <span class="appDetails__statLabel">{{ item.label }}</span>
         <span class="appDetails__statValue" :dir="item.ltr ? 'ltr' : undefined">{{ item.value }}</span>
       </article>
     </section>
 
-    <section v-if="app?.description" class="appDetails__card">
-      <h3 class="appDetails__cardTitle">{{ translate('app_details_about') }}</h3>
-      <p class="appDetails__description">{{ app.description }}</p>
-    </section>
+    <section class="appDetails__card appDetails__addresses">
+      <header class="appDetails__cardHead">
+        <div class="appDetails__cardHeadMain">
+          <Icon :is="saxIcon.routes" size="sm"/>
+          <h3 class="appDetails__cardTitle">{{ translate('app_details_addresses') }}</h3>
+          <span class="appDetails__count">{{ routes.length }}</span>
+        </div>
+        <button type="button" class="appDetails__textLink" @click="goRoutes">
+          {{ translate('app_details_manage_routes') }}
+        </button>
+      </header>
 
-    <section v-if="badges.length" class="appDetails__badges">
-      <span v-for="badge in badges" :key="badge.label" class="appDetails__badge" :class="badge.class">
-        {{ badge.label }}
-      </span>
-    </section>
-
-    <section v-if="routes.length" class="appDetails__card">
-      <h3 class="appDetails__cardTitle">{{ translate('app_details_addresses') }}</h3>
-      <ul class="appDetails__routes">
-        <li v-for="route in routesPreview" :key="route.path" dir="ltr">
-          <code>{{ route.path }}</code>
+      <ul v-if="routes.length" class="appDetails__routeList">
+        <li v-for="route in routes" :key="route.path" class="appDetails__route" dir="ltr">
+          <span class="appDetails__live" aria-hidden="true"/>
+          <a
+              class="appDetails__url"
+              dir="ltr"
+              :href="buildRouteUrl(route)"
+              target="_blank"
+              rel="noopener noreferrer"
+              :title="translate('route_url_open')"
+          >
+            <span class="appDetails__urlOrigin">{{ currentSite }}</span>
+            <span class="appDetails__urlPath">{{ routeUrlSuffix(route.path) }}</span>
+          </a>
+          <span v-if="isHomeRoute(route)" class="appDetails__homeBadge">
+            {{ translate('app_details_home_badge') }}
+          </span>
+          <div class="appDetails__routeActions">
+            <span
+                v-if="isCopied(route)"
+                class="appDetails__copied"
+                role="status"
+                aria-live="polite"
+            >
+              {{ translate('route_url_copied') }}
+            </span>
+            <button
+                type="button"
+                class="appDetails__iconBtn"
+                :class="{'is-copied': isCopied(route)}"
+                :title="isCopied(route) ? translate('route_url_copied') : translate('route_url_copy')"
+                @click="copyRouteUrl(route)"
+            >
+              <Icon :is="isCopied(route) ? saxIcon.notifySuccess : saxIcon.copy" size="xs"/>
+            </button>
+            <a
+                class="appDetails__iconBtn"
+                :href="buildRouteUrl(route)"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="translate('route_url_open')"
+            >
+              <Icon :is="saxIcon.externalLink" size="xs"/>
+            </a>
+          </div>
         </li>
       </ul>
-      <p v-if="routes.length > routesPreview.length" class="appDetails__routesMore">
-        +{{ routes.length - routesPreview.length }} {{ translate('app_details_more_addresses') }}
-      </p>
+
+      <div v-else class="appDetails__empty">
+        <Icon :is="saxIcon.routes" size="md"/>
+        <p>{{ translate('app_details_addresses_empty') }}</p>
+        <span>{{ translate('app_details_addresses_empty_hint') }}</span>
+        <button type="button" class="appDetails__quickBtn appDetails__quickBtn--primary" @click="goRoutes">
+          {{ translate('app_details_manage_routes') }}
+        </button>
+      </div>
     </section>
-      
+
     <section v-if="isSystemApp" class="appDetails__notice appDetails__notice--info">
       <Icon :is="saxIcon.notifyInfo" size="sm"/>
       <p>{{ translate('app_system_notice') }}</p>
     </section>
 
-    <template v-else>
-      <section class="appDetails__warn">
-        <div class="appDetails__warnHead">
-          <Icon :is="saxIcon.refresh" size="sm"/>
-          <h3>{{ translate('app_reset_title') }}</h3>
-        </div>
-        <p>{{ translate('app_reset_intro') }}</p>
-        <Button
-            :label="translate('app_reset_button')"
-            variant="warning"
-            outline
-            :icon="saxIcon.refresh"
-            @click="openResetModal"
-        />
-      </section>
+    <section v-else class="appDetails__dangerZone">
+      <h3 class="appDetails__dangerZoneTitle">{{ translate('app_details_danger_zone') }}</h3>
+      <div class="appDetails__dangerGrid">
+        <article class="appDetails__warn">
+          <div class="appDetails__warnHead">
+            <span class="appDetails__warnIcon">
+              <Icon :is="saxIcon.refresh" size="sm"/>
+            </span>
+            <h4>{{ translate('app_reset_title') }}</h4>
+          </div>
+          <p>{{ translate('app_reset_intro') }}</p>
+          <Button
+              :label="translate('app_reset_button')"
+              variant="warning"
+              outline
+              @click="openResetModal"
+          />
+        </article>
 
-      <section class="appDetails__danger">
-        <div class="appDetails__dangerHead">
-          <Icon :is="saxIcon.remove" size="sm"/>
-          <h3>{{ translate('app_uninstall_title') }}</h3>
-        </div>
-        <p>{{ translate('app_uninstall_intro') }}</p>
-        <Button
-            :label="translate('app_uninstall_button')"
-            variant="danger"
-            outline
-            :icon="saxIcon.remove"
-            @click="openUninstallModal"
-        />
-      </section>
-    </template>
+        <article class="appDetails__danger">
+          <div class="appDetails__dangerHead">
+            <span class="appDetails__dangerIcon">
+              <Icon :is="saxIcon.remove" size="sm"/>
+            </span>
+            <h4>{{ translate('app_uninstall_title') }}</h4>
+          </div>
+          <p>{{ translate('app_uninstall_intro') }}</p>
+          <Button
+              :label="translate('app_uninstall_button')"
+              variant="danger"
+              outline
+              @click="openUninstallModal"
+          />
+        </article>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import {computed} from 'vue';
+import {computed, onUnmounted, ref} from 'vue';
 import {openModal} from '@kolirt/vue-modal';
+import {getUrl} from '@/boot.js';
 import {saxIcon} from '@/const/icons.js';
 import Icon from '@/views/components/widgets/Icon.vue';
 import Button from '@/views/components/widgets/Button.vue';
 import {resolveRouterMode} from '@utils/helpers/appRoutePolicy.js';
-import {useGlobalRouter} from '@/views/composables/useGlobalRouter.js';
 import {useControlPanelNavigation} from '@/views/composables/useControlPanelNavigation.js';
 import {translate} from '@utils/helpers/managerLang.js';
 import {normalizeAppRoutes} from '@utils/appRoutes.js';
+import {formatSiteOriginForDisplay} from '@utils/helpers/siteUrlHelper.js';
 import {toastSuccess} from '@utils/helpers/toastHelper.js';
 import ModalUninstallApp from '@/views/pages/app-manager/modal-uninstall-app.vue';
 import ModalResetApp from '@/views/pages/app-manager/modal-reset-app.vue';
@@ -95,16 +183,24 @@ const props = defineProps({
   },
 });
 
-const globalRouter = useGlobalRouter();
 const {pushAppManager, pushControlPath} = useControlPanelNavigation();
 
-const isSystemApp = computed(() => !!(props.app?.sys_app ?? props.app?.['sys-app']));
+const siteUrl = String(getUrl().SITE ?? '').replace(/\/+$/, '');
+const currentSite = formatSiteOriginForDisplay(siteUrl);
+const copiedPath = ref(null);
+let copiedTimer = null;
 
+const isSystemApp = computed(() => !!(props.app?.sys_app ?? props.app?.['sys-app']));
+const hasTemplates = computed(() => !isSystemApp.value);
 const routes = computed(() => normalizeAppRoutes(props.app?.routes));
 
-const routesPreview = computed(() => routes.value.slice(0, 5));
+const primaryRoute = computed(() => {
+  if (routes.value.length === 0) {
+    return null;
+  }
 
-const hasTemplates = computed(() => !isSystemApp.value);
+  return routes.value.find((route) => route.path === '/') ?? routes.value[0];
+});
 
 const routerModeLabel = computed(() => {
   const mode = resolveRouterMode(props.app);
@@ -141,8 +237,66 @@ const badges = computed(() => {
   return list;
 });
 
-function openApp() {
-  globalRouter.push({name: 'app-view', params: {package_name: props.packageName}});
+function isHomeRoute(route) {
+  return route?.path === '/' || route?.path === '';
+}
+
+function routeUrlSuffix(path) {
+  if (!path || path === '/') {
+    return '/';
+  }
+
+  return path.startsWith('/') ? path : `/${path}`;
+}
+
+function buildRouteUrl(route) {
+  const suffix = routeUrlSuffix(route?.path);
+
+  if (!siteUrl) {
+    return suffix;
+  }
+
+  return suffix === '/' ? `${siteUrl}/` : `${siteUrl}${suffix}`;
+}
+
+function isCopied(route) {
+  return copiedPath.value === routeUrlSuffix(route?.path);
+}
+
+async function copyRouteUrl(route) {
+  const url = buildRouteUrl(route);
+
+  try {
+    await navigator.clipboard.writeText(url);
+    markCopied(route);
+  } catch {
+    try {
+      const input = document.createElement('textarea');
+      input.value = url;
+      input.setAttribute('readonly', '');
+      input.style.position = 'absolute';
+      input.style.left = '-9999px';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      markCopied(route);
+    } catch {
+      copiedPath.value = null;
+    }
+  }
+}
+
+function markCopied(route) {
+  copiedPath.value = routeUrlSuffix(route?.path);
+  clearTimeout(copiedTimer);
+  copiedTimer = setTimeout(() => {
+    copiedPath.value = null;
+  }, 1800);
+}
+
+function openRouteUrl(route) {
+  window.open(buildRouteUrl(route), '_blank', 'noopener,noreferrer');
 }
 
 function goConfig() {
@@ -151,6 +305,10 @@ function goConfig() {
 
 function goTemplates() {
   pushAppManager(props.packageName, 'templates');
+}
+
+function goRoutes() {
+  pushControlPath('/control/routes');
 }
 
 function openResetModal() {
@@ -179,4 +337,8 @@ function openUninstallModal() {
     }
   }).catch(() => {});
 }
+
+onUnmounted(() => {
+  clearTimeout(copiedTimer);
+});
 </script>
