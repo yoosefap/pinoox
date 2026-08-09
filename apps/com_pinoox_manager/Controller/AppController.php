@@ -27,9 +27,11 @@ use Pinoox\Component\Kernel\Controller\ApiController;
 use Pinoox\Component\Migration\MigrationQuery;
 use Pinoox\Model\FileModel;
 use Pinoox\Model\HistoryModel;
+use Pinoox\Model\Table;
 use Pinoox\Portal\App\AppEngine;
 use Pinoox\Portal\App\AppRouter;
 use Pinoox\Portal\Auth;
+use Pinoox\Portal\Database\DB;
 use Pinoox\Portal\Storage;
 
 class AppController extends ApiController
@@ -435,18 +437,8 @@ class AppController extends ApiController
         } catch (\Throwable) {
         }
 
-        $migrations = 0;
-        $patches = 0;
-
-        try {
-            $migrations = (int) HistoryModel::where('app', $packageName)
-                ->where('type', MigrationQuery::TYPE_MIGRATION)
-                ->count();
-            $patches = (int) HistoryModel::where('app', $packageName)
-                ->where('type', MigrationQuery::TYPE_PATCH)
-                ->count();
-        } catch (\Throwable) {
-        }
+        $migrations = $this->countAppHistory($packageName, MigrationQuery::TYPE_MIGRATION);
+        $patches = $this->countAppHistory($packageName, MigrationQuery::TYPE_PATCH);
 
         return [
             'storage_bytes' => $storageBytes,
@@ -528,6 +520,29 @@ class AppController extends ApiController
         }
 
         return $this->message('manager.reset_successfully', $result);
+    }
+
+    private function countAppHistory(string $packageName, string $type): int
+    {
+        if ($packageName === '' || $packageName === 'platform') {
+            return 0;
+        }
+
+        try {
+            return (int) DB::table(DB::tableName(Table::HISTORY, 'platform'), null, 'platform')
+                ->where('app', $packageName)
+                ->where('type', $type)
+                ->count();
+        } catch (\Throwable) {
+            try {
+                return (int) HistoryModel::query()
+                    ->where('app', $packageName)
+                    ->where('type', $type)
+                    ->count();
+            } catch (\Throwable) {
+                return 0;
+            }
+        }
     }
 
     private function resolveStoragePath(string $kind, string $package): ?string
