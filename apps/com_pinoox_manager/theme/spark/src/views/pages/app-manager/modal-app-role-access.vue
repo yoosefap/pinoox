@@ -3,15 +3,12 @@
     <p class="appRoleAccess__hint">{{ translate('app_users_role_access_hint') }}</p>
     <strong class="appRoleAccess__role">{{ role.name }}</strong>
 
-    <div v-if="permissions.length" class="appRoleAccess__list">
-      <label v-for="permission in permissions" :key="permission.permission_id" class="appRoleAccess__check">
-        <input v-model="selected" type="checkbox" :value="permission.permission_id"/>
-        <span>
-          <strong>{{ permission.name }}</strong>
-          <small v-if="permission.key !== permission.name" dir="ltr">{{ permission.key }}</small>
-        </span>
-      </label>
-    </div>
+    <PermissionGroups
+        v-if="permissions.length"
+        v-model="selected"
+        mode="checks"
+        :items="permissions"
+    />
     <p v-else class="appRoleAccess__empty">{{ translate('app_users_no_permissions') }}</p>
 
     <template #footer>
@@ -40,6 +37,7 @@ import {ref} from 'vue';
 import {closeModal, useModalContext} from '@kolirt/vue-modal';
 import SimpleModal from '@/views/components/commons/SimpleModal.vue';
 import Button from '@/views/components/widgets/Button.vue';
+import PermissionGroups from './PermissionGroups.vue';
 import {userAPI} from '@api/user.js';
 import {unwrapResponse} from '@utils/helpers/apiHelper.js';
 import {resolveApiFailure} from '@utils/apiEnvelope.js';
