@@ -1,6 +1,6 @@
 <template>
-  <section class="page">
-    <div class="page__header">
+  <section class="page" :class="{ 'page--noHeader': hideHeader }">
+    <div v-if="!hideHeader" class="page__header">
       <div class="page__header-title">{{ title }}</div>
     </div>
     <div v-if="hasToolbar" class="page__toolbar">
@@ -19,6 +19,10 @@ import {useRouter} from "vue-router";
 const props = defineProps({
   title: {
     type: String,
+  },
+  hideHeader: {
+    type: Boolean,
+    default: false,
   },
 });
 

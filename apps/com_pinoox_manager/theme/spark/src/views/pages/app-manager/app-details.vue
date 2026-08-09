@@ -14,31 +14,11 @@
         <p v-else class="appDetails__muted">{{ translate('app_details_no_description') }}</p>
 
         <dl class="appDetails__meta">
-          <div
-              v-if="versionLabel"
-              class="appDetails__metaItem"
-              :class="{ 'is-version': !!versionCode, 'is-open': versionCodeOpen }"
-              :title="versionCodeTitle"
-              @click="toggleVersionCode"
-          >
-            <dt>{{ translate('app_stat_version') }}</dt>
-            <dd dir="ltr">
-              {{ versionLabel }}
-              <span v-if="versionCode" class="appDetails__versionCode">#{{ versionCode }}</span>
-            </dd>
-          </div>
           <div v-for="item in statItems" :key="item.label" class="appDetails__metaItem">
             <dt>{{ item.label }}</dt>
             <dd :dir="item.ltr ? 'ltr' : undefined">{{ item.value }}</dd>
           </div>
         </dl>
-
-        <div v-if="canSecretView" class="appDetails__quick">
-          <button type="button" class="appDetails__quickBtn appDetails__quickBtn--primary" @click="openSecretView">
-            <Icon :is="saxIcon.eye" size="xs"/>
-            {{ translate('app_secret_view') }}
-          </button>
-        </div>
       </div>
     </section>
 
@@ -106,20 +86,9 @@
         <Icon :is="saxIcon.routes" size="md"/>
         <p>{{ translate('app_details_addresses_empty') }}</p>
         <span>{{ translate('app_details_addresses_empty_hint') }}</span>
-        <div class="appDetails__quick">
-          <button type="button" class="appDetails__quickBtn appDetails__quickBtn--primary" @click="goRoutes">
-            {{ translate('app_details_manage_routes') }}
-          </button>
-          <button
-              v-if="canSecretView"
-              type="button"
-              class="appDetails__quickBtn"
-              @click="openSecretView"
-          >
-            <Icon :is="saxIcon.eye" size="xs"/>
-            {{ translate('app_secret_view') }}
-          </button>
-        </div>
+        <button type="button" class="appDetails__quickBtn appDetails__quickBtn--primary" @click="goRoutes">
+          {{ translate('app_details_manage_routes') }}
+        </button>
       </div>
     </section>
   </div>
@@ -127,13 +96,10 @@
 
 <script setup>
 import {computed, onUnmounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
 import {getUrl} from '@/boot.js';
 import {saxIcon} from '@/const/icons.js';
 import Icon from '@/views/components/widgets/Icon.vue';
 import {useControlPanelNavigation} from '@/views/composables/useControlPanelNavigation.js';
-import {useAppViewMode} from '@/views/composables/useAppViewMode.js';
-import {useAppViewWindowStore} from '@/stores/modules/appViewWindow.js';
 import {translate} from '@utils/helpers/managerLang.js';
 import {normalizeAppRoutes} from '@utils/appRoutes.js';
 import {formatSiteOriginForDisplay} from '@utils/helpers/siteUrlHelper.js';
@@ -150,58 +116,20 @@ const props = defineProps({
 });
 
 const {pushControlPath} = useControlPanelNavigation();
-const router = useRouter();
-const {isAdvanced} = useAppViewMode();
-const appViewWindow = useAppViewWindowStore();
 
 const siteUrl = String(getUrl().SITE ?? '').replace(/\/+$/, '');
 const currentSite = formatSiteOriginForDisplay(siteUrl);
 const copiedPath = ref(null);
-const versionCodeOpen = ref(false);
 let copiedTimer = null;
 
-const isSystemApp = computed(() => !!(props.app?.sys_app ?? props.app?.['sys-app']));
 const routes = computed(() => normalizeAppRoutes(props.app?.routes));
-const versionLabel = computed(() => props.app?.version || '—');
-const versionCode = computed(() => {
-  const code = props.app?.version_code;
-
-  if (code == null || code === '') {
-    return null;
-  }
-
-  return String(code);
-});
-const versionCodeTitle = computed(() => {
-  if (!versionCode.value) {
-    return undefined;
-  }
-
-  return `${translate('app_stat_version_code')}: ${versionCode.value}`;
-});
-const canSecretView = computed(() => {
-  if (!props.packageName) {
-    return false;
-  }
-
-  if (props.app?.open === 'app-view') {
-    return true;
-  }
-
-  return !isSystemApp.value;
-});
 
 const statItems = computed(() => [
   {label: translate('app_stat_developer'), value: props.app?.developer || '—', ltr: false},
-  {label: translate('app_stat_package'), value: props.packageName, ltr: true},
 ]);
 
 const badges = computed(() => {
   const list = [];
-
-  if (isSystemApp.value) {
-    list.push({label: translate('app_badge_system'), class: 'is-system'});
-  }
 
   if (props.app?.hidden) {
     list.push({label: translate('app_badge_hidden'), class: 'is-muted'});
@@ -274,26 +202,6 @@ function markCopied(route) {
 
 function goRoutes() {
   pushControlPath('/control/routes');
-}
-
-function toggleVersionCode() {
-  if (!versionCode.value) {
-    return;
-  }
-
-  versionCodeOpen.value = !versionCodeOpen.value;
-}
-
-function openSecretView() {
-  if (!canSecretView.value) {
-    return;
-  }
-
-  if (isAdvanced.value) {
-    appViewWindow.openFullscreen(props.packageName);
-  }
-
-  router.push({name: 'app-view', params: {package_name: props.packageName}});
 }
 
 onUnmounted(() => {
