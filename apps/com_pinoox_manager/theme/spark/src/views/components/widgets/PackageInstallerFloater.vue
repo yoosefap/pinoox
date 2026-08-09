@@ -76,9 +76,7 @@
 
         <template v-else-if="store.phase === 'loading'">
           <div class="packageInstaller__loading">
-            <WidgetLoading/>
             <p class="packageInstaller__statusTitle">{{ store.loadingMessage }}</p>
-            <p class="packageInstaller__waitHint">چند لحظه صبر کنید…</p>
           </div>
         </template>
 
@@ -193,26 +191,22 @@
 
         <template v-else-if="store.phase === 'installing'">
           <div class="packageInstaller__installProgress">
-            <div v-if="store.meta" class="packageInstaller__statusHead">
-              <AppIcon v-bind="packageIconProps" size="sm"/>
-              <p class="packageInstaller__statusTitle">{{ store.actionLabel }}…</p>
-            </div>
-            <p v-else class="packageInstaller__statusTitle">{{ store.actionLabel }}…</p>
-
             <div class="packageInstaller__installHero">
-              <WidgetLoading/>
+              <span class="packageInstaller__installRing" aria-hidden="true"/>
+              <AppIcon v-if="store.meta" v-bind="packageIconProps" size="lg" class="packageInstaller__cardIcon"/>
+              <Icon v-else :is="saxIcon.upload" size="lg"/>
             </div>
-
+            <h3 v-if="displayName" class="packageInstaller__packageName">{{ displayName }}</h3>
+            <p class="packageInstaller__statusTitle">{{ store.actionLabel }}…</p>
             <p class="packageInstaller__installStatus" role="status" aria-live="polite">
               <span class="packageInstaller__installStatusDot"/>
               {{ currentInstallMessage }}
             </p>
-
-            <p class="packageInstaller__waitHint">تا پایان نصب صبر کنید و پنجره را نبندید.</p>
             <div class="packageInstaller__progressTrack">
               <div class="packageInstaller__progressBar" :style="{ width: `${store.progress}%` }"/>
             </div>
-            <p class="packageInstaller__statusMeta">{{ store.progress }}%</p>
+            <p class="packageInstaller__statusMeta">{{ store.progress }}٪</p>
+            <p class="packageInstaller__installHint">تا پایان نصب پنجره را نبندید.</p>
           </div>
         </template>
 
@@ -291,7 +285,6 @@
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import DraggableWidget from '@/views/components/widgets/DraggableWidget.vue';
 import FileUploader from '@/views/components/widgets/FileUploader.vue';
-import WidgetLoading from '@/views/components/desktop-widgets/WidgetLoading.vue';
 import AppIcon from '@/views/components/widgets/AppIcon.vue';
 import {saxIcon} from '@/const/icons.js';
 import {packageMetaIconProps} from '@utils/helpers/appIconProps.js';
