@@ -1,5 +1,5 @@
 <template>
-  <PageSection title="کاربران">
+  <PageSection :title="translate('app_users_title')">
     <div v-if="isLoading && !hasCachedData" class="appManagerSectionLoading">
       <WidgetLoading/>
     </div>
@@ -34,7 +34,7 @@
         </table>
       </div>
 
-      <PageEmpty v-else title="کاربری یافت نشد"/>
+      <PageEmpty v-else :title="translate('app_users_empty')"/>
     </div>
   </PageSection>
 </template>
@@ -43,6 +43,7 @@
 import {computed} from 'vue';
 import {userAPI} from '@api/user.js';
 import {unwrapResponse} from '@utils/helpers/apiHelper.js';
+import {translate} from '@utils/helpers/managerLang.js';
 import WidgetLoading from '@/views/components/desktop-widgets/WidgetLoading.vue';
 import {useAppManagerSectionData} from '@/views/composables/useAppManagerSectionData.js';
 

@@ -57,7 +57,7 @@
         </div>
       </header>
 
-      <nav class="appManagerNav" aria-label="بخش‌های مدیریت اپ">
+      <nav class="appManagerNav" :aria-label="translate('app_nav_aria')">
         <router-link
             v-for="item in navItems"
             :key="item.to"
@@ -89,7 +89,10 @@
           <h1 class="appManagerHero__title">{{ translate('app_not_found_title') }}</h1>
         </div>
       </header>
-      <PageEmpty title="اپلیکیشن یافت نشد" description="این اپ نصب نشده یا حذف شده است."/>
+      <PageEmpty
+          :title="translate('app_not_found_title')"
+          :description="translate('app_not_found_desc')"
+      />
     </template>
   </Page>
 </template>
@@ -159,11 +162,11 @@ const statusBadges = computed(() => {
 });
 
 const navItems = computed(() => [
-  {to: appManagerPath(packageName.value, 'details'), label: 'جزئیات', icon: saxIcon.guide},
-  {to: appManagerPath(packageName.value, 'config'), label: 'تنظیمات', icon: saxIcon.setting},
-  {to: appManagerPath(packageName.value, 'users'), label: 'کاربران', icon: saxIcon.user},
-  {to: appManagerPath(packageName.value, 'templates'), label: 'قالب‌ها', icon: saxIcon.appearance},
-  {to: appManagerPath(packageName.value, 'data'), label: 'داده‌ها', icon: saxIcon.data},
+  {to: appManagerPath(packageName.value, 'details'), label: translate('app_nav_details'), icon: saxIcon.guide},
+  {to: appManagerPath(packageName.value, 'config'), label: translate('app_nav_config'), icon: saxIcon.setting},
+  {to: appManagerPath(packageName.value, 'users'), label: translate('app_nav_users'), icon: saxIcon.user},
+  {to: appManagerPath(packageName.value, 'templates'), label: translate('app_nav_templates'), icon: saxIcon.appearance},
+  {to: appManagerPath(packageName.value, 'data'), label: translate('app_nav_data'), icon: saxIcon.data},
 ]);
 
 function toggleVersionCode() {

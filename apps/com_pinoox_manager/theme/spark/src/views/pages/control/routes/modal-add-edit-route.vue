@@ -11,7 +11,7 @@
         </div>
 
         <div v-if="currentStep === 1" class="form">
-            <p class="modalRoutes__hint">آدرسی را بنویسید که می‌خواهید در مرورگر باز شود.</p>
+            <p class="modalRoutes__hint">آدرسی بنویسید که مردم در مرورگر باز کنند؛ مثلاً shop یا blog.</p>
             <Input
                     type="text"
                     v-model="params.path"
@@ -24,7 +24,7 @@
                 {{ duplicatePathMessage }}
             </p>
             <p v-if="hasLockedPackage" class="modalRoutes__hint modalRoutes__hint--locked">
-                این آدرس به <strong>{{ lockedAppLabel }}</strong> وصل می‌شود.
+                این لینک برنامهٔ <strong>{{ lockedAppLabel }}</strong> را باز می‌کند.
             </p>
             <div class="flex justify-end mt-4 gap-2">
                 <Button @click="closeModal" label="بستن" variant="dark"/>
@@ -39,7 +39,7 @@
                     v-else
                     @click="goToNextStep"
                     :is-disabled="!canProceedStep1"
-                    label="انتخاب برنامه"
+                    label="بعدی"
                     variant="primary"
                 />
             </div>
@@ -49,7 +49,7 @@
             <Transition name="modalRoutesSave" mode="out-in">
                 <div v-if="!isSaving && !isDone && hasLockedPackage" key="locked" class="form">
                     <p class="modalRoutes__hint">
-                        با باز کردن <code>{{ routePreview }}</code> برنامهٔ <strong>{{ lockedAppLabel }}</strong> نمایش داده می‌شود.
+                        با باز کردن <code>{{ routePreview }}</code>، برنامهٔ <strong>{{ lockedAppLabel }}</strong> دیده می‌شود.
                     </p>
                     <div class="flex justify-between mt-4 gap-2">
                         <Button @click="goToPreviousStep" label="بازگشت" variant="dark"/>
@@ -517,7 +517,8 @@ const saveSuccessMessage = computed(() => {
 });
 
 const title = computed(() => {
-    if (props.hasSelectApp) return 'برنامهٔ صفحه اصلی';
-    return isEdit.value ? 'ویرایش آدرس' : 'افزودن آدرس جدید';
+    if (props.hasSelectApp) return 'برنامهٔ صفحهٔ اصلی';
+    if (hasLockedPackage.value) return 'ساخت آدرس برای این برنامه';
+    return isEdit.value ? 'ویرایش آدرس' : 'ساخت آدرس جدید';
 });
 </script>
