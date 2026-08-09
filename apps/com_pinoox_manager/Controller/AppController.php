@@ -299,16 +299,23 @@ class AppController extends ApiController
         }
     }
 
-    public function packageMeta($filename)
+    public function packageMeta(Request $request, $filename = null)
     {
-        if (empty($filename))
-            return $this->deny('manager.error_happened');
+        $filename = basename((string) (
+            $filename
+            ?: $request->queryOne('filename', '')
+            ?: $request->payload('filename', '')
+        ));
 
-        $filename = basename($filename);
+        if ($filename === '') {
+            return $this->deny('manager.error_happened');
+        }
+
         $pinxFile = PackagePaths::manualFile($filename);
 
-        if (!is_file($pinxFile))
+        if (!is_file($pinxFile)) {
             return $this->deny('manager.error_happened');
+        }
 
         try {
             return Wizard::pullPackageMeta($pinxFile);

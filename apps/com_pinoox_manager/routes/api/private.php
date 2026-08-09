@@ -77,8 +77,13 @@ return collect(['flow' => ['manager.auth']], function () {
             get('/getConfig/{packageName}', 'getConfig')->name('getConfig.packageName');
             post('/setConfig/{packageName}/{key}', 'setConfig')->name('setConfig.packageName.key');
             post('/install', 'install')->name('install');
-            get('/packageMeta/{filename}', 'packageMeta')->name('packageMeta.filename');
-            get('/installPackage/{filename}', 'installPackage')->name('installPackage.filename');
+            get('/packageMeta', 'packageMeta')->name('packageMeta');
+            get('/packageMeta/{filename}', 'packageMeta')
+                ->name('packageMeta.filename')
+                ->filters(['filename' => '[^/]+']);
+            get('/installPackage/{filename}', 'installPackage')
+                ->name('installPackage.filename')
+                ->filters(['filename' => '[^/]+']);
             post('/installPackage/start', 'installPackageStart')->name('installPackage.start');
             get('/installPackage/status/{installId}', 'installPackageStatus')->name('installPackage.status');
             post('/database/checkPrefix', 'checkDatabasePrefix')->name('database.checkPrefix');

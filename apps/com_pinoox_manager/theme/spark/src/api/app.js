@@ -15,7 +15,10 @@ export const appAPI = {
     checkDatabasePrefix: (payload) => http.post(`${BASE_URL}/database/checkPrefix`, payload, {alert: false}),
     testDatabaseConnection: (payload) => http.post(`${BASE_URL}/database/testConnection`, payload, {alert: false}),
     databaseDefaults: () => http.get(`${BASE_URL}/database/defaults`, {alert: false}),
-    packageMeta: (filename) => http.get(`${BASE_URL}/packageMeta/${encodeURIComponent(filename)}`, {alert: false}),
+    packageMeta: (filename) => http.get(`${BASE_URL}/packageMeta`, {
+        params: {filename},
+        alert: false,
+    }),
     files: () => http.get(`${BASE_URL}/files`, {alert: false}),
     deleteFile: (filename) => http.post(`${BASE_URL}/deleteFile`, {filename}),
     filesUpload: (formData) => http.postForm(`${BASE_URL}/filesUpload`, formData),

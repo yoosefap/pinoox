@@ -27,6 +27,7 @@ use Pinoox\Component\File;
 use Pinoox\Portal\FileSystem;
 use Pinoox\Portal\Lang;
 use Pinoox\Portal\Pinx;
+use Pinoox\Portal\Storage;
 use Pinoox\Portal\Url;
 use Pinoox\Portal\Zip;
 
@@ -102,6 +103,13 @@ class Wizard
 
     public static function deletePackageFile(string $pinxFile): void
     {
+        try {
+            $meta = self::pullPackageMeta($pinxFile);
+            self::deleteExtractedPackageIcon($meta);
+        } catch (\Throwable) {
+            // Ignore meta/icon cleanup failures — still remove the staged package.
+        }
+
         FileSystem::remove($pinxFile);
     }
 
@@ -585,7 +593,115 @@ class Wizard
             return null;
         }
 
+        // Prefer a public URL over a data URI — packaged icons can be large (hundreds of KB).
+        $publicUrl = self::extractPinxIconToPublic($pinxFile, $manifest);
+
+        if ($publicUrl !== null) {
+            return $publicUrl;
+        }
+
         return Pinx::withReader($pinxFile, static fn ($reader) => $reader->iconDataUri());
+    }
+
+    /**
+     * Extract package icon from .pinx into storage/public for install preview.
+     */
+    private static function extractPinxIconToPublic(string $pinxFile, PinxManifest $manifest): ?string
+    {
+        try {
+            $contents = Pinx::withReader($pinxFile, static fn ($reader) => $reader->iconContents());
+
+            if (!is_string($contents) || $contents === '') {
+                return null;
+            }
+
+            $key = self::packageIconStorageKey($manifest);
+
+            if ($key === null) {
+                return null;
+            }
+
+            $disk = Storage::app('com_pinoox_manager', 'public');
+            $mtime = @filemtime($pinxFile) ?: time();
+            $needsWrite = !$disk->exists($key);
+
+            if (!$needsWrite) {
+                $existingSize = (int) $disk->size($key);
+                $needsWrite = $existingSize !== strlen($contents)
+                    || ((int) $disk->lastModified($key)) < $mtime;
+            }
+
+            if ($needsWrite) {
+                $disk->put($key, $contents);
+            }
+
+            $url = $disk->url($key);
+
+            if (!is_string($url) || $url === '') {
+                return null;
+            }
+
+            return $url . (str_contains($url, '?') ? '&' : '?') . 'v=' . $mtime;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private static function packageIconStorageKey(PinxManifest $manifest): ?string
+    {
+        $name = $manifest->isApp()
+            ? $manifest->package()
+            : trim($manifest->targetApp() . '_' . $manifest->themeName(), '_');
+
+        $name = preg_replace('/[^a-zA-Z0-9._-]+/', '_', $name) ?: '';
+
+        if ($name === '') {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($manifest->icon() ?: 'icon.png', PATHINFO_EXTENSION) ?: 'png');
+
+        if (!in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico'], true)) {
+            $ext = 'png';
+        }
+
+        return 'packages/icons/' . $name . '.' . $ext;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     */
+    private static function deleteExtractedPackageIcon(array $meta): void
+    {
+        $package = (string) ($meta['package_name'] ?? $meta['package'] ?? '');
+        $type = (string) ($meta['type'] ?? '');
+
+        if ($type === 'theme') {
+            $package = trim(
+                (string) ($meta['app'] ?? '') . '_' . (string) ($meta['name'] ?? ''),
+                '_',
+            );
+        }
+
+        $package = preg_replace('/[^a-zA-Z0-9._-]+/', '_', $package) ?: '';
+
+        if ($package === '') {
+            return;
+        }
+
+        $icon = (string) ($meta['path_icon'] ?? $meta['icon_entry'] ?? 'icon.png');
+        $ext = strtolower(pathinfo(basename($icon), PATHINFO_EXTENSION) ?: 'png');
+
+        if (!in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico'], true)) {
+            $ext = 'png';
+        }
+
+        $key = 'packages/icons/' . $package . '.' . $ext;
+        $disk = Storage::app('com_pinoox_manager', 'public');
+
+        if ($disk->exists($key)) {
+            $disk->delete($key);
+        }
     }
 
     /**
@@ -608,6 +724,8 @@ class Wizard
             'version' => $manifest->versionName(),
             'version-code' => $manifest->versionCode(),
             'developer' => $manifest->developer(),
+            'path_icon' => $manifest->icon() ?: 'icon.png',
+            'icon_entry' => $manifest->iconEntry(),
             'path_cover' => '',
             'has_icon' => $iconDataUri !== null,
             'icon' => $iconDataUri,
