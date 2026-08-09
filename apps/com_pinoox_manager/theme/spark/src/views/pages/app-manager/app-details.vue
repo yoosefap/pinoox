@@ -29,9 +29,19 @@
           <h3 class="appDetails__cardTitle">{{ translate('app_details_addresses') }}</h3>
           <span class="appDetails__count">{{ routes.length }}</span>
         </div>
-        <button type="button" class="appDetails__textLink" @click="goRoutes">
-          {{ translate('app_details_manage_routes') }}
-        </button>
+        <div class="appDetails__cardHeadActions">
+          <button
+              v-if="canAddRoute"
+              type="button"
+              class="appDetails__textLink appDetails__textLink--primary"
+              @click="openAddRouteModal"
+          >
+            {{ translate('app_details_add_route') }}
+          </button>
+          <button type="button" class="appDetails__textLink" @click="goRoutes">
+            {{ translate('app_details_manage_routes') }}
+          </button>
+        </div>
       </header>
 
       <ul v-if="routes.length" class="appDetails__routeList">
@@ -85,10 +95,21 @@
       <div v-else class="appDetails__empty">
         <Icon :is="saxIcon.routes" size="md"/>
         <p>{{ translate('app_details_addresses_empty') }}</p>
-        <span>{{ translate('app_details_addresses_empty_hint') }}</span>
-        <button type="button" class="appDetails__quickBtn appDetails__quickBtn--primary" @click="goRoutes">
-          {{ translate('app_details_manage_routes') }}
-        </button>
+        <span>{{ emptyAddressesHint }}</span>
+        <div class="appDetails__quick">
+          <button
+              v-if="canAddRoute"
+              type="button"
+              class="appDetails__quickBtn appDetails__quickBtn--primary"
+              @click="openAddRouteModal"
+          >
+            <Icon :is="saxIcon.add" size="xs"/>
+            {{ translate('app_details_add_route') }}
+          </button>
+          <button type="button" class="appDetails__quickBtn" @click="goRoutes">
+            {{ translate('app_details_manage_routes') }}
+          </button>
+        </div>
       </div>
     </section>
   </div>
@@ -96,13 +117,19 @@
 
 <script setup>
 import {computed, onUnmounted, ref} from 'vue';
+import {openModal} from '@kolirt/vue-modal';
 import {getUrl} from '@/boot.js';
 import {saxIcon} from '@/const/icons.js';
 import Icon from '@/views/components/widgets/Icon.vue';
 import {useControlPanelNavigation} from '@/views/composables/useControlPanelNavigation.js';
+import {useAppStore} from '@/stores/modules/app.js';
+import {useRouteStore} from '@/stores/modules/route.js';
 import {translate} from '@utils/helpers/managerLang.js';
 import {normalizeAppRoutes} from '@utils/appRoutes.js';
 import {formatSiteOriginForDisplay} from '@utils/helpers/siteUrlHelper.js';
+import {canAssignAnotherRoute, isRoutable} from '@utils/helpers/appRoutePolicy.js';
+import ModalAddEditRoute from '@/views/pages/control/routes/modal-add-edit-route.vue';
+import {toastSuccess} from '@utils/helpers/toastHelper.js';
 
 const props = defineProps({
   app: {
@@ -116,6 +143,8 @@ const props = defineProps({
 });
 
 const {pushControlPath} = useControlPanelNavigation();
+const appStore = useAppStore();
+const routeStore = useRouteStore();
 
 const siteUrl = String(getUrl().SITE ?? '').replace(/\/+$/, '');
 const currentSite = formatSiteOriginForDisplay(siteUrl);
@@ -123,6 +152,23 @@ const copiedPath = ref(null);
 let copiedTimer = null;
 
 const routes = computed(() => normalizeAppRoutes(props.app?.routes));
+const canAddRoute = computed(() => {
+  if (routes.value.length > 0 || !isRoutable(props.app)) {
+    return false;
+  }
+
+  return canAssignAnotherRoute(
+      {...props.app, package_name: props.packageName},
+      routeStore.routeList,
+  );
+});
+const emptyAddressesHint = computed(() => {
+  if (canAddRoute.value) {
+    return translate('app_details_addresses_empty_add_hint');
+  }
+
+  return translate('app_details_addresses_empty_hint');
+});
 
 const statItems = computed(() => [
   {label: translate('app_stat_developer'), value: props.app?.developer || '—', ltr: false},
@@ -202,6 +248,28 @@ function markCopied(route) {
 
 function goRoutes() {
   pushControlPath('/control/routes');
+}
+
+async function openAddRouteModal() {
+  if (!canAddRoute.value) {
+    return;
+  }
+
+  if (!routeStore.isLoaded) {
+    await routeStore.getRoutes();
+  }
+
+  openModal(ModalAddEditRoute, {
+    props: {
+      lockedPackage: props.packageName,
+    },
+  }).then(async () => {
+    toastSuccess(translate('route_save_success_create'));
+    await appStore.getApps();
+    if (routeStore.isLoaded) {
+      await routeStore.getRoutes();
+    }
+  }).catch(() => {});
 }
 
 onUnmounted(() => {

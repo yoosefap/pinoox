@@ -582,6 +582,13 @@
     font-weight: 700;
   }
 
+  &__cardHeadActions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
   &__textLink {
     padding: 0;
     border: 0;
@@ -594,6 +601,14 @@
     &:hover {
       color: #fff;
       text-decoration: underline;
+    }
+
+    &--primary {
+      color: rgba(var(--color-primary-rgb), 0.95);
+
+      &:hover {
+        color: #fff;
+      }
     }
   }
 
@@ -775,6 +790,11 @@
       font-size: 0.78rem;
       line-height: 1.6;
       color: rgba(255, 255, 255, 0.52);
+    }
+
+    .appDetails__quick {
+      justify-content: center;
+      margin-top: 0.15rem;
     }
   }
 
