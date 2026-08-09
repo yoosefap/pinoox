@@ -12,14 +12,16 @@
         </div>
         <p v-if="app?.description" class="appDetails__description">{{ app.description }}</p>
         <p v-else class="appDetails__muted">{{ translate('app_details_no_description') }}</p>
-      </div>
-    </section>
 
-    <section class="appDetails__stats" :aria-label="translate('app_details_about')">
-      <article v-for="item in statItems" :key="item.label" class="appDetails__stat">
-        <span class="appDetails__statLabel">{{ item.label }}</span>
-        <span class="appDetails__statValue" :dir="item.ltr ? 'ltr' : undefined">{{ item.value }}</span>
-      </article>
+        <dl class="appDetails__meta">
+          <div v-for="item in statItems" :key="item.label" class="appDetails__metaItem">
+            <dt>{{ item.label }}</dt>
+            <dd :dir="item.ltr ? 'ltr' : undefined">
+              {{ item.value }}<span v-if="item.hint" class="appDetails__metaHint">{{ item.hint }}</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
     </section>
 
     <section class="appDetails__card appDetails__addresses">
@@ -182,12 +184,15 @@ const routerModeLabel = computed(() => {
 });
 
 const statItems = computed(() => [
-  {label: translate('app_stat_version'), value: props.app?.version || '—', ltr: false},
-  {label: translate('app_stat_version_code'), value: props.app?.version_code ?? '—', ltr: true},
+  {
+    label: translate('app_stat_version'),
+    value: props.app?.version || '—',
+    hint: props.app?.version_code != null && props.app?.version_code !== '' ? `#${props.app.version_code}` : null,
+    ltr: true,
+  },
   {label: translate('app_stat_developer'), value: props.app?.developer || '—', ltr: false},
   {label: translate('app_stat_package'), value: props.packageName, ltr: true},
   {label: translate('app_stat_routing'), value: routerModeLabel.value, ltr: false},
-  {label: translate('app_stat_address_count'), value: String(routes.value.length), ltr: true},
 ]);
 
 const badges = computed(() => {
