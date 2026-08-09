@@ -186,7 +186,11 @@ function openSecretView() {
     appViewWindow.openFullscreen(packageName.value);
   }
 
-  router.push({name: 'app-view', params: {package_name: packageName.value}});
+  router.push({
+    name: 'app-view',
+    params: {package_name: packageName.value},
+    state: {returnTo: route.fullPath},
+  });
 }
 
 onMounted(async () => {
