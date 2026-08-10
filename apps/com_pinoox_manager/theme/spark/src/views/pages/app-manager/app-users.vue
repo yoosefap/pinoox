@@ -23,6 +23,11 @@
       <div class="appUsers">
       <p class="appUsers__intro">{{ translate('app_users_intro') }}</p>
 
+      <p v-if="meta.shares_manager_users" class="appUsers__notice">
+        <Icon :is="saxIcon.notifyInfo" size="xs"/>
+        <span>{{ translate('app_users_platform_notice') }}</span>
+      </p>
+
       <div class="appUsers__toolbar">
         <label class="appUsers__search">
           <Icon :is="saxIcon.search" size="xs"/>
@@ -162,6 +167,7 @@ const meta = ref({
   has_roles: false,
   roles: [],
   statuses: ['active', 'inactive', 'suspend', 'pending'],
+  shares_manager_users: false,
 });
 const total = ref(0);
 const page = ref(1);
@@ -351,6 +357,7 @@ async function loadUsers() {
         has_roles: Boolean(data.meta.has_roles),
         roles: data.meta.roles || [],
         statuses: data.meta.statuses || ['active', 'inactive', 'suspend', 'pending'],
+        shares_manager_users: Boolean(data.meta.shares_manager_users),
       };
     }
   } catch {

@@ -1428,6 +1428,26 @@
     color: rgba(255, 255, 255, 0.62);
   }
 
+  &__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.28);
+    background: rgba(var(--color-primary-rgb), 0.12);
+    font-size: 0.78rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.82);
+
+    .icon {
+      flex-shrink: 0;
+      margin-top: 0.12rem;
+      color: rgb(var(--color-primary-rgb));
+    }
+  }
+
   &__add,
   &__access {
     display: inline-flex;
@@ -1784,6 +1804,7 @@
   }
 
   .appUserForm__hint,
+  .appUserForm__notice,
   .appRoleAccess__hint,
   .modalAppAccess__hint,
   .modalAppUserDelete__hint,
@@ -1807,6 +1828,17 @@
     @media (max-width: 560px) {
       grid-template-columns: 1fr;
     }
+  }
+
+  &__notice {
+    margin: 0;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.7rem;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.28);
+    background: rgba(var(--color-primary-rgb), 0.14);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.88);
   }
 
   &__hint {

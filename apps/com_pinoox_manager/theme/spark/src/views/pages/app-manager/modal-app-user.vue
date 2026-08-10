@@ -1,6 +1,9 @@
 <template>
   <SimpleModal :title="title" size="md" class="modalAppUser">
     <form class="appUserForm" @submit.prevent="save">
+      <p v-if="sharesManagerUsers" class="appUserForm__notice">
+        {{ translate('app_users_platform_notice_form') }}
+      </p>
       <div class="appUserForm__row">
         <Input v-model="form.fname" variant="glass" :label="translate('app_users_form_fname')"/>
         <Input v-model="form.lname" variant="glass" :label="translate('app_users_form_lname')"/>
@@ -107,6 +110,7 @@ const saving = ref(false);
 const isEdit = computed(() => Boolean(props.user?.user_id));
 const title = computed(() => translate(isEdit.value ? 'app_users_form_edit_title' : 'app_users_form_add_title'));
 const hasRoles = computed(() => Boolean(props.meta?.has_roles));
+const sharesManagerUsers = computed(() => Boolean(props.meta?.shares_manager_users));
 
 const statusOptions = computed(() => (props.meta?.statuses || ['active', 'inactive', 'suspend', 'pending']).map((value) => ({
   value,

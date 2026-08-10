@@ -524,6 +524,40 @@ class UserController extends ApiController
             'has_roles' => $roles !== [],
             'roles' => $roles,
             'statuses' => self::STATUSES,
+            'shares_manager_users' => $this->sharesManagerUsers($packageName),
         ];
+    }
+
+    private function sharesManagerUsers(string $packageName): bool
+    {
+        if ($packageName === 'com_pinoox_manager') {
+            return false;
+        }
+
+        $scope = $this->transportUserScope($packageName);
+
+        return is_string($scope) && in_array($scope, ['platform', 'com_pinoox_manager'], true);
+    }
+
+    private function transportUserScope(string $packageName): ?string
+    {
+        try {
+            $transport = AppEngine::config($packageName)->get('transport');
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (!is_array($transport)) {
+            return null;
+        }
+
+        foreach (['user_table', 'user', 'full'] as $key) {
+            $value = $transport[$key] ?? null;
+            if (is_string($value) && $value !== '' && $value !== 'local') {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }
