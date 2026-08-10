@@ -50,10 +50,14 @@
               v-if="canSecretView"
               type="button"
               class="appManagerHero__preview"
+              :title="`${translate('app_secret_view')} — ${translate('app_secret_view_hint')}`"
               @click="openSecretView"
           >
             <Icon :is="saxIcon.eye" size="xs"/>
-            <span>{{ translate('app_secret_view') }}</span>
+            <span class="appManagerHero__previewText">
+              <strong>{{ translate('app_secret_view') }}</strong>
+              <small>{{ translate('app_secret_view_hint') }}</small>
+            </span>
           </button>
         </div>
       </header>

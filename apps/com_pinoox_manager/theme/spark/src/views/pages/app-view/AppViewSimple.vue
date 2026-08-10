@@ -43,7 +43,7 @@
           ref="frameRef"
           class="appView__iframe"
           :src="embedUrl"
-          :title="app?.name || 'پیش‌نمایش اپ'"
+          :title="app?.name || 'مشاهده برنامه'"
           @load="handleFrameLoad"
       ></iframe>
     </div>
