@@ -56,7 +56,12 @@
               <th
                   v-for="column in userColumns"
                   :key="column.key"
-                  :class="{ 'is-sortable': column.sort, 'is-active': sort === column.key }"
+                  :class="{
+                    'is-sortable': column.sort,
+                    'is-active': sort === column.key,
+                    'is-ltr': column.ltr,
+                    'is-actions': column.key === 'actions',
+                  }"
               >
                 <button
                     v-if="column.sort"
@@ -73,36 +78,37 @@
             </thead>
             <tbody>
             <tr v-for="user in users" :key="user.user_id">
-              <td class="appUsersTable__id" :data-label="translate('app_users_col_id')" dir="ltr">{{ user.user_id }}</td>
-              <td :data-label="translate('app_users_col_name')">
-                <div class="appUsersTable__person">
-                  <strong>{{ user.full_name }}</strong>
-                  <small v-if="user.mobile" dir="ltr">{{ user.mobile }}</small>
-                </div>
-              </td>
-              <td class="ltr" :data-label="translate('app_users_col_username')">{{ user.username || '—' }}</td>
-              <td class="ltr" :data-label="translate('app_users_col_email')">{{ user.email || '—' }}</td>
-              <td :data-label="translate('app_users_col_status')">
-                <span class="appUsersStatus" :class="`is-${user.status}`">{{ statusLabel(user.status) }}</span>
-              </td>
-              <td :data-label="translate('app_users_col_group')">{{ user.group_key || '—' }}</td>
-              <td v-if="meta.has_roles" :data-label="translate('app_users_col_level')">
-                {{ userRoleLabel(user) }}
-              </td>
-              <td :data-label="translate('app_users_col_date')" dir="ltr">{{ user.register_date_fa || user.register_date || '—' }}</td>
-              <td class="appUsersTable__actions" :data-label="translate('app_users_col_actions')">
-                <button type="button" class="appUsersTable__action" :title="translate('app_users_edit')" @click="openEdit(user)">
-                  <Icon :is="saxIcon.edit" size="xs"/>
-                </button>
-                <button
-                    type="button"
-                    class="appUsersTable__action is-danger"
-                    :title="user.is_self ? translate('app_users_delete_self') : translate('app_users_delete')"
-                    :disabled="user.is_self"
-                    @click="openDelete(user)"
-                >
-                  <Icon :is="saxIcon.remove" size="xs"/>
-                </button>
+              <td
+                  v-for="column in userColumns"
+                  :key="column.key"
+                  :class="{
+                    'is-ltr': column.ltr,
+                    'is-id': column.key === 'user_id',
+                    'appUsersTable__actions': column.key === 'actions',
+                  }"
+                  :data-label="column.label"
+              >
+                <template v-if="column.key === 'actions'">
+                  <button type="button" class="appUsersTable__action" :title="translate('app_users_edit')" @click="openEdit(user)">
+                    <Icon :is="saxIcon.edit" size="xs"/>
+                  </button>
+                  <button
+                      type="button"
+                      class="appUsersTable__action is-danger"
+                      :title="user.is_self ? translate('app_users_delete_self') : translate('app_users_delete')"
+                      :disabled="user.is_self"
+                      @click="openDelete(user)"
+                  >
+                    <Icon :is="saxIcon.remove" size="xs"/>
+                  </button>
+                </template>
+                <span v-else-if="column.key === 'status'" class="appUsersStatus" :class="`is-${user.status}`">
+                  {{ statusLabel(user.status) }}
+                </span>
+                <span v-else-if="cellValue(user, column)" :dir="column.ltr ? 'ltr' : undefined">
+                  {{ cellValue(user, column) }}
+                </span>
+                <span v-else class="appUsersEmpty">{{ emptyLabel(column) }}</span>
               </td>
             </tr>
             </tbody>
@@ -205,12 +211,13 @@ const roleFilterOptions = computed(() => [
 
 const userColumns = computed(() => {
   const columns = [
-    {key: 'user_id', label: translate('app_users_col_id'), sort: true},
+    {key: 'user_id', label: translate('app_users_col_id'), sort: true, ltr: true},
     {key: 'full_name', label: translate('app_users_col_name'), sort: true},
-    {key: 'username', label: translate('app_users_col_username'), sort: true},
-    {key: 'email', label: translate('app_users_col_email'), sort: true},
+    {key: 'username', label: translate('app_users_col_username'), sort: true, ltr: true},
+    {key: 'mobile', label: translate('app_users_col_mobile'), sort: true, ltr: true},
+    {key: 'email', label: translate('app_users_col_email'), sort: true, ltr: true},
     {key: 'status', label: translate('app_users_col_status'), sort: true},
-    {key: 'group_key', label: translate('app_users_col_group'), sort: true},
+    {key: 'group_key', label: translate('app_users_col_group'), sort: true, ltr: true},
   ];
 
   if (meta.value.has_roles) {
@@ -218,7 +225,7 @@ const userColumns = computed(() => {
   }
 
   columns.push(
-      {key: 'created_at', label: translate('app_users_col_date'), sort: true},
+      {key: 'created_at', label: translate('app_users_col_date'), sort: true, ltr: true},
       {key: 'actions', label: translate('app_users_col_actions'), sort: false},
   );
 
@@ -238,10 +245,45 @@ function userRoleLabel(user) {
   const role = user?.roles?.[0];
 
   if (!role) {
-    return translate('app_users_no_roles_assigned');
+    return '';
   }
 
   return translateLevel(role.key, role.name);
+}
+
+function cellValue(user, column) {
+  switch (column.key) {
+    case 'user_id':
+      return user?.user_id != null ? String(user.user_id) : '';
+    case 'full_name':
+      return String(user?.full_name || '').trim();
+    case 'username':
+      return String(user?.username || '').trim();
+    case 'mobile':
+      return String(user?.mobile || '').trim();
+    case 'email':
+      return String(user?.email || '').trim();
+    case 'group_key':
+      return String(user?.group_key || '').trim();
+    case 'roles':
+      return userRoleLabel(user);
+    case 'created_at':
+      return String(user?.register_date_fa || user?.register_date || '').trim();
+    default:
+      return '';
+  }
+}
+
+function emptyLabel(column) {
+  if (column.key === 'roles') {
+    return translate('app_users_no_roles_assigned');
+  }
+
+  if (column.key === 'group_key') {
+    return translate('app_users_form_group_none');
+  }
+
+  return translate('app_users_empty_value');
 }
 
 function sortMark(column) {

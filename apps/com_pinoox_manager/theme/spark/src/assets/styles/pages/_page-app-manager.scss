@@ -1519,7 +1519,7 @@
 
 .appUsersTable {
   width: 100%;
-  min-width: 42rem;
+  min-width: 52rem;
   border-collapse: collapse;
 
   &--compact {
@@ -1530,7 +1530,7 @@
   td {
     padding: 0.7rem 0.85rem;
     text-align: start;
-    vertical-align: middle;
+    vertical-align: top;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
@@ -1548,6 +1548,19 @@
     color: rgba(255, 255, 255, 0.88);
   }
 
+  th.is-ltr,
+  td.is-ltr {
+    direction: ltr;
+    text-align: start;
+    unicode-bidi: isolate;
+  }
+
+  td.is-id {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
   tbody tr:last-child td {
     border-bottom: 0;
   }
@@ -1556,30 +1569,10 @@
     background: rgba(255, 255, 255, 0.03);
   }
 
-  &__id {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  &__person {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-
-    strong {
-      font-weight: 650;
-    }
-
-    small {
-      font-size: 0.72rem;
-      color: rgba(255, 255, 255, 0.5);
-    }
-  }
-
   &__sort {
     display: inline-flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 0.35rem;
     padding: 0;
     border: 0;
@@ -1599,7 +1592,8 @@
     color: rgb(var(--color-primary-rgb));
   }
 
-  &__actions {
+  &__actions,
+  th.is-actions {
     white-space: nowrap;
   }
 
@@ -1642,18 +1636,18 @@
 
     tbody tr {
       display: grid;
-      gap: 0.45rem;
+      gap: 0.7rem;
       padding: 0.85rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     td {
-      display: grid;
-      grid-template-columns: 7.5rem minmax(0, 1fr);
-      gap: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.22rem;
       padding: 0;
       border: 0;
-      align-items: start;
 
       &::before {
         content: attr(data-label);
@@ -1663,8 +1657,12 @@
       }
     }
 
+    td.is-ltr {
+      align-items: flex-start;
+    }
+
     &__actions {
-      grid-template-columns: 7.5rem auto;
+      align-items: flex-start;
     }
   }
 }
@@ -1711,8 +1709,9 @@
   color: rgba(255, 255, 255, 0.78);
 }
 
-.appUsersMuted {
-  color: rgba(255, 255, 255, 0.45);
+.appUsersMuted,
+.appUsersEmpty {
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .appUsersPager {

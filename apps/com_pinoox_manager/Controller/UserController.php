@@ -40,6 +40,7 @@ class UserController extends ApiController
         'full_name',
         'username',
         'email',
+        'mobile',
         'status',
         'group_key',
         'created_at',
