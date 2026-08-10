@@ -68,7 +68,7 @@ class UserController extends ApiController
         return $this->runForApp($packageName, function () use ($request, $packageName) {
             $meta = $this->accessMeta($packageName);
             $query = UserModel::query()->with('file');
-            if (($meta['mode'] ?? '') === 'role') {
+            if (!empty($meta['has_roles'])) {
                 $query->with('roles');
             }
             $q = trim((string) $request->get('q', ''));
@@ -80,7 +80,8 @@ class UserController extends ApiController
                         ->orWhere('lname', 'like', $like)
                         ->orWhere('username', 'like', $like)
                         ->orWhere('email', 'like', $like)
-                        ->orWhere('mobile', 'like', $like);
+                        ->orWhere('mobile', 'like', $like)
+                        ->orWhere('group_key', 'like', $like);
 
                     if (ctype_digit($q)) {
                         $builder->orWhere('user_id', (int) $q);
@@ -93,22 +94,21 @@ class UserController extends ApiController
                 $query->where('status', $status);
             }
 
-            $level = trim((string) $request->get('level', ''));
-            if ($level !== '' && !empty($meta['has_levels'])) {
-                $mode = (string) ($meta['mode'] ?? 'none');
+            $group = trim((string) $request->get('group', ''));
+            if ($group !== '') {
+                $query->where('group_key', $group);
+            }
 
-                if ($mode === 'group') {
-                    $query->where('group_key', $level);
-                } elseif ($mode === 'role') {
-                    $roleId = $this->roleIdFromLevel($meta, $level);
-                    $query->whereHas('roles', function ($builder) use ($roleId, $level) {
-                        if ($roleId > 0) {
-                            $builder->where('role_id', $roleId);
-                        } else {
-                            $builder->where('role_key', $level);
-                        }
-                    });
-                }
+            $role = trim((string) ($request->get('role', $request->get('level', ''))));
+            if ($role !== '' && !empty($meta['has_roles'])) {
+                $roleId = $this->roleIdFromMeta($meta, $role);
+                $query->whereHas('roles', function ($builder) use ($roleId, $role) {
+                    if ($roleId > 0) {
+                        $builder->where('role_id', $roleId);
+                    } else {
+                        $builder->where('role_key', $role);
+                    }
+                });
             }
 
             $sort = (string) $request->get('sort', 'user_id');
@@ -160,10 +160,10 @@ class UserController extends ApiController
         return $this->runForApp($packageName, function () use ($request, $packageName) {
             $input = $this->validated($request, $this->userRules());
             $meta = $this->accessMeta($packageName);
-            $payload = $this->userPayload($input, $meta, true);
+            $payload = $this->userPayload($input);
 
             $user = UserModel::create($payload);
-            $this->applyUserLevel($user, $input, $meta);
+            $this->applyUserRoles($user, $input, $meta);
 
             return $this->ok($this->serializeUser($user->fresh(['file', 'roles'])));
         });
@@ -184,11 +184,11 @@ class UserController extends ApiController
 
             $input = $this->validated($request, $this->userRules((int) $user->user_id, false));
             $meta = $this->accessMeta($packageName);
-            $payload = $this->userPayload($input, $meta, false);
+            $payload = $this->userPayload($input);
 
             $user->fill($payload);
             $user->save();
-            $this->applyUserLevel($user, $input, $meta);
+            $this->applyUserRoles($user, $input, $meta);
 
             return $this->ok($this->serializeUser($user->fresh(['file', 'roles'])));
         });
@@ -348,8 +348,9 @@ class UserController extends ApiController
             'password' => $password,
             'mobile' => 'nullable|string|max:30',
             'status' => 'nullable|in:' . implode(',', self::STATUSES),
-            'level' => 'nullable|string|max:80',
             'group_key' => 'nullable|string|max:80',
+            'role_id' => 'nullable|integer',
+            'level' => 'nullable|string|max:80',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'integer',
         ];
@@ -357,15 +358,16 @@ class UserController extends ApiController
 
     /**
      * @param array<string, mixed> $input
-     * @param array<string, mixed> $meta
      * @return array<string, mixed>
      */
-    private function userPayload(array $input, array $meta, bool $creating): array
+    private function userPayload(array $input): array
     {
         $status = $input['status'] ?? UserModel::ACTIVE;
         if (!in_array($status, self::STATUSES, true)) {
             $status = UserModel::ACTIVE;
         }
+
+        $groupKey = trim((string) ($input['group_key'] ?? ''));
 
         $payload = [
             'fname' => trim((string) ($input['fname'] ?? '')),
@@ -374,22 +376,11 @@ class UserController extends ApiController
             'username' => trim((string) ($input['username'] ?? '')),
             'mobile' => trim((string) ($input['mobile'] ?? '')) ?: null,
             'status' => $status,
+            'group_key' => $groupKey !== '' ? $groupKey : null,
         ];
 
         if (!empty($input['password'])) {
             $payload['password'] = (string) $input['password'];
-        }
-
-        $mode = (string) ($meta['mode'] ?? 'none');
-        $level = trim((string) ($input['level'] ?? $input['group_key'] ?? ''));
-
-        if ($mode === 'group') {
-            $allowed = array_column($meta['levels'] ?? [], 'key');
-            $payload['group_key'] = ($level !== '' && in_array($level, $allowed, true))
-                ? $level
-                : null;
-        } elseif ($creating || $mode === 'role') {
-            $payload['group_key'] = null;
         }
 
         return $payload;
@@ -399,44 +390,43 @@ class UserController extends ApiController
      * @param array<string, mixed> $input
      * @param array<string, mixed> $meta
      */
-    private function applyUserLevel(UserModel $user, array $input, array $meta): void
+    private function applyUserRoles(UserModel $user, array $input, array $meta): void
     {
-        $mode = (string) ($meta['mode'] ?? 'none');
-
-        if ($mode === 'group') {
-            $this->syncUserRoles($user, [], true);
+        if (empty($meta['has_roles'])) {
             return;
         }
 
-        if ($mode !== 'role') {
-            return;
+        $roleId = (int) ($input['role_id'] ?? 0);
+        if ($roleId <= 0 && !empty($input['role_ids']) && is_array($input['role_ids'])) {
+            $roleId = (int) ($input['role_ids'][0] ?? 0);
+        }
+        if ($roleId <= 0) {
+            $roleId = $this->roleIdFromMeta($meta, trim((string) ($input['level'] ?? '')));
         }
 
-        $level = trim((string) ($input['level'] ?? ''));
-        $roleId = $this->roleIdFromLevel($meta, $level);
         $this->syncUserRoles($user, $roleId > 0 ? [$roleId] : [], true);
     }
 
     /**
      * @param array<string, mixed> $meta
      */
-    private function roleIdFromLevel(array $meta, string $level): int
+    private function roleIdFromMeta(array $meta, string $value): int
     {
-        if ($level === '') {
+        if ($value === '') {
             return 0;
         }
 
-        foreach ($meta['levels'] ?? [] as $item) {
+        foreach ($meta['roles'] ?? [] as $item) {
             if (!is_array($item)) {
                 continue;
             }
 
-            if ((string) ($item['key'] ?? '') === $level || (string) ($item['role_id'] ?? '') === $level) {
+            if ((string) ($item['key'] ?? '') === $value || (string) ($item['role_id'] ?? '') === $value) {
                 return (int) ($item['role_id'] ?? 0);
             }
         }
 
-        return ctype_digit($level) ? (int) $level : 0;
+        return ctype_digit($value) ? (int) $value : 0;
     }
 
     /**
@@ -490,11 +480,6 @@ class UserController extends ApiController
             $roles = [];
         }
 
-        $level = trim((string) ($user->group_key ?? ''));
-        if ($level === '' && $roles !== []) {
-            $level = (string) ($roles[0]['key'] ?: $roles[0]['role_id']);
-        }
-
         return [
             'user_id' => (int) $user->user_id,
             'fname' => $user->fname,
@@ -506,7 +491,6 @@ class UserController extends ApiController
             'status' => $user->status,
             'group_key' => $user->group_key,
             'roles' => $roles,
-            'level' => $level !== '' ? $level : null,
             'register_date' => $registerDate,
             'register_date_fa' => $registerDateFa,
             'is_self' => (int) $user->user_id === (int) Auth::id(),
@@ -518,36 +502,6 @@ class UserController extends ApiController
      */
     private function accessMeta(string $packageName): array
     {
-        $config = [];
-
-        try {
-            $raw = AppEngine::config($packageName)->get('access');
-            $config = is_array($raw) ? $raw : [];
-        } catch (\Throwable) {
-            $config = [];
-        }
-
-        $groups = [];
-        foreach (($config['groups'] ?? []) as $key => $abilities) {
-            if (!is_string($key) || $key === '') {
-                continue;
-            }
-
-            $groups[] = [
-                'key' => $key,
-                'label' => $key,
-            ];
-        }
-
-        if ($groups !== []) {
-            return [
-                'mode' => 'group',
-                'has_levels' => true,
-                'levels' => $groups,
-                'statuses' => self::STATUSES,
-            ];
-        }
-
         $roles = [];
         try {
             $roles = RoleModel::query()->orderBy('name')->orderBy('role_key')->get()
@@ -562,19 +516,9 @@ class UserController extends ApiController
             $roles = [];
         }
 
-        if ($roles !== []) {
-            return [
-                'mode' => 'role',
-                'has_levels' => true,
-                'levels' => $roles,
-                'statuses' => self::STATUSES,
-            ];
-        }
-
         return [
-            'mode' => 'none',
-            'has_levels' => false,
-            'levels' => [],
+            'has_roles' => $roles !== [],
+            'roles' => $roles,
             'statuses' => self::STATUSES,
         ];
     }

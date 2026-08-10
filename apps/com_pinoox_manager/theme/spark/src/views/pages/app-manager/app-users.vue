@@ -40,10 +40,10 @@
             direction="rtl"
         />
         <DarkSelect
-            v-if="meta.has_levels"
-            v-model="levelFilter"
+            v-if="meta.has_roles"
+            v-model="roleFilter"
             :label="translate('app_users_filter_level')"
-            :options="levelFilterOptions"
+            :options="roleFilterOptions"
             direction="rtl"
         />
       </div>
@@ -85,8 +85,9 @@
               <td :data-label="translate('app_users_col_status')">
                 <span class="appUsersStatus" :class="`is-${user.status}`">{{ statusLabel(user.status) }}</span>
               </td>
-              <td v-if="meta.has_levels" :data-label="translate('app_users_col_level')">
-                {{ userLevelLabel(user) }}
+              <td :data-label="translate('app_users_col_group')">{{ user.group_key || '—' }}</td>
+              <td v-if="meta.has_roles" :data-label="translate('app_users_col_level')">
+                {{ userRoleLabel(user) }}
               </td>
               <td :data-label="translate('app_users_col_date')" dir="ltr">{{ user.register_date_fa || user.register_date || '—' }}</td>
               <td class="appUsersTable__actions" :data-label="translate('app_users_col_actions')">
@@ -152,9 +153,8 @@ const props = defineProps({packageName: String});
 const packageName = computed(() => props.packageName);
 const users = ref([]);
 const meta = ref({
-  mode: 'none',
-  has_levels: false,
-  levels: [],
+  has_roles: false,
+  roles: [],
   statuses: ['active', 'inactive', 'suspend', 'pending'],
 });
 const total = ref(0);
@@ -163,7 +163,7 @@ const perPage = ref(10);
 const lastPage = ref(1);
 const query = ref('');
 const statusFilter = ref('');
-const levelFilter = ref('');
+const roleFilter = ref('');
 const sort = ref('user_id');
 const dir = ref('desc');
 const isLoading = ref(true);
@@ -185,7 +185,7 @@ const perPageOptions = [
   {value: '50', label: '50'},
 ];
 
-const hasActiveFilters = computed(() => Boolean(query.value || statusFilter.value || levelFilter.value));
+const hasActiveFilters = computed(() => Boolean(query.value || statusFilter.value || roleFilter.value));
 
 const statusFilterOptions = computed(() => [
   {value: '', label: translate('app_users_filter_all')},
@@ -195,11 +195,11 @@ const statusFilterOptions = computed(() => [
   })),
 ]);
 
-const levelFilterOptions = computed(() => [
+const roleFilterOptions = computed(() => [
   {value: '', label: translate('app_users_filter_all')},
-  ...(meta.value.levels || []).map((level) => ({
-    value: String(level.key),
-    label: translateLevel(level.key, level.label),
+  ...(meta.value.roles || []).map((role) => ({
+    value: String(role.role_id),
+    label: translateLevel(role.key, role.label || role.name),
   })),
 ]);
 
@@ -210,14 +210,11 @@ const userColumns = computed(() => {
     {key: 'username', label: translate('app_users_col_username'), sort: true},
     {key: 'email', label: translate('app_users_col_email'), sort: true},
     {key: 'status', label: translate('app_users_col_status'), sort: true},
+    {key: 'group_key', label: translate('app_users_col_group'), sort: true},
   ];
 
-  if (meta.value.has_levels) {
-    columns.push({
-      key: meta.value.mode === 'group' ? 'group_key' : 'level',
-      label: translate('app_users_col_level'),
-      sort: meta.value.mode === 'group',
-    });
+  if (meta.value.has_roles) {
+    columns.push({key: 'roles', label: translate('app_users_col_level'), sort: false});
   }
 
   columns.push(
@@ -237,15 +234,14 @@ function statusLabel(status) {
   return translate(`app_users_status_${status}`);
 }
 
-function userLevelLabel(user) {
-  const key = user?.level || user?.group_key || user?.roles?.[0]?.key || '';
-  const fallback = user?.roles?.[0]?.name || '';
+function userRoleLabel(user) {
+  const role = user?.roles?.[0];
 
-  if (!key) {
+  if (!role) {
     return translate('app_users_no_roles_assigned');
   }
 
-  return translateLevel(key, fallback);
+  return translateLevel(role.key, role.name);
 }
 
 function sortMark(column) {
@@ -294,7 +290,7 @@ async function loadUsers() {
     const response = await userAPI.getUsers(packageName.value, {
       q: query.value || undefined,
       status: statusFilter.value || undefined,
-      level: levelFilter.value || undefined,
+      role: roleFilter.value || undefined,
       sort: sort.value,
       dir: dir.value,
       page: page.value,
@@ -309,9 +305,8 @@ async function loadUsers() {
 
     if (data.meta && typeof data.meta === 'object') {
       meta.value = {
-        mode: data.meta.mode || 'none',
-        has_levels: Boolean(data.meta.has_levels),
-        levels: data.meta.levels || [],
+        has_roles: Boolean(data.meta.has_roles),
+        roles: data.meta.roles || [],
         statuses: data.meta.statuses || ['active', 'inactive', 'suspend', 'pending'],
       };
     }
@@ -351,7 +346,7 @@ onMounted(loadUsers);
 watch(packageName, () => {
   query.value = '';
   statusFilter.value = '';
-  levelFilter.value = '';
+  roleFilter.value = '';
   page.value = 1;
   loadUsers();
 });
@@ -364,7 +359,7 @@ watch(query, () => {
   }, 280);
 });
 
-watch([statusFilter, levelFilter], () => {
+watch([statusFilter, roleFilter], () => {
   page.value = 1;
   loadUsers();
 });

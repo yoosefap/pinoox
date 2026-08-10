@@ -44,11 +44,19 @@
           direction="rtl"
       />
 
+      <Input
+          v-model="form.group_key"
+          variant="glass"
+          :label="translate('app_users_form_group')"
+          direction="ltr"
+      />
+      <p class="appUserForm__hint">{{ translate('app_users_form_group_hint') }}</p>
+
       <DarkSelect
-          v-if="hasLevels"
-          v-model="form.level"
+          v-if="hasRoles"
+          v-model="form.role_id"
           :label="translate('app_users_form_level')"
-          :options="levelOptions"
+          :options="roleOptions"
           direction="rtl"
       />
     </form>
@@ -96,18 +104,18 @@ const {confirm} = useModalContext();
 const saving = ref(false);
 const isEdit = computed(() => Boolean(props.user?.user_id));
 const title = computed(() => translate(isEdit.value ? 'app_users_form_edit_title' : 'app_users_form_add_title'));
-const hasLevels = computed(() => Boolean(props.meta?.has_levels));
+const hasRoles = computed(() => Boolean(props.meta?.has_roles));
 
 const statusOptions = computed(() => (props.meta?.statuses || ['active', 'inactive', 'suspend', 'pending']).map((value) => ({
   value,
   label: translate(`app_users_status_${value}`),
 })));
 
-const levelOptions = computed(() => [
+const roleOptions = computed(() => [
   {value: '', label: translate('app_users_form_level_none')},
-  ...(props.meta?.levels || []).map((level) => ({
-    value: String(level.key),
-    label: translateLevel(level.key, level.label),
+  ...(props.meta?.roles || []).map((role) => ({
+    value: String(role.role_id),
+    label: translateLevel(role.key, role.label || role.name),
   })),
 ]);
 
@@ -119,7 +127,8 @@ const form = reactive({
   mobile: props.user?.mobile || '',
   password: '',
   status: props.user?.status || 'active',
-  level: String(props.user?.level || props.user?.group_key || props.user?.roles?.[0]?.key || ''),
+  group_key: props.user?.group_key || '',
+  role_id: props.user?.roles?.[0]?.role_id ? String(props.user.roles[0].role_id) : '',
 });
 
 async function save() {
@@ -136,8 +145,12 @@ async function save() {
     email: form.email,
     mobile: form.mobile,
     status: form.status,
-    level: form.level,
+    group_key: form.group_key,
   };
+
+  if (hasRoles.value) {
+    payload.role_id = form.role_id ? Number(form.role_id) : null;
+  }
 
   if (form.password) {
     payload.password = form.password;
