@@ -68,7 +68,7 @@ class UserController extends ApiController
         return $this->runForApp($packageName, function () use ($request, $packageName) {
             $meta = $this->accessMeta($packageName);
             $query = UserModel::query()->with('file');
-            if (!empty($meta['has_roles'])) {
+            if (($meta['mode'] ?? '') === 'role') {
                 $query->with('roles');
             }
             $q = trim((string) $request->get('q', ''));
@@ -93,16 +93,22 @@ class UserController extends ApiController
                 $query->where('status', $status);
             }
 
-            $groupKey = trim((string) $request->get('group', ''));
-            if ($groupKey !== '') {
-                $query->where('group_key', $groupKey);
-            }
+            $level = trim((string) $request->get('level', ''));
+            if ($level !== '' && !empty($meta['has_levels'])) {
+                $mode = (string) ($meta['mode'] ?? 'none');
 
-            $roleId = (int) $request->get('role', 0);
-            if ($roleId > 0 && !empty($meta['has_roles'])) {
-                $query->whereHas('roles', function ($builder) use ($roleId) {
-                    $builder->where('role_id', $roleId);
-                });
+                if ($mode === 'group') {
+                    $query->where('group_key', $level);
+                } elseif ($mode === 'role') {
+                    $roleId = $this->roleIdFromLevel($meta, $level);
+                    $query->whereHas('roles', function ($builder) use ($roleId, $level) {
+                        if ($roleId > 0) {
+                            $builder->where('role_id', $roleId);
+                        } else {
+                            $builder->where('role_key', $level);
+                        }
+                    });
+                }
             }
 
             $sort = (string) $request->get('sort', 'user_id');
@@ -157,7 +163,7 @@ class UserController extends ApiController
             $payload = $this->userPayload($input, $meta, true);
 
             $user = UserModel::create($payload);
-            $this->syncUserRoles($user, $input['role_ids'] ?? [], $meta['has_roles']);
+            $this->applyUserLevel($user, $input, $meta);
 
             return $this->ok($this->serializeUser($user->fresh(['file', 'roles'])));
         });
@@ -182,7 +188,7 @@ class UserController extends ApiController
 
             $user->fill($payload);
             $user->save();
-            $this->syncUserRoles($user, $input['role_ids'] ?? null, $meta['has_roles']);
+            $this->applyUserLevel($user, $input, $meta);
 
             return $this->ok($this->serializeUser($user->fresh(['file', 'roles'])));
         });
@@ -342,6 +348,7 @@ class UserController extends ApiController
             'password' => $password,
             'mobile' => 'nullable|string|max:30',
             'status' => 'nullable|in:' . implode(',', self::STATUSES),
+            'level' => 'nullable|string|max:80',
             'group_key' => 'nullable|string|max:80',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'integer',
@@ -373,17 +380,63 @@ class UserController extends ApiController
             $payload['password'] = (string) $input['password'];
         }
 
-        if (!empty($meta['has_groups'])) {
-            $groupKey = trim((string) ($input['group_key'] ?? ''));
-            $allowed = array_column($meta['groups'] ?? [], 'key');
-            $payload['group_key'] = ($groupKey !== '' && in_array($groupKey, $allowed, true))
-                ? $groupKey
+        $mode = (string) ($meta['mode'] ?? 'none');
+        $level = trim((string) ($input['level'] ?? $input['group_key'] ?? ''));
+
+        if ($mode === 'group') {
+            $allowed = array_column($meta['levels'] ?? [], 'key');
+            $payload['group_key'] = ($level !== '' && in_array($level, $allowed, true))
+                ? $level
                 : null;
-        } elseif ($creating) {
+        } elseif ($creating || $mode === 'role') {
             $payload['group_key'] = null;
         }
 
         return $payload;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $meta
+     */
+    private function applyUserLevel(UserModel $user, array $input, array $meta): void
+    {
+        $mode = (string) ($meta['mode'] ?? 'none');
+
+        if ($mode === 'group') {
+            $this->syncUserRoles($user, [], true);
+            return;
+        }
+
+        if ($mode !== 'role') {
+            return;
+        }
+
+        $level = trim((string) ($input['level'] ?? ''));
+        $roleId = $this->roleIdFromLevel($meta, $level);
+        $this->syncUserRoles($user, $roleId > 0 ? [$roleId] : [], true);
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     */
+    private function roleIdFromLevel(array $meta, string $level): int
+    {
+        if ($level === '') {
+            return 0;
+        }
+
+        foreach ($meta['levels'] ?? [] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            if ((string) ($item['key'] ?? '') === $level || (string) ($item['role_id'] ?? '') === $level) {
+                return (int) ($item['role_id'] ?? 0);
+            }
+        }
+
+        return ctype_digit($level) ? (int) $level : 0;
     }
 
     /**
@@ -437,6 +490,11 @@ class UserController extends ApiController
             $roles = [];
         }
 
+        $level = trim((string) ($user->group_key ?? ''));
+        if ($level === '' && $roles !== []) {
+            $level = (string) ($roles[0]['key'] ?: $roles[0]['role_id']);
+        }
+
         return [
             'user_id' => (int) $user->user_id,
             'fname' => $user->fname,
@@ -448,6 +506,7 @@ class UserController extends ApiController
             'status' => $user->status,
             'group_key' => $user->group_key,
             'roles' => $roles,
+            'level' => $level !== '' ? $level : null,
             'register_date' => $registerDate,
             'register_date_fa' => $registerDateFa,
             'is_self' => (int) $user->user_id === (int) Auth::id(),
@@ -477,54 +536,45 @@ class UserController extends ApiController
             $groups[] = [
                 'key' => $key,
                 'label' => $key,
-                'permissions' => is_array($abilities) ? array_values($abilities) : [],
+            ];
+        }
+
+        if ($groups !== []) {
+            return [
+                'mode' => 'group',
+                'has_levels' => true,
+                'levels' => $groups,
+                'statuses' => self::STATUSES,
             ];
         }
 
         $roles = [];
         try {
-            $roles = RoleModel::with('permissions')->orderBy('name')->orderBy('role_key')->get()
+            $roles = RoleModel::query()->orderBy('name')->orderBy('role_key')->get()
                 ->map(static function (RoleModel $role) {
                     return [
+                        'key' => (string) ($role->role_key ?: $role->role_id),
+                        'label' => (string) ($role->name ?: $role->role_key ?: $role->role_id),
                         'role_id' => (int) $role->role_id,
-                        'key' => $role->role_key,
-                        'name' => $role->name ?: $role->role_key,
-                        'description' => $role->description,
-                        'permissions' => $role->permissions->map(static function ($permission) {
-                            return [
-                                'permission_id' => (int) $permission->permission_id,
-                                'key' => $permission->permission_key,
-                                'name' => $permission->name ?: $permission->permission_key,
-                            ];
-                        })->values()->all(),
                     ];
                 })->all();
         } catch (QueryException) {
             $roles = [];
         }
 
-        $permissions = [];
-        try {
-            $permissions = PermissionModel::orderBy('name')->orderBy('permission_key')->get()
-                ->map(static function (PermissionModel $permission) {
-                    return [
-                        'permission_id' => (int) $permission->permission_id,
-                        'key' => $permission->permission_key,
-                        'name' => $permission->name ?: $permission->permission_key,
-                        'description' => $permission->description,
-                    ];
-                })->all();
-        } catch (QueryException) {
-            $permissions = [];
+        if ($roles !== []) {
+            return [
+                'mode' => 'role',
+                'has_levels' => true,
+                'levels' => $roles,
+                'statuses' => self::STATUSES,
+            ];
         }
 
         return [
-            'has_groups' => $groups !== [],
-            'has_roles' => $roles !== [],
-            'has_permissions' => $permissions !== [],
-            'groups' => $groups,
-            'roles' => $roles,
-            'permissions' => $permissions,
+            'mode' => 'none',
+            'has_levels' => false,
+            'levels' => [],
             'statuses' => self::STATUSES,
         ];
     }

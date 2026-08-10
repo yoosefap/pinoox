@@ -1,15 +1,6 @@
 <template>
   <PageSection :title="translate('app_users_title')">
     <template #actions>
-      <button
-          v-if="hasAccessLists"
-          type="button"
-          class="appUsers__access"
-          @click="openAccess"
-      >
-        <Icon :is="saxIcon.lock" size="xs"/>
-        <span>{{ translate('app_users_access_button') }}</span>
-      </button>
       <button type="button" class="appUsers__add" @click="openCreate">
         <Icon :is="saxIcon.add" size="xs"/>
         <span>{{ translate('app_users_add') }}</span>
@@ -49,17 +40,10 @@
             direction="rtl"
         />
         <DarkSelect
-            v-if="meta.has_groups"
-            v-model="groupFilter"
-            :label="translate('app_users_filter_group')"
-            :options="groupFilterOptions"
-            direction="rtl"
-        />
-        <DarkSelect
-            v-if="meta.has_roles"
-            v-model="roleFilter"
-            :label="translate('app_users_filter_role')"
-            :options="roleFilterOptions"
+            v-if="meta.has_levels"
+            v-model="levelFilter"
+            :label="translate('app_users_filter_level')"
+            :options="levelFilterOptions"
             direction="rtl"
         />
       </div>
@@ -101,12 +85,8 @@
               <td :data-label="translate('app_users_col_status')">
                 <span class="appUsersStatus" :class="`is-${user.status}`">{{ statusLabel(user.status) }}</span>
               </td>
-              <td v-if="meta.has_groups" :data-label="translate('app_users_col_group')">{{ user.group_key || '—' }}</td>
-              <td v-if="meta.has_roles" :data-label="translate('app_users_col_roles')">
-                <span v-if="user.roles?.length" class="appUsersChips">
-                  <span v-for="role in user.roles" :key="role.role_id" class="appUsersChip">{{ role.name }}</span>
-                </span>
-                <span v-else class="appUsersMuted">{{ translate('app_users_no_roles_assigned') }}</span>
+              <td v-if="meta.has_levels" :data-label="translate('app_users_col_level')">
+                {{ userLevelLabel(user) }}
               </td>
               <td :data-label="translate('app_users_col_date')" dir="ltr">{{ user.register_date_fa || user.register_date || '—' }}</td>
               <td class="appUsersTable__actions" :data-label="translate('app_users_col_actions')">
@@ -163,22 +143,18 @@ import DarkSelect from '@/views/components/form/DarkSelect.vue';
 import WidgetLoading from '@/views/components/desktop-widgets/WidgetLoading.vue';
 import {userAPI} from '@api/user.js';
 import {unwrapResponse} from '@utils/helpers/apiHelper.js';
-import {translate} from '@utils/helpers/managerLang.js';
+import {translate, translateLevel} from '@utils/helpers/managerLang.js';
 import ModalAppUser from './modal-app-user.vue';
 import ModalDeleteAppUser from './modal-delete-app-user.vue';
-import ModalAppAccess from './modal-app-access.vue';
 
 const props = defineProps({packageName: String});
 
 const packageName = computed(() => props.packageName);
 const users = ref([]);
 const meta = ref({
-  has_groups: false,
-  has_roles: false,
-  has_permissions: false,
-  groups: [],
-  roles: [],
-  permissions: [],
+  mode: 'none',
+  has_levels: false,
+  levels: [],
   statuses: ['active', 'inactive', 'suspend', 'pending'],
 });
 const total = ref(0);
@@ -187,8 +163,7 @@ const perPage = ref(10);
 const lastPage = ref(1);
 const query = ref('');
 const statusFilter = ref('');
-const groupFilter = ref('');
-const roleFilter = ref('');
+const levelFilter = ref('');
 const sort = ref('user_id');
 const dir = ref('desc');
 const isLoading = ref(true);
@@ -210,8 +185,7 @@ const perPageOptions = [
   {value: '50', label: '50'},
 ];
 
-const hasActiveFilters = computed(() => Boolean(query.value || statusFilter.value || groupFilter.value || roleFilter.value));
-const hasAccessLists = computed(() => Boolean(meta.value.has_groups || meta.value.has_roles || meta.value.has_permissions));
+const hasActiveFilters = computed(() => Boolean(query.value || statusFilter.value || levelFilter.value));
 
 const statusFilterOptions = computed(() => [
   {value: '', label: translate('app_users_filter_all')},
@@ -221,19 +195,11 @@ const statusFilterOptions = computed(() => [
   })),
 ]);
 
-const groupFilterOptions = computed(() => [
+const levelFilterOptions = computed(() => [
   {value: '', label: translate('app_users_filter_all')},
-  ...(meta.value.groups || []).map((group) => ({
-    value: group.key,
-    label: group.label || group.key,
-  })),
-]);
-
-const roleFilterOptions = computed(() => [
-  {value: '', label: translate('app_users_filter_all')},
-  ...(meta.value.roles || []).map((role) => ({
-    value: String(role.role_id),
-    label: role.name,
+  ...(meta.value.levels || []).map((level) => ({
+    value: String(level.key),
+    label: translateLevel(level.key, level.label),
   })),
 ]);
 
@@ -246,12 +212,12 @@ const userColumns = computed(() => {
     {key: 'status', label: translate('app_users_col_status'), sort: true},
   ];
 
-  if (meta.value.has_groups) {
-    columns.push({key: 'group_key', label: translate('app_users_col_group'), sort: true});
-  }
-
-  if (meta.value.has_roles) {
-    columns.push({key: 'roles', label: translate('app_users_col_roles'), sort: false});
+  if (meta.value.has_levels) {
+    columns.push({
+      key: meta.value.mode === 'group' ? 'group_key' : 'level',
+      label: translate('app_users_col_level'),
+      sort: meta.value.mode === 'group',
+    });
   }
 
   columns.push(
@@ -269,6 +235,17 @@ const usersCaption = computed(() => {
 
 function statusLabel(status) {
   return translate(`app_users_status_${status}`);
+}
+
+function userLevelLabel(user) {
+  const key = user?.level || user?.group_key || user?.roles?.[0]?.key || '';
+  const fallback = user?.roles?.[0]?.name || '';
+
+  if (!key) {
+    return translate('app_users_no_roles_assigned');
+  }
+
+  return translateLevel(key, fallback);
 }
 
 function sortMark(column) {
@@ -317,8 +294,7 @@ async function loadUsers() {
     const response = await userAPI.getUsers(packageName.value, {
       q: query.value || undefined,
       status: statusFilter.value || undefined,
-      group: groupFilter.value || undefined,
-      role: roleFilter.value || undefined,
+      level: levelFilter.value || undefined,
       sort: sort.value,
       dir: dir.value,
       page: page.value,
@@ -333,12 +309,9 @@ async function loadUsers() {
 
     if (data.meta && typeof data.meta === 'object') {
       meta.value = {
-        has_groups: Boolean(data.meta.has_groups),
-        has_roles: Boolean(data.meta.has_roles),
-        has_permissions: Boolean(data.meta.has_permissions),
-        groups: data.meta.groups || [],
-        roles: data.meta.roles || [],
-        permissions: data.meta.permissions || [],
+        mode: data.meta.mode || 'none',
+        has_levels: Boolean(data.meta.has_levels),
+        levels: data.meta.levels || [],
         statuses: data.meta.statuses || ['active', 'inactive', 'suspend', 'pending'],
       };
     }
@@ -373,23 +346,12 @@ function openDelete(user) {
   }).then(() => loadUsers()).catch(() => {});
 }
 
-function openAccess() {
-  openModal(ModalAppAccess, {
-    props: {
-      packageName: packageName.value,
-      meta: meta.value,
-      onUpdated: loadUsers,
-    },
-  }).catch(() => {});
-}
-
 onMounted(loadUsers);
 
 watch(packageName, () => {
   query.value = '';
   statusFilter.value = '';
-  groupFilter.value = '';
-  roleFilter.value = '';
+  levelFilter.value = '';
   page.value = 1;
   loadUsers();
 });
@@ -402,7 +364,7 @@ watch(query, () => {
   }, 280);
 });
 
-watch([statusFilter, groupFilter, roleFilter], () => {
+watch([statusFilter, levelFilter], () => {
   page.value = 1;
   loadUsers();
 });

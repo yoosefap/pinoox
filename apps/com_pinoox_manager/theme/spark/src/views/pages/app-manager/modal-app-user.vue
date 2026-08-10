@@ -45,20 +45,12 @@
       />
 
       <DarkSelect
-          v-if="hasGroups"
-          v-model="form.group_key"
-          :label="translate('app_users_form_group')"
-          :options="groupOptions"
+          v-if="hasLevels"
+          v-model="form.level"
+          :label="translate('app_users_form_level')"
+          :options="levelOptions"
           direction="rtl"
       />
-
-      <div v-if="hasRoles" class="appUserForm__checks">
-        <span class="appUserForm__checksLabel">{{ translate('app_users_form_roles') }}</span>
-        <label v-for="role in meta.roles" :key="role.role_id" class="appUserForm__check">
-          <input v-model="form.role_ids" type="checkbox" :value="role.role_id"/>
-          <span>{{ role.name }}</span>
-        </label>
-      </div>
     </form>
 
     <template #footer>
@@ -92,7 +84,7 @@ import {userAPI} from '@api/user.js';
 import {unwrapResponse} from '@utils/helpers/apiHelper.js';
 import {resolveApiFailure} from '@utils/apiEnvelope.js';
 import {toastError, toastSuccess} from '@utils/helpers/toastHelper.js';
-import {translate} from '@utils/helpers/managerLang.js';
+import {translate, translateLevel} from '@utils/helpers/managerLang.js';
 
 const props = defineProps({
   packageName: {type: String, required: true},
@@ -104,19 +96,18 @@ const {confirm} = useModalContext();
 const saving = ref(false);
 const isEdit = computed(() => Boolean(props.user?.user_id));
 const title = computed(() => translate(isEdit.value ? 'app_users_form_edit_title' : 'app_users_form_add_title'));
-const hasGroups = computed(() => Boolean(props.meta?.has_groups));
-const hasRoles = computed(() => Boolean(props.meta?.has_roles));
+const hasLevels = computed(() => Boolean(props.meta?.has_levels));
 
 const statusOptions = computed(() => (props.meta?.statuses || ['active', 'inactive', 'suspend', 'pending']).map((value) => ({
   value,
   label: translate(`app_users_status_${value}`),
 })));
 
-const groupOptions = computed(() => [
-  {value: '', label: translate('app_users_form_group_none')},
-  ...(props.meta?.groups || []).map((group) => ({
-    value: group.key,
-    label: group.label || group.key,
+const levelOptions = computed(() => [
+  {value: '', label: translate('app_users_form_level_none')},
+  ...(props.meta?.levels || []).map((level) => ({
+    value: String(level.key),
+    label: translateLevel(level.key, level.label),
   })),
 ]);
 
@@ -128,8 +119,7 @@ const form = reactive({
   mobile: props.user?.mobile || '',
   password: '',
   status: props.user?.status || 'active',
-  group_key: props.user?.group_key || '',
-  role_ids: (props.user?.roles || []).map((role) => role.role_id),
+  level: String(props.user?.level || props.user?.group_key || props.user?.roles?.[0]?.key || ''),
 });
 
 async function save() {
@@ -146,8 +136,7 @@ async function save() {
     email: form.email,
     mobile: form.mobile,
     status: form.status,
-    group_key: form.group_key,
-    role_ids: form.role_ids.map((id) => Number(id)),
+    level: form.level,
   };
 
   if (form.password) {

@@ -84,6 +84,7 @@ const MESSAGES = {
         app_users_filter_status: 'وضعیت',
         app_users_filter_group: 'گروه',
         app_users_filter_role: 'نقش',
+        app_users_filter_level: 'نقش',
         app_users_filter_all: 'همه',
         app_users_col_id: 'شناسه',
         app_users_col_name: 'نام',
@@ -92,6 +93,7 @@ const MESSAGES = {
         app_users_col_status: 'وضعیت',
         app_users_col_group: 'گروه',
         app_users_col_roles: 'نقش‌ها',
+        app_users_col_level: 'نقش',
         app_users_col_date: 'تاریخ عضویت',
         app_users_col_actions: 'عملیات',
         app_users_col_key: 'شناسه',
@@ -123,6 +125,14 @@ const MESSAGES = {
         app_users_form_group: 'گروه',
         app_users_form_group_none: 'بدون گروه',
         app_users_form_roles: 'نقش‌ها',
+        app_users_form_level: 'نقش در این برنامه',
+        app_users_form_level_none: 'بدون نقش',
+        app_users_level_admin: 'مدیر',
+        app_users_level_superadmin: 'مدیر اصلی',
+        app_users_level_manager: 'مدیر برنامه',
+        app_users_level_user: 'کاربر',
+        app_users_level_editor: 'ویرایشگر',
+        app_users_level_guest: 'مهمان',
         app_users_form_save: 'ذخیره',
         app_users_saved: 'کاربر ذخیره شد',
         app_users_save_failed: 'ذخیره کاربر انجام نشد',
@@ -264,6 +274,7 @@ const MESSAGES = {
         app_users_filter_status: 'Status',
         app_users_filter_group: 'Group',
         app_users_filter_role: 'Role',
+        app_users_filter_level: 'Role',
         app_users_filter_all: 'All',
         app_users_col_id: 'ID',
         app_users_col_name: 'Name',
@@ -272,6 +283,7 @@ const MESSAGES = {
         app_users_col_status: 'Status',
         app_users_col_group: 'Group',
         app_users_col_roles: 'Roles',
+        app_users_col_level: 'Role',
         app_users_col_date: 'Joined',
         app_users_col_actions: 'Actions',
         app_users_col_key: 'Key',
@@ -303,6 +315,14 @@ const MESSAGES = {
         app_users_form_group: 'Group',
         app_users_form_group_none: 'No group',
         app_users_form_roles: 'Roles',
+        app_users_form_level: 'Role in this app',
+        app_users_form_level_none: 'No role',
+        app_users_level_admin: 'Admin',
+        app_users_level_superadmin: 'Main admin',
+        app_users_level_manager: 'App manager',
+        app_users_level_user: 'User',
+        app_users_level_editor: 'Editor',
+        app_users_level_guest: 'Guest',
         app_users_form_save: 'Save',
         app_users_saved: 'User saved',
         app_users_save_failed: 'Could not save the user',
@@ -391,4 +411,27 @@ function readActiveLang() {
 export function translate(key, lang) {
     const locale = resolveLocale(lang);
     return MESSAGES[locale]?.[key] ?? MESSAGES.en[key] ?? key;
+}
+
+export function translateLevel(key, fallback = '') {
+    const value = String(key || '').trim();
+
+    if (value === '') {
+        return translate('app_users_no_roles_assigned');
+    }
+
+    const i18nKey = `app_users_level_${value}`;
+    const known = translate(i18nKey);
+
+    if (known && known !== i18nKey) {
+        return known;
+    }
+
+    const name = String(fallback || '').trim();
+
+    if (name !== '' && name !== value) {
+        return name;
+    }
+
+    return value.replace(/[_-]+/g, ' ');
 }
