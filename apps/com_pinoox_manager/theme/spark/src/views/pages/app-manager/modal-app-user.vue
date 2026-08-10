@@ -37,20 +37,22 @@
       />
       <p v-if="isEdit" class="appUserForm__hint">{{ translate('app_users_form_password_hint') }}</p>
 
+      <template v-if="!hasRoles">
+        <Input
+            v-model="form.group_key"
+            variant="glass"
+            :label="translate('app_users_form_group')"
+            direction="ltr"
+        />
+        <p class="appUserForm__hint">{{ translate('app_users_form_group_hint') }}</p>
+      </template>
+
       <DarkSelect
           v-model="form.status"
           :label="translate('app_users_form_status')"
           :options="statusOptions"
           direction="rtl"
       />
-
-      <Input
-          v-model="form.group_key"
-          variant="glass"
-          :label="translate('app_users_form_group')"
-          direction="ltr"
-      />
-      <p class="appUserForm__hint">{{ translate('app_users_form_group_hint') }}</p>
 
       <DarkSelect
           v-if="hasRoles"
@@ -145,11 +147,12 @@ async function save() {
     email: form.email,
     mobile: form.mobile,
     status: form.status,
-    group_key: form.group_key,
   };
 
   if (hasRoles.value) {
     payload.role_id = form.role_id ? Number(form.role_id) : null;
+  } else {
+    payload.group_key = form.group_key;
   }
 
   if (form.password) {

@@ -217,11 +217,12 @@ const userColumns = computed(() => {
     {key: 'mobile', label: translate('app_users_col_mobile'), sort: true, ltr: true},
     {key: 'email', label: translate('app_users_col_email'), sort: true, ltr: true},
     {key: 'status', label: translate('app_users_col_status'), sort: true},
-    {key: 'group_key', label: translate('app_users_col_group'), sort: true, ltr: true},
   ];
 
   if (meta.value.has_roles) {
     columns.push({key: 'roles', label: translate('app_users_col_level'), sort: false});
+  } else {
+    columns.push({key: 'group_key', label: translate('app_users_col_group'), sort: true, ltr: true});
   }
 
   columns.push(

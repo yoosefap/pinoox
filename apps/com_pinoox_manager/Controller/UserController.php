@@ -161,7 +161,7 @@ class UserController extends ApiController
         return $this->runForApp($packageName, function () use ($request, $packageName) {
             $input = $this->validated($request, $this->userRules());
             $meta = $this->accessMeta($packageName);
-            $payload = $this->userPayload($input);
+            $payload = $this->userPayload($input, $meta);
 
             $user = UserModel::create($payload);
             $this->applyUserRoles($user, $input, $meta);
@@ -185,7 +185,7 @@ class UserController extends ApiController
 
             $input = $this->validated($request, $this->userRules((int) $user->user_id, false));
             $meta = $this->accessMeta($packageName);
-            $payload = $this->userPayload($input);
+            $payload = $this->userPayload($input, $meta);
 
             $user->fill($payload);
             $user->save();
@@ -359,16 +359,15 @@ class UserController extends ApiController
 
     /**
      * @param array<string, mixed> $input
+     * @param array<string, mixed> $meta
      * @return array<string, mixed>
      */
-    private function userPayload(array $input): array
+    private function userPayload(array $input, array $meta = []): array
     {
         $status = $input['status'] ?? UserModel::ACTIVE;
         if (!in_array($status, self::STATUSES, true)) {
             $status = UserModel::ACTIVE;
         }
-
-        $groupKey = trim((string) ($input['group_key'] ?? ''));
 
         $payload = [
             'fname' => trim((string) ($input['fname'] ?? '')),
@@ -377,8 +376,12 @@ class UserController extends ApiController
             'username' => trim((string) ($input['username'] ?? '')),
             'mobile' => trim((string) ($input['mobile'] ?? '')) ?: null,
             'status' => $status,
-            'group_key' => $groupKey !== '' ? $groupKey : null,
         ];
+
+        if (empty($meta['has_roles'])) {
+            $groupKey = trim((string) ($input['group_key'] ?? ''));
+            $payload['group_key'] = $groupKey !== '' ? $groupKey : null;
+        }
 
         if (!empty($input['password'])) {
             $payload['password'] = (string) $input['password'];
