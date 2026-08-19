@@ -5,7 +5,7 @@ function makeLucideIcon(name) {
     const comp = resolveLucideComponent(name);
     if (!comp) return null;
     return {
-        element: { render: () => h(comp, { size: 18, strokeWidth: 2.15, color: 'currentColor' }) },
+        element: { render: () => h(comp, { size: 18, strokeWidth: 1.75, color: 'currentColor' }) },
         class: '',
     };
 }
@@ -31,7 +31,7 @@ export function toSidebarMenuItems() {
         const base = {
             title: item.title,
             icon: makeLucideIcon(item.lucide),
-            attributes: { 'aria-label': item.title },
+            attributes: { 'aria-label': item.title, 'data-tooltip': item.title },
         };
 
         if (item.children) {
