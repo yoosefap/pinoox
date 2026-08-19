@@ -29,9 +29,9 @@ app.use(createModal({
 
 //---------------------------- Mixin ----------------------------
 
-import {saxIcon, mdiIcon} from '@/const/icons.js';
+import {saxIcon} from '@/const/icons.js';
 
-app.mixin({data: () => ({saxIcon, mdiIcon})});
+app.mixin({data: () => ({saxIcon})});
 
 
 // ---------------------------- Mount ----------------------------

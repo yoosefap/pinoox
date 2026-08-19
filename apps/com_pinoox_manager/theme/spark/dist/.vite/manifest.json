@@ -1,6 +1,6 @@
 {
-  "_vendor-DGhgPzGe.js": {
-    "file": "assets/vendor-DGhgPzGe.js",
+  "_vendor-ChLX1Shj.js": {
+    "file": "assets/vendor-ChLX1Shj.js",
     "name": "vendor",
     "css": [
       "assets/vendor-i6itkE4U.css"
@@ -176,12 +176,12 @@
     ]
   },
   "src/main.js": {
-    "file": "assets/main-C4_ISrVv.js",
+    "file": "assets/main-BB1B2zPl.js",
     "name": "main",
     "src": "src/main.js",
     "isEntry": true,
     "imports": [
-      "_vendor-DGhgPzGe.js"
+      "_vendor-ChLX1Shj.js"
     ],
     "css": [
       "assets/main-Cya-u6IH.css"
