@@ -17,7 +17,7 @@ use App\com_pinoox_manager\Component\PackagePaths;
 use Pinoox\Component\Cache\AppCacheManager;
 use Pinoox\Component\Database\Patch\PatchToolkit;
 use Pinoox\Component\Migration\Migrator;
-use Pinoox\Component\Package\Lifecycle\AppLifecycle;
+use Pinoox\Component\Package\Lifecycle\AppLifecycle as PackageAppLifecycle;
 use Pinoox\Component\Package\Lifecycle\AppLifecycleRunner;
 use Pinoox\Component\Package\Pinx\PinxInstallResult;
 use Pinoox\Component\Package\Pinx\PinxManifest;
@@ -505,7 +505,7 @@ class Wizard
 
             $life = (new AppLifecycleRunner(AppEngine::___()))->run(
                 $package,
-                $result->mode === 'update' ? AppLifecycle::UPDATE : AppLifecycle::INSTALL,
+                $result->mode === 'update' ? PackageAppLifecycle::UPDATE : PackageAppLifecycle::INSTALL,
                 [
                     'toVersionCode' => $result->manifest->versionCode(),
                     'toVersionName' => $result->manifest->versionName(),
