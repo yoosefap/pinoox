@@ -1,8 +1,6 @@
 import { createApp } from "vue";
 import 'dockbar';
 import App from "./App.vue";
-import axios from "axios";
-import VueAxios from "vue-axios";
 import store from "@/stores";
 import router from "./router";
 import "@/assets/styles/tailwind-config.css";
@@ -14,7 +12,6 @@ import { bindNotify } from '@utils/helpers/toastHelper.js';
 const app = createApp(App);
 
 // ---------------------------- Plugins ----------------------------
-app.use(VueAxios, axios);
 app.use(store);
 app.use(router);
 app.use(Notifications);
