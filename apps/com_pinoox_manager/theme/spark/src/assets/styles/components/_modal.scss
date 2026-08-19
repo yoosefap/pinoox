@@ -46,9 +46,13 @@ $modal-z-region: 10100;
   }
 
   &-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
     flex-shrink: 0;
     border-top-color: $color-border !important;
-    gap: 1rem !important;
+    gap: 0.5rem !important;
     padding: 0.85rem 1.15rem 1rem !important;
   }
 
