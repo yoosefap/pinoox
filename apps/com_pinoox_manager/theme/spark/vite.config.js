@@ -25,22 +25,34 @@ export default defineConfig({
     ],
     build: {
         chunkSizeWarningLimit: 1000,
-        rollupOptions: {
+        rolldownOptions: {
+            checks: {
+                invalidAnnotation: false,
+            },
             output: {
                 manualChunks(id) {
                     if (id.includes('@kyvg/vue3-notification')) {
                         return undefined;
                     }
-                    if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
+                    if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/')) {
                         return 'vue-core';
                     }
-                    if (id.includes('@vueuse/core') || id.includes('@vueuse/shared')) {
+                    if (id.includes('node_modules/vue-router/')) {
+                        return 'vue-router';
+                    }
+                    if (id.includes('node_modules/pinia/')) {
+                        return 'pinia';
+                    }
+                    if (id.includes('node_modules/@vueuse/')) {
                         return 'vueuse';
                     }
-                    if (id.includes('reka-ui') || id.includes('lucide-vue-next')) {
-                        return 'ui';
+                    if (id.includes('node_modules/reka-ui/')) {
+                        return 'reka-ui';
                     }
-                    if (id.includes('node_modules')) {
+                    if (id.includes('node_modules/lucide-vue-next/')) {
+                        return 'lucide';
+                    }
+                    if (id.includes('node_modules/')) {
                         return 'vendor';
                     }
                 },
