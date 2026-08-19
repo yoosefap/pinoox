@@ -2,7 +2,7 @@
   <Page title="اپلیکیشن‌ها" class="pageApps">
     <template #toolbar>
       <Menu @click="openModalInstallApp" :icon="icons.add" label="نصب اپلکیشن"/>
-      <Menu @click="openMarket()" :icon="icons.market" label="مارکت"/>
+      <Menu @click="openMarketFromControl()" :icon="icons.market" label="مارکت"/>
     </template>
 
     <div v-if="stagedCount" class="pageApps__stagedEntry">
@@ -55,7 +55,7 @@ const globalRouter = useGlobalRouter();
 const appStore = useAppStore();
 const packageInstallerStore = usePackageInstallerStore();
 const {pushAppManager} = useControlPanelNavigation();
-const {openMarket} = useMarket();
+const {openMarketFromControl} = useMarket();
 const stagedFiles = ref([]);
 
 const icons = markRaw({

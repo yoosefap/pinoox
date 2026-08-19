@@ -15,6 +15,7 @@ import {watch} from 'vue';
 import {useRoute} from 'vue-router';
 import {useMarketWindowStore} from '@/stores/modules/marketWindow.js';
 import {isMarketRoute} from '@/views/composables/useMarket.js';
+import {isControlRoute} from '@/views/composables/useControlPanel.js';
 import {useControlPanelLayoutStore} from '@/stores/modules/controlPanelLayout.js';
 import {useAppViewMode} from '@/views/composables/useAppViewMode.js';
 import MarketWindow from '@/views/pages/market/MarketWindow.vue';
@@ -55,12 +56,16 @@ function syncMarketOnLeave() {
 
 watch(
     () => route.path,
-    () => {
+    (_path, previousPath) => {
       if (isSimple.value) {
         return;
       }
 
       if (isMarketRoute(route)) {
+        if (previousPath && isControlRoute({path: previousPath})) {
+          marketWindow.setReturnTo('control');
+        }
+
         marketWindow.setLastPath(route.path);
         syncRouteSession();
         return;

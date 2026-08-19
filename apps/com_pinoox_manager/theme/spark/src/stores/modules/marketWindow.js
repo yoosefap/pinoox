@@ -15,6 +15,7 @@ export const useMarketWindowStore = defineStore('marketWindow', {
         topZ: 10050,
         restoreMode: 'fullscreen',
         lastPath: '/market',
+        returnTo: null,
     }),
     getters: {
         isOpen(state) {
@@ -46,6 +47,12 @@ export const useMarketWindowStore = defineStore('marketWindow', {
             if (normalized.startsWith('/market')) {
                 this.lastPath = normalized;
             }
+        },
+        setReturnTo(target) {
+            this.returnTo = target === 'control' ? 'control' : null;
+        },
+        clearReturnTo() {
+            this.returnTo = null;
         },
         syncFloatingRect() {
             const layout = useControlPanelLayoutStore();
@@ -90,6 +97,7 @@ export const useMarketWindowStore = defineStore('marketWindow', {
         dismiss() {
             this.mode = 'hidden';
             this.restoreMode = 'fullscreen';
+            this.returnTo = null;
         },
     },
 });

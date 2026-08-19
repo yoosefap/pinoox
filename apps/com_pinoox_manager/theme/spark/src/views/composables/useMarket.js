@@ -1,6 +1,7 @@
 import {useRouter} from 'vue-router';
 import {MARKET_ID, useMarketWindowStore} from '@/stores/modules/marketWindow.js';
 import {useAppViewMode} from '@/views/composables/useAppViewMode.js';
+import {isControlRoute, useControlPanel} from '@/views/composables/useControlPanel.js';
 import {pushManagerBrowserRoute} from '@/views/composables/useManagerWindowRouteSync.js';
 
 export {MARKET_ID};
@@ -13,8 +14,24 @@ export function useMarket() {
     const router = useRouter();
     const {isAdvanced} = useAppViewMode();
     const marketWindow = useMarketWindowStore();
+    const {openControlPanel, controlPanelWindow} = useControlPanel();
 
-    async function openMarket(path = '/market') {
+    function captureReturnTo(fromControl) {
+        const openedFromControl = fromControl === true
+            || isControlRoute(router.currentRoute.value);
+
+        if (!marketWindow.isOpen) {
+            marketWindow.setReturnTo(openedFromControl ? 'control' : null);
+            return;
+        }
+
+        if (openedFromControl) {
+            marketWindow.setReturnTo('control');
+        }
+    }
+
+    async function openMarket(path = '/market', options = {}) {
+        captureReturnTo(options.fromControl === true);
         marketWindow.setLastPath(path);
 
         if (isAdvanced.value) {
@@ -35,18 +52,33 @@ export function useMarket() {
         await router.push(path);
     }
 
-    function closeMarket() {
+    async function openMarketFromControl(path = '/market') {
+        await openMarket(path, {fromControl: true});
+    }
+
+    async function closeMarket() {
+        const shouldReturnToControl = marketWindow.returnTo === 'control';
+        const controlPath = controlPanelWindow.lastPath || '/control/apps';
+
         if (isAdvanced.value && marketWindow.isOpen) {
             marketWindow.close();
         }
 
+        marketWindow.clearReturnTo();
+
+        if (shouldReturnToControl) {
+            await openControlPanel(controlPath);
+            return;
+        }
+
         if (isMarketRoute(router.currentRoute.value)) {
-            router.push({name: 'desktop'});
+            await router.push({name: 'desktop'});
         }
     }
 
     return {
         openMarket,
+        openMarketFromControl,
         closeMarket,
         isMarketRoute,
         marketWindow,
