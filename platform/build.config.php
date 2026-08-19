@@ -9,6 +9,9 @@ return [
     | Produces a .zip archive (not .pinx) for deploying the full Pinoox platform.
     | App packages keep using app.php → build settings and .pinx output.
     |
+    | Apply on a host: php pinoox update path/to.zip
+    | (extracts files, then runs core + bundled-app migrations and patches)
+    |
     */
 
     // Respect project and nested .gitignore files when collecting files
