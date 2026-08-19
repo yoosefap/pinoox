@@ -4,7 +4,6 @@ namespace App\com_pinoox_installer\Component;
 
 use Pinoox\Component\Package\AppProvisioner;
 use Pinoox\Component\Package\Engine\AppEngine;
-use Pinoox\Portal\App\App;
 use Pinoox\Portal\App\AppEngine as AppEnginePortal;
 use Pinoox\Portal\App\AppRouter;
 use Pinoox\Portal\Database\DB;
@@ -119,7 +118,7 @@ final class SetupService
     private function projectPackages(): array
     {
         return $this->provisioner()->packagesForSetup([
-            'exclude' => [(string) App::package()],
+            'exclude' => ['com_pinoox_installer'],
             'only_enabled' => true,
         ]);
     }
@@ -127,10 +126,20 @@ final class SetupService
     private function disableInstaller(): void
     {
         $routesFile = AppEnginePortal::path('com_pinoox_installer') . '/config/app.config.php';
-        $postInstallRoutes = is_file($routesFile) ? require $routesFile : [];
+        $postInstallRoutes = is_file($routesFile) ? require $routesFile : [
+            '/' => 'com_pinoox_welcome',
+            '/manager' => 'com_pinoox_manager',
+        ];
 
-        AppRouter::setData(is_array($postInstallRoutes) ? $postInstallRoutes : []);
-        App::set('enable', false)->save();
+        try {
+            AppRouter::setData(is_array($postInstallRoutes) ? $postInstallRoutes : []);
+        } catch (\Throwable $e) {
+            Logger::error('Installer app-router swap failed: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+        }
+
+        AppEnginePortal::config('com_pinoox_installer')->set('enable', false)->save();
     }
 
     private function reconnectDatabase(array $config): void
