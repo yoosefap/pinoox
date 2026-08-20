@@ -79,6 +79,15 @@ final class InstallPlatformConfig
         return is_file($path);
     }
 
+    public static function remove(string $path): bool
+    {
+        if (!is_file($path)) {
+            return true;
+        }
+
+        return @unlink($path);
+    }
+
     /**
      * @param array{
      *     lang?: string,

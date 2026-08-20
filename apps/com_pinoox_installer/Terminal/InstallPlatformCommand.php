@@ -41,6 +41,7 @@ Other:
   php pinoox install-platform check
   php pinoox install-platform init --force
   php pinoox install-platform run --dry-run
+  php pinoox install-platform run -r
   php pinoox install-platform run --file=.pinoox/install-platform.php
 
 This runs the same SetupService as the GUI installer: save DB credentials,
@@ -51,6 +52,8 @@ HELP
             ->addArgument('action', InputArgument::OPTIONAL, 'init, run, or check')
             ->addOption('file', null, InputOption::VALUE_REQUIRED, 'Config file path (default: .pinoox/install-platform.php)')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite the stub (init) or re-run setup if already installed')
+            ->addOption('remove', 'r', InputOption::VALUE_NONE, 'Delete the config file after a successful install')
+            ->addOption('delete', 'd', InputOption::VALUE_NONE, 'Alias of --remove')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Validate the config without installing (run)');
     }
 
@@ -213,9 +216,30 @@ HELP
             '/  → com_pinoox_welcome',
             '/manager  → com_pinoox_manager',
         ]);
-        $io->note('Config still contains secrets: ' . $path);
+
+        if ($this->shouldRemoveConfig($input)) {
+            $this->forgetConfig($io, $path);
+        } else {
+            $io->note('Config still contains secrets: ' . $path);
+        }
 
         return Command::SUCCESS;
+    }
+
+    private function shouldRemoveConfig(InputInterface $input): bool
+    {
+        return (bool) $input->getOption('remove') || (bool) $input->getOption('delete');
+    }
+
+    private function forgetConfig(SymfonyStyle $io, string $path): void
+    {
+        if (InstallPlatformConfig::remove($path)) {
+            $io->writeln('Removed config: <comment>' . $path . '</comment>');
+
+            return;
+        }
+
+        $io->warning('Installed, but could not delete config: ' . $path);
     }
 
     private function isAlreadyInstalled(): bool
