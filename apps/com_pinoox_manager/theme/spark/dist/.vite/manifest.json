@@ -1,7 +1,37 @@
 {
-  "_vendor-ClrndVkp.js": {
-    "file": "assets/vendor-ClrndVkp.js",
+  "_lucide-CB4vBUj0.js": {
+    "file": "assets/lucide-CB4vBUj0.js",
+    "name": "lucide",
+    "imports": [
+      "_rolldown-runtime-DK3Fl9T5.js"
+    ]
+  },
+  "_pinia-7tW7jnxY.js": {
+    "file": "assets/pinia-7tW7jnxY.js",
+    "name": "pinia",
+    "imports": [
+      "_lucide-CB4vBUj0.js"
+    ]
+  },
+  "_reka-ui-EJjFXrwz.js": {
+    "file": "assets/reka-ui-EJjFXrwz.js",
+    "name": "reka-ui",
+    "imports": [
+      "_lucide-CB4vBUj0.js"
+    ]
+  },
+  "_rolldown-runtime-DK3Fl9T5.js": {
+    "file": "assets/rolldown-runtime-DK3Fl9T5.js",
+    "name": "rolldown-runtime"
+  },
+  "_vendor-BcRoqoUt.js": {
+    "file": "assets/vendor-BcRoqoUt.js",
     "name": "vendor",
+    "imports": [
+      "_rolldown-runtime-DK3Fl9T5.js",
+      "_lucide-CB4vBUj0.js",
+      "_reka-ui-EJjFXrwz.js"
+    ],
     "css": [
       "assets/vendor-i6itkE4U.css"
     ]
@@ -9,6 +39,13 @@
   "_vendor-i6itkE4U.css": {
     "file": "assets/vendor-i6itkE4U.css",
     "src": "_vendor-i6itkE4U.css"
+  },
+  "_vue-router-Cy7m1zhD.js": {
+    "file": "assets/vue-router-Cy7m1zhD.js",
+    "name": "vue-router",
+    "imports": [
+      "_lucide-CB4vBUj0.js"
+    ]
   },
   "src/assets/fonts/kalameh/Woff/KalamehWeb(FaNum)-Black.woff": {
     "file": "assets/KalamehWeb(FaNum)-Black-UdSzDJ6F.woff",
@@ -176,15 +213,19 @@
     ]
   },
   "src/main.js": {
-    "file": "assets/main-BsEy9WC2.js",
+    "file": "assets/main-CNEmFpMe.js",
     "name": "main",
     "src": "src/main.js",
     "isEntry": true,
     "imports": [
-      "_vendor-ClrndVkp.js"
+      "_lucide-CB4vBUj0.js",
+      "_vendor-BcRoqoUt.js",
+      "_vue-router-Cy7m1zhD.js",
+      "_pinia-7tW7jnxY.js",
+      "_reka-ui-EJjFXrwz.js"
     ],
     "css": [
-      "assets/main-CdoKB8nt.css"
+      "assets/main-DaQ7EUZt.css"
     ],
     "assets": [
       "assets/logo-9UY93egM.png",

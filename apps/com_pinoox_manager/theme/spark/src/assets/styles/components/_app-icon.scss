@@ -33,6 +33,35 @@
     border-radius: calc(var(--app-icon-radius) - 2px);
     user-select: none;
     -webkit-user-drag: none;
+    transition: opacity 0.22s ease;
+  }
+
+  &__skeleton {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--app-icon-image-scale, 100%);
+    height: var(--app-icon-image-scale, 100%);
+    transform: translate(-50%, -50%);
+    border-radius: 22%;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.28) 50%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
+    background-size: 200% 100%;
+    animation: appIconShimmer 1.15s ease-in-out infinite;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+
+  &--loading {
+    position: relative;
+
+    .appIcon__image {
+      opacity: 0;
+    }
   }
 
   &--custom-image {
@@ -43,24 +72,31 @@
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     overflow: visible;
+    position: relative;
     --app-icon-image-scale: 84%;
     --app-icon-image-shadow:
       drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
       drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
 
-    .appIcon__image {
+    .appIcon__image,
+    .appIcon__skeleton {
       width: var(--app-icon-image-scale);
       height: var(--app-icon-image-scale);
       border-radius: 22%;
+    }
+
+    .appIcon__image {
       filter: var(--app-icon-image-shadow);
     }
   }
 
-  &--custom-image.appIcon--xs .appIcon__image {
+  &--custom-image.appIcon--xs .appIcon__image,
+  &--custom-image.appIcon--xs .appIcon__skeleton {
     border-radius: 28%;
   }
 
-  &--custom-image.appIcon--sm .appIcon__image {
+  &--custom-image.appIcon--sm .appIcon__image,
+  &--custom-image.appIcon--sm .appIcon__skeleton {
     border-radius: 26%;
   }
 
@@ -68,7 +104,8 @@
   &--custom-image.appIcon--lg,
   &--custom-image.appIcon--xl,
   &--custom-image.appIcon--tray {
-    .appIcon__image {
+    .appIcon__image,
+    .appIcon__skeleton {
       border-radius: 22%;
     }
   }
@@ -79,7 +116,8 @@
     flex: 0 0 88%;
     align-self: center;
 
-    .appIcon__image {
+    .appIcon__image,
+    .appIcon__skeleton {
       border-radius: 22%;
       margin: auto;
       object-fit: contain;
@@ -444,5 +482,15 @@
   [role='button']:hover .appIcon,
   .cursor-pointer:hover .appIcon {
     transform: scale(1.05);
+  }
+}
+
+@keyframes appIconShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
   }
 }

@@ -38,6 +38,10 @@ return collect(['flow' => ['manager.auth']], function () {
             post('/changeInfo', 'changeInfo')->name('changeInfo');
             post('/changePassword', 'changePassword')->name('changePassword');
             get('/getUsers/{packageName}', 'getUsers')->name('getUsers.packageName');
+            post('/create/{packageName}', 'createUser')->name('create.packageName');
+            post('/update/{packageName}/{userId}', 'updateUser')->name('update.packageName.userId');
+            post('/delete/{packageName}/{userId}', 'deleteUser')->name('delete.packageName.userId');
+            post('/rolePermissions/{packageName}/{roleId}', 'saveRolePermissions')->name('rolePermissions.packageName.roleId');
         });
 
     group('/options')
@@ -77,8 +81,10 @@ return collect(['flow' => ['manager.auth']], function () {
             get('/getConfig/{packageName}', 'getConfig')->name('getConfig.packageName');
             post('/setConfig/{packageName}/{key}', 'setConfig')->name('setConfig.packageName.key');
             post('/install', 'install')->name('install');
-            get('/packageMeta/{filename}', 'packageMeta')->name('packageMeta.filename');
-            get('/installPackage/{filename}', 'installPackage')->name('installPackage.filename');
+            post('/packageMeta', 'packageMeta')->name('packageMeta');
+            get('/installPackage/{filename}', 'installPackage')
+                ->name('installPackage.filename')
+                ->filters(['filename' => '[^/]+']);
             post('/installPackage/start', 'installPackageStart')->name('installPackage.start');
             get('/installPackage/status/{installId}', 'installPackageStatus')->name('installPackage.status');
             post('/database/checkPrefix', 'checkDatabasePrefix')->name('database.checkPrefix');
@@ -100,7 +106,9 @@ return collect(['flow' => ['manager.auth']], function () {
                     post('/abort/{uploadId}', 'abort')->name('abort');
                 });
 
+            get('/usage/{packageName}', 'usage')->name('usage.packageName');
             post('/remove/{packageName}', 'remove')->name('remove.packageName');
+            post('/reset/{packageName}', 'reset')->name('reset.packageName');
         });
 
     group('/router')

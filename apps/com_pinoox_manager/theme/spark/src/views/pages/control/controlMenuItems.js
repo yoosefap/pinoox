@@ -1,57 +1,37 @@
-import { lucideSidebar } from '@/const/icons.js';
+import { resolveLucideComponent } from '@/utils/lucideIcon.js';
+import { h } from 'vue';
+
+function makeLucideIcon(name) {
+    const comp = resolveLucideComponent(name);
+    if (!comp) return null;
+    return {
+        element: { render: () => h(comp, { size: 18, strokeWidth: 1.75, color: 'currentColor' }) },
+        class: '',
+    };
+}
 
 export const controlMenuItems = [
+    { href: '/control/widgets', title: 'ویجت‌ها',     lucide: 'layout-grid' },
+    { href: '/control/apps',    title: 'اپلیکیشن‌ها', lucide: 'boxes' },
+    { href: '/control/routes',  title: 'مسیریابی',    lucide: 'route' },
     {
-        href: '/control/widgets',
-        title: 'ویجت‌ها',
-        iconName: lucideSidebar.widgets,
-    },
-    {
-        href: '/control/apps',
-        title: 'اپلیکیشن‌ها',
-        iconName: lucideSidebar.apps,
-    },
-    {
-        href: '/control/routes',
-        title: 'مسیریابی',
-        iconName: lucideSidebar.routes,
-    },
-    {
-        title: 'تنظیمات',
-        iconName: lucideSidebar.setting,
+        title: 'تنظیمات', lucide: 'settings',
         children: [
-            {
-                href: '/control/settings/appearance',
-                title: 'ظاهر و زمینه',
-            },
-            {
-                href: '/control/settings/application',
-                title: 'تنظیمات اپلیکیشن',
-            },
+            { href: '/control/settings/appearance',  title: 'ظاهر و زمینه' },
+            { href: '/control/settings/application', title: 'تنظیمات اپلیکیشن' },
         ],
     },
-    {
-        href: '/control/profile',
-        title: 'حساب کاربری',
-        iconName: lucideSidebar.profile,
-    },
-    {
-        href: '/control/pincore',
-        title: 'پینوکس',
-        iconName: lucideSidebar.pincore,
-    },
-    {
-        href: '/market',
-        title: 'مارکت',
-        iconName: lucideSidebar.market,
-    },
+    { href: '/control/profile', title: 'حساب کاربری', lucide: 'user' },
+    { href: '/control/pincore', title: 'پینوکس',       lucide: 'code' },
+    { href: '/market',          title: 'مارکت',        lucide: 'store' },
 ];
 
 export function toSidebarMenuItems() {
     return controlMenuItems.map((item) => {
         const base = {
             title: item.title,
-            attributes: { 'aria-label': item.title },
+            icon: makeLucideIcon(item.lucide),
+            attributes: { 'aria-label': item.title, 'data-tooltip': item.title },
         };
 
         if (item.children) {

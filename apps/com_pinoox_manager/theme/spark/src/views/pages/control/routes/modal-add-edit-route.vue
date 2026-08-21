@@ -4,14 +4,14 @@
         size="sm"
         :class="['modalRoutes', { 'modalRoutes--saving': isSaving || isDone }]"
     >
-        <div v-if="!props.hasSelectApp" class="modalRoutes__steps" aria-hidden="true">
+        <div v-if="!props.hasSelectApp && !hasLockedPackage" class="modalRoutes__steps" aria-hidden="true">
             <span class="modalRoutes__step" :class="{ 'is-active': currentStep === 1, 'is-done': currentStep > 1 || isSaving || isDone }">۱. آدرس</span>
             <span class="modalRoutes__stepLine"/>
             <span class="modalRoutes__step" :class="{ 'is-active': currentStep === 2, 'is-done': isSaving || isDone }">۲. برنامه</span>
         </div>
 
         <div v-if="currentStep === 1" class="form">
-            <p class="modalRoutes__hint">آدرسی را بنویسید که می‌خواهید در مرورگر باز شود.</p>
+            <p class="modalRoutes__hint">آدرسی بنویسید که مردم در مرورگر باز کنند؛ مثلاً shop یا blog.</p>
             <Input
                     type="text"
                     v-model="params.path"
@@ -23,15 +23,47 @@
             <p v-if="isDuplicatePath" class="modalRoutes__pathWarn" role="alert">
                 {{ duplicatePathMessage }}
             </p>
+            <p v-if="hasLockedPackage" class="modalRoutes__hint modalRoutes__hint--locked">
+                این لینک برنامهٔ <strong>{{ lockedAppLabel }}</strong> را باز می‌کند.
+            </p>
             <div class="flex justify-end mt-4 gap-2">
                 <Button @click="closeModal" label="بستن" variant="dark"/>
-                <Button @click="goToNextStep" :is-disabled="!canProceedStep1" label="انتخاب برنامه" variant="primary"/>
+                <Button
+                    v-if="hasLockedPackage"
+                    @click="saveFromLockedStep"
+                    :is-disabled="!canProceedStep1"
+                    label="ذخیره"
+                    variant="primary"
+                />
+                <Button
+                    v-else
+                    @click="goToNextStep"
+                    :is-disabled="!canProceedStep1"
+                    label="بعدی"
+                    variant="primary"
+                />
             </div>
         </div>
 
         <div v-else class="modalRoutes__stepPanel">
             <Transition name="modalRoutesSave" mode="out-in">
-                <div v-if="!isSaving && !isDone" key="picker" class="form">
+                <div v-if="!isSaving && !isDone && hasLockedPackage" key="locked" class="form">
+                    <p class="modalRoutes__hint">
+                        با باز کردن <code>{{ routePreview }}</code>، برنامهٔ <strong>{{ lockedAppLabel }}</strong> دیده می‌شود.
+                    </p>
+                    <div class="flex justify-between mt-4 gap-2">
+                        <Button @click="goToPreviousStep" label="بازگشت" variant="dark"/>
+                        <Button
+                            type="button"
+                            :is-disabled="!canSave"
+                            label="ذخیره"
+                            variant="primary"
+                            @click="save"
+                        />
+                    </div>
+                </div>
+
+                <div v-else-if="!isSaving && !isDone" key="picker" class="form">
                     <p class="modalRoutes__hint">
                         <span v-if="props.hasSelectApp">وقتی کسی آدرس اصلی سایت را باز می‌کند، کدام برنامه نمایش داده شود؟</span>
                         <span v-else>با باز کردن <code>{{ routePreview }}</code> کدام برنامه نمایش داده شود؟</span>
@@ -166,6 +198,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    lockedPackage: {
+        type: String,
+        default: null,
+    },
 });
 
 const {confirm} = useModalContext();
@@ -188,6 +224,8 @@ const currentStep = ref(1);
 const isSaving = ref(false);
 const isDone = ref(false);
 
+const hasLockedPackage = computed(() => Boolean(props.lockedPackage));
+
 const isEditingRoute = computed(() => Boolean(props.payload?.path) && !props.hasSelectApp);
 
 const isEditingHomeRoute = computed(() => props.hasSelectApp || props.payload?.path === '/');
@@ -195,6 +233,11 @@ const isEditingHomeRoute = computed(() => props.hasSelectApp || props.payload?.p
 const selectedApp = computed(() => appStore.fetchAppByPackage(params.value.packageName));
 
 const selectedAppLabel = computed(() => resolveAppDisplayLabel(selectedApp.value, params.value.packageName));
+
+const lockedAppLabel = computed(() => resolveAppDisplayLabel(
+    appStore.fetchAppByPackage(props.lockedPackage),
+    props.lockedPackage,
+));
 
 const filteredApps = computed(() => {
     const routes = routeStore.routeList;
@@ -326,12 +369,31 @@ const goToPreviousStep = () => {
     currentStep.value = 1;
 };
 
+const saveFromLockedStep = async () => {
+    if (!canProceedStep1.value) {
+        if (!canGoNext.value) {
+            toastError('لطفاً آدرس را وارد کنید.');
+        } else if (isDuplicatePath.value) {
+            toastError(duplicatePathMessage.value);
+        }
+        return;
+    }
+
+    if (props.lockedPackage) {
+        params.value.packageName = props.lockedPackage;
+    }
+
+    currentStep.value = 2;
+    await nextTick();
+    await save();
+};
+
 const resetForm = (data = null) => {
     const homePath = data?.path === '/' ? '/' : (data?.path ?? '');
 
     params.value = {
         path: homePath,
-        packageName: data?.package ?? null,
+        packageName: data?.package ?? props.lockedPackage ?? null,
         oldPath: data?.is_implicit ? '' : homePath,
     };
     searchQuery.value = '';
@@ -341,7 +403,7 @@ const resetForm = (data = null) => {
 };
 
 watch(
-    () => [props.payload, props.hasSelectApp],
+    () => [props.payload, props.hasSelectApp, props.lockedPackage],
     ([data]) => {
         resetForm(data);
     },
@@ -351,6 +413,10 @@ watch(
 onMounted(async () => {
     if (!appStore.isLoaded) {
         await appStore.getApps();
+    }
+
+    if (!routeStore.isLoaded) {
+        await routeStore.getRoutes();
     }
 });
 
@@ -451,7 +517,8 @@ const saveSuccessMessage = computed(() => {
 });
 
 const title = computed(() => {
-    if (props.hasSelectApp) return 'برنامهٔ صفحه اصلی';
-    return isEdit.value ? 'ویرایش آدرس' : 'افزودن آدرس جدید';
+    if (props.hasSelectApp) return 'برنامهٔ صفحهٔ اصلی';
+    if (hasLockedPackage.value) return 'ساخت آدرس برای این برنامه';
+    return isEdit.value ? 'ویرایش آدرس' : 'ساخت آدرس جدید';
 });
 </script>

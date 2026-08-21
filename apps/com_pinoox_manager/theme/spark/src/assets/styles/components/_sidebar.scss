@@ -69,6 +69,7 @@
     background: transparent !important;
     color: rgba(255, 255, 255, 0.72);
     transition: transform 0.22s ease;
+
   }
 
   .vsm--link_level-1.vsm--link_hover:not(.vsm--link_active) .vsm--icon {
@@ -132,6 +133,38 @@
     &:hover {
       opacity: 0.95;
       background: rgba(255, 255, 255, 0.06) !important;
+    }
+  }
+
+  &.vsm_collapsed .vsm--link_level-1[data-tooltip] {
+    position: relative;
+
+    &::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      inset-inline-end: calc(100% + 0.55rem);
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      background: rgba(19, 13, 11, 0.93);
+      backdrop-filter: blur(12px);
+      color: rgba(255, 255, 255, 0.93);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.32rem 0.65rem;
+      border-radius: 0.45rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      transform: translateY(-50%) translateX(4px);
+      z-index: 50;
+    }
+
+    &:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
     }
   }
 

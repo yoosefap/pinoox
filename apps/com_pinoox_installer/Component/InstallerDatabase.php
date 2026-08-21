@@ -177,25 +177,36 @@ final class InstallerDatabase
     /**
      * @param array<string, mixed> $input
      */
-    public static function testConnection(array $input): bool
+    public static function testConnection(array $input, ?string &$error = null): bool
     {
         $config = self::normalize($input);
 
         if (empty($config['database'])) {
+            $error = 'Database name is empty.';
+
             return false;
         }
 
-        if (!InstallerDatabase::extensionStatus(InstallerDatabase::connectionName($input))['available']) {
+        $status = self::extensionStatus(self::connectionName($input));
+        if (!$status['available']) {
+            $error = 'Host PHP is missing the PDO driver for ' . self::connectionName($input) . '.';
+
             return false;
         }
 
         try {
-            DB::addConnection($config);
-            DB::bootEloquent();
+            if (method_exists(DB::class, 'refreshCoreConnection')) {
+                DB::refreshCoreConnection($config);
+            } else {
+                DB::addConnection($config);
+                DB::bootEloquent();
+            }
             DB::connection()->getPdo();
 
             return true;
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $error = $e->getMessage();
+
             return false;
         }
     }

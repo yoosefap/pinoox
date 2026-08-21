@@ -70,4 +70,10 @@
     padding: 1rem;
     overflow-y: auto;
   }
+
+  &--noHeader {
+    .page__content {
+      padding-top: 0.85rem;
+    }
+  }
 }

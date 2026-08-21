@@ -4,7 +4,6 @@ import vue from '@vitejs/plugin-vue';
 import pinoox from '@pinooxhq/vite-plugin';
 import { pinooxVueTemplateOptions } from '@pinooxhq/vite-plugin/vue';
 import Components from 'unplugin-vue-components/vite';
-import commonjs from 'vite-plugin-commonjs';
 import { babel } from '@rollup/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -18,7 +17,6 @@ export default defineConfig({
                 },
             },
         })),
-        commonjs(),
         babel({ babelHelpers: 'bundled' }),
         tailwindcss(),
         Components({
@@ -26,23 +24,43 @@ export default defineConfig({
         }),
     ],
     build: {
-        rollupOptions: {
+        chunkSizeWarningLimit: 1000,
+        rolldownOptions: {
+            checks: {
+                invalidAnnotation: false,
+            },
             output: {
                 manualChunks(id) {
                     if (id.includes('@kyvg/vue3-notification')) {
                         return undefined;
                     }
-
-                    if (id.includes('vendor')) {
-                        return 'plugins';
+                    if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/')) {
+                        return 'vue-core';
                     }
-
-                    if (id.includes('node_modules')) {
+                    if (id.includes('node_modules/vue-router/')) {
+                        return 'vue-router';
+                    }
+                    if (id.includes('node_modules/pinia/')) {
+                        return 'pinia';
+                    }
+                    if (id.includes('node_modules/@vueuse/')) {
+                        return 'vueuse';
+                    }
+                    if (id.includes('node_modules/reka-ui/')) {
+                        return 'reka-ui';
+                    }
+                    if (id.includes('node_modules/lucide-vue-next/')) {
+                        return 'lucide';
+                    }
+                    if (id.includes('node_modules/')) {
                         return 'vendor';
                     }
                 },
             },
         },
+    },
+    optimizeDeps: {
+        exclude: ['@vueuse/core'],
     },
     resolve: {
         dedupe: ['vue', '@kyvg/vue3-notification'],

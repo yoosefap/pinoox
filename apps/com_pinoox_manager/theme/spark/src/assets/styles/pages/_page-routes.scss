@@ -617,6 +617,21 @@
       direction: ltr;
       unicode-bidi: isolate;
     }
+
+    &--locked {
+      margin-top: 0.75rem;
+      margin-bottom: 0;
+      padding: 0.55rem 0.7rem;
+      border-radius: 0.65rem;
+      border: 1px solid rgba(var(--color-primary-rgb), 0.28);
+      background: rgba(var(--color-primary-rgb), 0.1);
+      font-size: 0.78rem;
+
+      strong {
+        font-weight: 700;
+        color: #fff;
+      }
+    }
   }
 
   .modalRoutes__pathWarn {

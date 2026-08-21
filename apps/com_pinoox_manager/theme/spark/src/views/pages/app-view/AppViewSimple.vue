@@ -43,7 +43,7 @@
           ref="frameRef"
           class="appView__iframe"
           :src="embedUrl"
-          :title="app?.name || 'پیش‌نمایش اپ'"
+          :title="app?.name || 'مشاهده برنامه'"
           @load="handleFrameLoad"
       ></iframe>
     </div>
@@ -91,6 +91,18 @@ const app = computed(() =>
 const embedUrl = computed(() => buildSecretViewEmbedUrl(props.package_name));
 
 function closePreview() {
+  const returnTo = window.history.state?.returnTo;
+
+  if (typeof returnTo === 'string' && returnTo.startsWith('/')) {
+    router.push(returnTo);
+    return;
+  }
+
+  if (router.options.history.state.back != null) {
+    router.back();
+    return;
+  }
+
   router.push({name: 'desktop'});
 }
 

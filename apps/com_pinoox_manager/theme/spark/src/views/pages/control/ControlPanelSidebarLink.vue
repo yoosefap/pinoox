@@ -25,7 +25,7 @@ const emit = defineEmits(['click']);
 
 const globalRouter = useRouter();
 const {pushControlPath} = useControlPanelNavigation();
-const {openMarket} = useMarket();
+const {openMarketFromControl} = useMarket();
 
 async function onClick(event) {
     emit('click', event);
@@ -37,7 +37,7 @@ async function onClick(event) {
     event.preventDefault();
 
     if (props.item.href === '/market') {
-        await openMarket();
+        await openMarketFromControl();
         return;
     }
 

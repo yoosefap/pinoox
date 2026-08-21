@@ -11,6 +11,7 @@ import AppDetails from '@/views/pages/app-manager/app-details.vue';
 import AppConfig from '@/views/pages/app-manager/app-config.vue';
 import AppUsers from '@/views/pages/app-manager/app-users.vue';
 import AppTemplates from '@/views/pages/app-manager/app-templates.vue';
+import AppData from '@/views/pages/app-manager/app-data.vue';
 
 export function createAppManagerChildRoutes() {
     return [
@@ -36,6 +37,12 @@ export function createAppManagerChildRoutes() {
             path: 'templates',
             name: 'app-templates',
             component: AppTemplates,
+            props: true,
+        },
+        {
+            path: 'data',
+            name: 'app-data',
+            component: AppData,
             props: true,
         },
         {

@@ -10,27 +10,31 @@
         'appIcon--lucide-crystal': showLucide && isLucideCrystal,
         'appIcon--lucide-gradient': showLucide && isLucideGradient,
         'appIcon--custom-image': isCustomImage,
+        'appIcon--loading': isImageLoading,
       }]"
 
       :style="rootStyle"
+      :aria-busy="isImageLoading"
 
   >
 
-    <img
-
-        v-if="showImage"
-
-        :src="src"
-
-        :alt="alt"
-
-        class="appIcon__image"
-
-        loading="lazy"
-
-        draggable="false"
-
-    />
+    <template v-if="showImage">
+      <img
+          ref="imageEl"
+          :src="src"
+          :alt="alt"
+          class="appIcon__image"
+          loading="lazy"
+          draggable="false"
+          @load="onImageLoad"
+          @error="onImageError"
+      />
+      <span
+          v-if="isImageLoading"
+          class="appIcon__skeleton"
+          aria-hidden="true"
+      />
+    </template>
 
     <span v-else-if="showLucide" class="appIcon__lucide" aria-hidden="true">
       <component
@@ -62,7 +66,7 @@
 
 <script setup>
 
-import {computed} from 'vue';
+import {computed, nextTick, ref, watch} from 'vue';
 
 import Icon from '@/views/components/widgets/Icon.vue';
 
@@ -213,13 +217,61 @@ const props = defineProps({
 
 
 
+const imageEl = ref(null);
+const imageReady = ref(false);
+const imageFailed = ref(false);
+
 const lucideComponent = computed(() => resolveLucideComponent(props.lucide));
 
-const showImage = computed(() => props.iconSource === 'custom' && Boolean(props.src));
+const showImage = computed(() =>
+    props.iconSource === 'custom' && Boolean(props.src) && !imageFailed.value,
+);
+
+const isImageLoading = computed(() => showImage.value && !imageReady.value);
 
 const showLucide = computed(() =>
     props.iconSource !== 'custom' && Boolean(props.lucide) && Boolean(lucideComponent.value),
 );
+
+function syncImageFromElement() {
+  const el = imageEl.value;
+  if (!el) {
+    return;
+  }
+  if (el.complete && el.naturalWidth > 0) {
+    imageReady.value = true;
+    return;
+  }
+  if (el.complete) {
+    imageFailed.value = true;
+  }
+}
+
+function onImageLoad() {
+  imageReady.value = true;
+}
+
+function onImageError() {
+  imageFailed.value = true;
+  imageReady.value = false;
+}
+
+watch(
+    () => [props.src, props.iconSource],
+    async () => {
+      imageReady.value = false;
+      imageFailed.value = false;
+      await nextTick();
+      syncImageFromElement();
+    },
+    {immediate: true},
+);
+
+watch(imageEl, (el) => {
+  if (el) {
+    syncImageFromElement();
+  }
+});
 
 const showGlyph = computed(() => !showLucide.value && !showImage.value && Boolean(props.glyph));
 

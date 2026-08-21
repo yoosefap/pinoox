@@ -15,7 +15,7 @@
       :shell-compact="layout.isCompact"
       :on-rect-commit="commitRect"
       :on-focus="actions.focusWindow"
-      @close="actions.close"
+      @close="closeMarket"
       @minimize="onMinimize"
       @toggle-float="onToggleFloat"
   >
@@ -38,7 +38,7 @@ import {fitControlPanelRectAboveDock} from '@/stores/modules/controlPanelLayout.
 import {useControlPanelLayoutStore} from '@/stores/modules/controlPanelLayout.js';
 import {useControlPanelShellLayout} from '@/views/composables/useControlPanelShellLayout.js';
 import {useManagerWindowActions} from '@/views/composables/useManagerWindowActions.js';
-import {isMarketRoute} from '@/views/composables/useMarket.js';
+import {isMarketRoute, useMarket} from '@/views/composables/useMarket.js';
 import MarketPanelShell from '@/views/pages/market/MarketPanelShell.vue';
 
 const props = defineProps({
@@ -67,6 +67,7 @@ const shellRef = computed(() => windowRef.value?.shellRef ?? null);
 
 const sessionRect = computed(() => (props.advanced ? marketWindow.rect : null));
 
+const {closeMarket} = useMarket();
 const actions = useManagerWindowActions({
   windowStore: marketWindow,
   isRouteActive: isMarketRoute,

@@ -1,5 +1,5 @@
 <template>
-  <PageSection title="قالب‌ها">
+  <PageSection :title="translate('app_templates')">
     <div v-if="isLoading && !hasCachedData" class="appManagerSectionLoading">
       <WidgetLoading/>
     </div>
@@ -46,7 +46,7 @@
         </article>
       </div>
 
-      <PageEmpty v-else title="قالبی یافت نشد"/>
+      <PageEmpty v-else :title="translate('app_templates_empty')"/>
     </div>
   </PageSection>
 </template>
