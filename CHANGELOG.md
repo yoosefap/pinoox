@@ -1,6 +1,45 @@
 # Release Notes
 
-## [Unreleased](https://github.com/pinoox/pinoox/compare/3.3.6...master)
+## [Unreleased](https://github.com/pinoox/pinoox/compare/3.4.0...master)
+
+## [v3.4.0 (2026-08-21)](https://github.com/pinoox/pinoox/releases/tag/3.4.0)
+
+## Added
+
+- Add **Pinroll** (`pinoox/pinroll`) for atomic release rollout, rollback, and PinGate delivery — now a production dependency.
+- Add **`php pinoox install-platform`** — first-time setup from a local config file (same steps as the web installer): `init`, `check`, `run` (`-r` deletes the config after success).
+- Add **app user management** in Manager: search, sort, roles, grouped permissions, free-text group keys, and optional DB role select.
+- Add **app reset** and optional storage purge on uninstall, wired to app lifecycle hooks.
+- Add **private app preview** and a clearer “view from here” control for app URLs.
+- Add a **route from app details** when the app has no addresses yet.
+- Add a GitHub Action that **builds a platform zip** on published releases (PHP 8.3, Node 24).
+- Warn in Manager when granting app users access that also unlocks the control panel login.
+
+## Changed
+
+- Redesign **Manager app details**: clickable public URLs, compact meta chips, unified header, and the danger zone moved into the data tab with storage stats.
+- Replace Manager icon libraries with **lucide-vue-next** only; thinner sidebar icons and collapsed-state tooltips.
+- Wire the Manager **spark** theme to **`@pinooxhq/auth`**.
+- Persist installer DB credentials to `pinker/stable`, disable the installer app after setup, and swap app-router to welcome/manager.
+- Bump the kernel constraint to **`pinoox/pincore` ^3.8** and add a shebang so the `pinoox` CLI can run directly.
+- Keep production `vendor/pincore` when a local `.pincore` path is invalid; boot storage via `StorageSetup::ensure`.
+- Raise the platform release workflow to **PHP 8.3** and **Node 24**.
+
+## Fixed
+
+- Fix installer setup errors (real exception messages), core DB connectivity before the connection test, locale from `app.php`, scroll and cloud background, and `ApiResource` request signature.
+- Fix Pinx install preview: extract package icons to public storage and post `packageMeta` so the filename reaches the API.
+- Fix Manager market panel returning to the control panel, Vue chunk splitting (`manualChunks` / vue-axios CJS), JWT `token_key` for app-view preview, and all HTTP methods on app-view proxy routes.
+- Fix app-manager copy and labels, users table layout, role-list contrast, and `purgeStorage` class collision on uninstall.
+- Fix pincore helper loading from Composer autoload.
+- Restore the installer backend that was removed in the Pinx Inspector commit.
+
+## Notes
+
+- Platform distribution **3.4.0** (`platform/pinoox.config.php`). Kernel ships via **`pinoox/pincore` ^3.8**.
+- Production deploy tool: **`pinoox/pinroll` ^1.1**.
+- Optional dev tools: `pinoox/pinx-inspector` ^1.3, `pinoox/devdb` ^1.4.
+- First-time setup: web installer, or `php pinoox install-platform init` then `run`.
 
 ## [v3.3.6 (2026-07-08)](https://github.com/pinoox/pinoox/releases/tag/3.3.6)
 
