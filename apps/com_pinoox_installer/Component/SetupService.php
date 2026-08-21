@@ -28,16 +28,14 @@ final class SetupService
         @set_time_limit(600);
         ignore_user_abort(true);
 
-        if (!$this->prepareDatabase($dbInput)) {
-            throw new SetupException('install.err_insert_tables');
-        }
+        $this->prepareDatabase($dbInput);
 
         try {
             $this->migrateTables();
             $this->runPatches();
 
             if (!$this->ensureAdminUser($userInput)) {
-                throw new SetupException('install.err_insert_tables');
+                throw new SetupException('install.err_insert_tables', 'Could not create the admin user.');
             }
 
             $this->configureApps($lang);
@@ -50,7 +48,7 @@ final class SetupService
                 'patch_path' => SystemConfig::platformPath('patches'),
             ]);
 
-            throw new SetupException('install.err_provision');
+            throw new SetupException('install.err_provision', $e->getMessage(), $e);
         }
 
         try {
@@ -60,34 +58,41 @@ final class SetupService
                 'exception' => $e,
             ]);
 
-            throw new SetupException('install.err_provision');
+            throw new SetupException('install.err_provision', $e->getMessage(), $e);
         }
     }
 
     /**
      * @param array<string, mixed> $dbInput
      */
-    private function prepareDatabase(array $dbInput): bool
+    private function prepareDatabase(array $dbInput): void
     {
         if ($dbInput === []) {
-            return false;
+            throw new SetupException('install.err_insert_tables', 'Database credentials were empty.');
         }
 
         $config = InstallerDatabase::normalize($dbInput);
         $connectionName = InstallerDatabase::connectionName($dbInput);
+        $this->applyInstallConnection($connectionName, $config);
 
-        if (!InstallerDatabase::testConnection($dbInput)) {
-            return false;
+        $error = null;
+        if (!InstallerDatabase::testConnection($dbInput, $error)) {
+            throw new SetupException(
+                'install.err_insert_tables',
+                'Database connection failed: ' . ($error ?: 'unknown error'),
+            );
         }
 
-        if (!DatabaseCredentialsSync::persist($config, $connectionName)) {
-            return false;
+        if (!DatabaseCredentialsSync::persist($config, $connectionName)
+            && !$this->persistDatabaseFallback($config, $connectionName)
+        ) {
+            throw new SetupException(
+                'install.err_insert_tables',
+                'Could not write pinker/stable/platform/database.config.php (check permissions).',
+            );
         }
 
-        $this->applyInstallConnection($connectionName);
         $this->reconnectDatabase($config);
-
-        return true;
     }
 
     private function migrateTables(): void
@@ -95,7 +100,7 @@ final class SetupService
         $this->provisioner()->provisionCore(['skip_patch' => true]);
 
         if (!$this->coreTablesReady()) {
-            throw new SetupException('install.err_insert_tables');
+            throw new SetupException('install.err_insert_tables', 'Core tables were not created after migration.');
         }
 
         $this->provisioner()->migratePackages($this->projectPackages());
@@ -145,18 +150,64 @@ final class SetupService
     private function reconnectDatabase(array $config): void
     {
         SystemConfig::clearCache();
-        DB::refreshCoreConnection($config);
+        if (method_exists(DB::class, 'refreshCoreConnection')) {
+            DB::refreshCoreConnection($config);
+
+            return;
+        }
+
+        DB::addConnection($config, 'default');
+        DB::addConnection($config, 'platform');
+        DB::bootEloquent();
     }
 
-    private function applyInstallConnection(string $connectionName): void
+    private function applyInstallConnection(string $connectionName, array $config = []): void
     {
-        foreach (['DB_CONNECTION'] as $key) {
-            $_ENV[$key] = $connectionName;
-            $_SERVER[$key] = $connectionName;
-            putenv($key . '=' . $connectionName);
+        $vars = [
+            'APP_ENV' => 'production',
+            'MODE' => 'production',
+            'DB_CONNECTION' => $connectionName,
+            'DB_HOST' => (string) ($config['host'] ?? ''),
+            'DB_PORT' => (string) ($config['port'] ?? ''),
+            'DB_DATABASE' => (string) ($config['database'] ?? ''),
+            'DB_USERNAME' => (string) ($config['username'] ?? ''),
+            'DB_PASSWORD' => (string) ($config['password'] ?? ''),
+            'DB_PREFIX' => (string) ($config['prefix'] ?? ''),
+            'DB_TIMEZONE' => (string) ($config['timezone'] ?? ''),
+        ];
+
+        foreach ($vars as $key => $value) {
+            if ($value === '' && $key !== 'DB_PASSWORD') {
+                continue;
+            }
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+            putenv($key . '=' . $value);
         }
 
         SystemConfig::clearCache();
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function persistDatabaseFallback(array $config, string $connectionName): bool
+    {
+        $file = SystemConfig::pinkerStableConfigPath('database');
+        $dir = dirname($file);
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            return false;
+        }
+
+        $payload = [
+            'default' => $connectionName,
+            'connections' => [
+                $connectionName => $config,
+            ],
+        ];
+        $export = var_export($payload, true);
+
+        return @file_put_contents($file, "<?php\n\nreturn {$export};\n") !== false;
     }
 
     private function coreTablesReady(): bool

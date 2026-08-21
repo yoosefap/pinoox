@@ -3,13 +3,18 @@
 namespace App\com_pinoox_installer\Component;
 
 use RuntimeException;
+use Throwable;
 
 final class SetupException extends RuntimeException
 {
     public function __construct(
         private readonly string $messageKey,
+        string $detail = '',
+        ?Throwable $previous = null,
     ) {
-        parent::__construct($messageKey);
+        $message = $detail !== '' ? $messageKey . ': ' . $detail : $messageKey;
+
+        parent::__construct($message, 0, $previous);
     }
 
     public function messageKey(): string
@@ -17,4 +22,3 @@ final class SetupException extends RuntimeException
         return $this->messageKey;
     }
 }
-
